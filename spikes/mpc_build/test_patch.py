@@ -120,3 +120,43 @@ def test_write_uses_gzip_header_of_device() -> None:
     packed = patch.pack(patch.render(project()))
     assert packed[:10].hex() == "1f8b0800000000000003"
     assert gzip.decompress(packed).decode() == HEADER + BODY
+
+
+def program() -> dict:
+    layer = {"sampleName": "", "sampleFile": "", "sliceInfo": {"End": 0}, "rootNote": 0,
+             "keyTrackEnable": False, "velocityStart": 0, "velocityEnd": 127}
+    blank = {"lowNote": 0, "highNote": 127, "layersv": [dict(layer, sliceInfo={"End": 0}) for _ in range(2)]}
+    return {
+        "name": "P",
+        "samples": [],
+        "keygroup": {"numKeygroups": 5},
+        "drum": {"instruments": [copy.deepcopy(blank) for _ in range(6)]},
+    }
+
+
+ENTRY = {"name": "S", "path": "S.wav", "metadata": {"rootNote": 60}}
+
+
+def test_keygroup_is_one_zone_with_root() -> None:
+    item = program()
+    item["drum"]["instruments"][1]["lowNote"] = 42
+    patch.set_keygroup(item, ENTRY, 100, root=48, key_track=True)
+    zone = item["drum"]["instruments"][0]
+    assert (zone["lowNote"], zone["highNote"]) == (0, 127)
+    assert zone["layersv"][0]["sampleFile"] == "S.wav"
+    assert zone["layersv"][0]["rootNote"] == 48
+    assert zone["layersv"][0]["keyTrackEnable"] is True
+    assert zone["layersv"][0]["sliceInfo"]["End"] == 99
+    assert item["keygroup"]["numKeygroups"] == 1
+    assert item["samples"] == [ENTRY]
+
+
+def test_velocity_layers_split_range() -> None:
+    item = program()
+    other = dict(ENTRY, name="T", path="T.wav")
+    patch.set_velocity_layers(item, 2, [(ENTRY, 10), (other, 20)])
+    layers = item["drum"]["instruments"][2]["layersv"]
+    assert [(x["velocityStart"], x["velocityEnd"]) for x in layers] == [(0, 63), (64, 127)]
+    assert [x["sliceInfo"]["End"] for x in layers] == [9, 19]
+    assert [s["path"] for s in item["samples"]] == ["S.wav", "T.wav"]
+
