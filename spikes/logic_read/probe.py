@@ -9,6 +9,7 @@
     probe.py tags <project.logicx> [--alt NNN]
     probe.py tree <project.logicx> [--alt NNN]
     probe.py regions <project.logicx> [--alt NNN]
+    probe.py notes <project.logicx> [--alt NNN]
     probe.py diff <a.logicx> <b.logicx> [--alt NNN]
     probe.py hash <project.logicx> ...
 """
@@ -253,6 +254,12 @@ def placements(body: bytes) -> list[int]:
     return found
 
 
+def midi_length(payload: bytes) -> int:
+    """Длина в тиках. Поля за именем сдвигаются: имя выравнивается по чётной длине."""
+    name_end = 0x12 + (u16(payload, 0x10) + 1 & ~1)
+    return u32(payload, name_end + 0x3C)
+
+
 def regions(records: list[Record]) -> list[Region]:
     """Обход от корневого списка, папки регионов раскрываются рекурсивно.
 
@@ -271,7 +278,7 @@ def regions(records: list[Record]) -> list[Region]:
         for offset in placements(body):
             tick = base + u32(body, offset + 4) - REGION_ORIGIN
             own_row = row if row is not None else u16(body, offset + 0x14) - 1
-            audible = not u32(body, offset + 0x0C) & 0x10
+            audible = not u32(body, offset + 0x0C) & 1
             if body[offset] == 0x24:
                 file_index = u32(body, offset + 0x2C)
                 number = u32(body, offset + 0x28)
@@ -288,10 +295,86 @@ def regions(records: list[Record]) -> list[Region]:
             if child in lists and placements(lists[child].payload):
                 visit(child, tick, own_row, depth + 1, seen)
                 continue
-            length = u32(sequence.payload, 0x56) if sequence else None
+            length = midi_length(sequence.payload) if sequence else None
             found.append(Region("midi", name, tick, own_row, length, depth, audible))
 
     visit(0x40000, 0, None, 0, set())
+    return found
+
+
+@dataclass(frozen=True)
+class NoteEvent:
+    tick: int
+    pitch: int
+    velocity: int
+    length: int
+    channel: int
+
+
+def sequence_notes(body: bytes) -> list[NoteEvent]:
+    """Ноты списка событий, позиции от начала региона. Шаг 16 байт, метка 0x89 в +0x17."""
+    notes = []
+    for offset in range(0, len(body) - 31, 16):
+        if body[offset] & 0xF0 != 0x90 or body[offset + 1] not in (0, 0x40):
+            continue
+        if body[offset + 0x17] != 0x89:
+            continue
+        tick = u32(body, offset + 4) - TEMPO_ORIGIN
+        channel = body[offset] & 0x0F
+        velocity, pitch = body[offset + 0x0B], body[offset + 0x0C]
+        notes.append(NoteEvent(tick, pitch, velocity, u32(body, offset + 0x1C), channel))
+    return notes
+
+
+@dataclass(frozen=True)
+class RegionNotes:
+    name: str | None
+    tick: int
+    row: int
+    muted: bool
+    notes: list[NoteEvent]
+
+
+def region_notes(records: list[Record]) -> list[RegionNotes]:
+    """Ноты MIDI-регионов верхнего уровня с параметрами. Выключенные не отбрасываются.
+
+    Параметры в размещении: +0x0c бит 0 Mute, бит 0x1000 Loop, +0x1c длина повторов,
+    +0x35 транспонирование. Алиас: +0x08 указывает на чужую последовательность.
+    Смысл полей подтверждён единичными примерами, см. docs/spikes.md.
+    """
+    lists = {r.idx: r for r in records if r.tag == "qSvE" and r.role == 0x17}
+    sequences = {r.idx: r for r in records if r.tag == "qeSM" and r.role == 0x17}
+    body = lists[0x40000].payload
+    found = []
+    for offset in placements(body):
+        if body[offset] != 0x20:
+            continue
+        flags = u32(body, offset + 0x0C)
+        child = u32(body, offset + 0x20) << 16
+        if child not in lists or child not in sequences:
+            continue
+        if placements(lists[child].payload):
+            continue
+        name = sized_string(sequences[child].payload, 0x10)
+        tick = u32(body, offset + 4) - REGION_ORIGIN
+        row = u16(body, offset + 0x14) - 1
+        source = u32(body, offset + 0x08) << 16
+        if source == 0 or source not in lists:
+            source = child
+        transpose = struct.unpack_from("<b", body, offset + 0x35)[0]
+        notes = [
+            NoteEvent(n.tick, n.pitch + transpose, n.velocity, n.length, n.channel)
+            for n in sequence_notes(lists[source].payload)
+        ]
+        muted = bool(flags & 1)
+        found.append(RegionNotes(name, tick, row, muted, notes))
+        if flags & 0x1000:
+            length = midi_length(sequences[child].payload)
+            extra = u32(body, offset + 0x1C)
+            for start in range(length, extra + length, length):
+                visible = [n for n in notes if n.tick < extra + length - start]
+                if visible:
+                    found.append(RegionNotes(name, tick + start, row, muted, visible))
     return found
 
 
@@ -352,6 +435,18 @@ def cmd_regions(args: argparse.Namespace) -> None:
         )
 
 
+def cmd_notes(args: argparse.Namespace) -> None:
+    _, data = load(args.project, args.alt)
+    for region in region_notes(walk(data)):
+        muted = ", Mute" if region.muted else ""
+        print(
+            f"{region.name}: строка {region.row}, такт {bars(region.tick):.2f}, "
+            f"нот {len(region.notes)}{muted}"
+        )
+        for note in region.notes[: args.limit]:
+            print(f"  {note}")
+
+
 def keyed(records: list[Record]) -> dict[tuple[str, int, int, int, int], Record]:
     seen: Counter[tuple[str, int, int, int]] = Counter()
     result = {}
@@ -400,6 +495,11 @@ def main() -> None:
     region_list.add_argument("project", type=Path)
     region_list.add_argument("--alt")
     region_list.set_defaults(run=cmd_regions)
+    note_list = commands.add_parser("notes")
+    note_list.add_argument("project", type=Path)
+    note_list.add_argument("--alt")
+    note_list.add_argument("--limit", type=int, default=20)
+    note_list.set_defaults(run=cmd_notes)
     tree = commands.add_parser("tree")
     tree.add_argument("project", type=Path)
     tree.add_argument("--alt")
