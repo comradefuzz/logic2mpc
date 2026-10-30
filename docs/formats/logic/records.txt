@@ -1,0 +1,60 @@
+2347c0abcb09030004000000010008002c85020000000000 size-24==@10: True Spike Control 1 region.logicx
+2347c0abcb0903000400000001000800207a020000000000 size-24==@10: True 001
+2347c0abcb0903000400000001000800247a020000000000 size-24==@10: True Spike Control 1 region.logicx
+2347c0abcb09030004000000010008002c85020000000000 size-24==@10: True Spike Control 2 length.logicx
+2347c0abcb0903000400000001000800207a020000000000 size-24==@10: True 001
+2347c0abcb0903000400000001000800247a020000000000 size-24==@10: True Spike Control 2 length.logicx
+2347c0abcb0903000400000001000800378a020000000000 size-24==@10: True 000
+2347c0abcb09030004000000010008002c9e020000000000 size-24==@10: True Spike Control 3 folder.logicx
+2347c0abcb0903000400000001000800207a020000000000 size-24==@10: True 001
+2347c0abcb0903000400000001000800247a020000000000 size-24==@10: True Spike Control 3 folder.logicx
+2347c0abcb09030004000000010008002c85020000000000 size-24==@10: True 000
+2347c0abcb0903000400000001000800c692020000000000 size-24==@10: True 000
+2347c0abcb0903000400000001000800c692020000000000 size-24==@10: True Spike Control 4 midi.logicx
+2347c0abcb0903000400000001000800207a020000000000 size-24==@10: True 001
+2347c0abcb0903000400000001000800247a020000000000 size-24==@10: True Spike Control 4 midi.logicx
+2347c0abcb0903000400000001000800127a020000000000 size-24==@10: True Spike Control.logicx
+2347c0abcb0903000400000001000800207a020000000000 size-24==@10: True 001
+2347c0abcb0903000400000001000800247a020000000000 size-24==@10: True Spike Control.logicx
+2347c0abcb09030004000000010008004c00450000000000 size-24==@10: True Fuzz - Elated.logicx
+2347c0abcb090300040000000100080030b0d70000000000 size-24==@10: True Fuzz - Pyro.logicx
+2347c0abc4090300040000000100080033753f0000000000 size-24==@10: True MONTERO.logicx
+MneG GenM role=0x001e n=1633 size=38..10860 sizes=64
+MroC CorM role=0x000e n=42 size=106..406 sizes=3
+OCuA AuCO role=0x000e n=7093 size=14..264 sizes=15
+OgnS SngO role=0x000e n=46 size=1206..716626 sizes=13
+UCuA AuCU role=0x000e n=2559 size=44..3028192 sizes=372
+ddAG GAdd role=0x0022 n=1224 size=5..20 sizes=3
+dirG Grid role=0x0022 n=1 size=36..36 sizes=1
+dlFA AFld role=0x000e n=1 size=3430..3430 sizes=1
+ediV Vide role=0x000e n=21 size=130..130 sizes=1
+gRuA AuRg role=0x000b n=2849 size=204..278 sizes=33
+gnoS Song role=0xffff n=21 size=3716..3716 sizes=1
+ivnE Envi role=0x0014 n=776 size=178..2290 sizes=47
+karT Trak role=0x0017 n=3511 size=0..57 sizes=3
+lFuA AuFl role=0x000b n=499 size=598..742 sizes=55
+lytS Styl role=0x000c n=672 size=100..270 sizes=13
+nCuA AuCn role=0x000e n=273 size=132..4016 sizes=7
+pilC Clip role=0x0007 n=6 size=85..85 sizes=1
+qSvE EvSq role=0x0001 n=58 size=16..192 sizes=3
+qSvE EvSq role=0x0003 n=22 size=48..144 sizes=4
+qSvE EvSq role=0x0005 n=21 size=16..16 sizes=1
+qSvE EvSq role=0x000e n=21 size=16..16 sizes=1
+qSvE EvSq role=0x0016 n=62 size=16..736 sizes=4
+qSvE EvSq role=0x0017 n=1466 size=16..298176 sizes=127
+qSvE EvSq role=0x0019 n=42 size=16..16 sizes=1
+qSxT TxSq role=0x0020 n=244 size=100..566 sizes=12
+qeSM MSeq role=0x0001 n=58 size=304..304 sizes=1
+qeSM MSeq role=0x0003 n=22 size=304..304 sizes=1
+qeSM MSeq role=0x0005 n=21 size=304..304 sizes=1
+qeSM MSeq role=0x000e n=21 size=296..296 sizes=1
+qeSM MSeq role=0x0016 n=62 size=304..304 sizes=1
+qeSM MSeq role=0x0017 n=1466 size=296..352 sizes=17
+qeSM MSeq role=0x0019 n=42 size=304..304 sizes=1
+rpyH Hypr role=0x000f n=63 size=200..6194 sizes=3
+ryaL Layr role=0x000e n=21 size=228..228 sizes=1
+snrT Trns role=0x000a n=3 size=492..492 sizes=1
+tScS ScSt role=0x000e n=21 size=3752..3752 sizes=1
+tSnI InSt role=0x0002 n=21 size=64..64 sizes=1
+tSxT TxSt role=0x0004 n=672 size=142..154 sizes=6
+vEuA AuEv role=0x0000 n=58 size=52..52 sizes=1
