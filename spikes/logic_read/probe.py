@@ -10,6 +10,7 @@
     probe.py tree <project.logicx> [--alt NNN]
     probe.py regions <project.logicx> [--alt NNN]
     probe.py notes <project.logicx> [--alt NNN]
+    probe.py positions <project.logicx> --track NAME [--row N] [--alt NNN]
     probe.py diff <a.logicx> <b.logicx> [--alt NNN]
     probe.py hash <project.logicx> ...
 """
@@ -17,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import plistlib
 import re
 import struct
@@ -31,6 +33,7 @@ RECORD_HEADER = 36
 TAIL = 0xF1
 TEMPO_ORIGIN = 38400
 REGION_ORIGIN = 34560
+LOOP = 0x200
 PPQ = 960
 
 
@@ -260,17 +263,27 @@ def midi_length(payload: bytes) -> int:
     return u32(payload, name_end + 0x3C)
 
 
+def loop_passes(length: int, flags: int, total: int) -> list[int]:
+    """Начала проходов региона от его начала. `total` полная длина с повторами."""
+    if not flags & LOOP or length <= 0:
+        return [0]
+    return list(range(0, total, length))
+
+
 def regions(records: list[Record]) -> list[Region]:
     """Обход от корневого списка, папки регионов раскрываются рекурсивно.
 
     Длина: у MIDI тики из qeSM, у аудио кадры исходника из gRuA.
+    Слышимость учитывает Mute папки и её длину.
     """
     lists = {r.idx: r for r in records if r.tag == "qSvE" and r.role == 0x17}
     sequences = {r.idx: r for r in records if r.tag == "qeSM" and r.role == 0x17}
     audio = {(r.idx, u32(r.raw, 0x0C)): r for r in records if r.tag == "gRuA"}
     found: list[Region] = []
 
-    def visit(idx: int, base: int, row: int | None, depth: int, seen: set[int]) -> None:
+    def visit(
+        idx: int, base: int, row: int | None, depth: int, seen: set[int], parent: tuple[bool, int | None]
+    ) -> None:
         if idx in seen or idx not in lists:
             return
         seen = seen | {idx}
@@ -278,7 +291,9 @@ def regions(records: list[Record]) -> list[Region]:
         for offset in placements(body):
             tick = base + u32(body, offset + 4) - REGION_ORIGIN
             own_row = row if row is not None else u16(body, offset + 0x14) - 1
-            audible = not u32(body, offset + 0x0C) & 1
+            muted, limit = parent
+            relative = tick - base
+            audible = not muted and not u32(body, offset + 0x0C) & 1 and (limit is None or relative < limit)
             if body[offset] == 0x24:
                 file_index = u32(body, offset + 0x2C)
                 number = u32(body, offset + 0x28)
@@ -293,13 +308,68 @@ def regions(records: list[Record]) -> list[Region]:
             if name == "*Automation":
                 continue
             if child in lists and placements(lists[child].payload):
-                visit(child, tick, own_row, depth + 1, seen)
+                length = midi_length(sequence.payload) if sequence else None
+                inner = length if limit is None or length is None else min(length, limit - relative)
+                visit(child, tick, own_row, depth + 1, seen, (not audible, inner))
                 continue
             length = midi_length(sequence.payload) if sequence else None
             found.append(Region("midi", name, tick, own_row, length, depth, audible))
 
-    visit(0x40000, 0, None, 0, set())
+    visit(0x40000, 0, None, 0, set(), (False, None))
     return found
+
+
+@dataclass(frozen=True)
+class Position:
+    tick: int
+    row: int
+    name: str | None
+    loop_end: int | None
+
+
+def audio_positions(records: list[Record]) -> list[Position]:
+    """Слышимые аудиорегионы на таймлайне: папки с Loop развёрнуты, Mute и длина папки учтены.
+
+    Аудиорегион с Loop остаётся одной позицией с концом: его период в файле не найден, см. LOGIC-044.
+    """
+    lists = {r.idx: r for r in records if r.tag == "qSvE" and r.role == 0x17}
+    sequences = {r.idx: r for r in records if r.tag == "qeSM" and r.role == 0x17}
+    audio = {(r.idx, u32(r.raw, 0x0C)): r for r in records if r.tag == "gRuA"}
+    found: list[Position] = []
+
+    def visit(idx: int, base: int, row: int | None, limit: int | None, seen: set[int]) -> None:
+        if idx in seen or idx not in lists:
+            return
+        seen = seen | {idx}
+        body = lists[idx].payload
+        for offset in placements(body):
+            flags = u32(body, offset + 0x0C)
+            relative = u32(body, offset + 4) - REGION_ORIGIN
+            if flags & 1 or (limit is not None and relative >= limit):
+                continue
+            tick = base + relative
+            own_row = row if row is not None else u16(body, offset + 0x14) - 1
+            total = u32(body, offset + 0x1C)
+            if body[offset] == 0x24:
+                target = audio.get((u32(body, offset + 0x2C) << 16, u32(body, offset + 0x28) << 16))
+                name = sized_string(target.payload, 0x4A) if target else None
+                found.append(Position(tick, own_row, name, tick + total if flags & LOOP else None))
+                continue
+            child = u32(body, offset + 0x20) << 16
+            sequence = sequences.get(child)
+            if sequence is None or child not in lists or not placements(lists[child].payload):
+                continue
+            length = midi_length(sequence.payload)
+            end = total if flags & LOOP else length
+            for start in loop_passes(length, flags, total):
+                room = min(length, end - start)
+                if limit is not None:
+                    room = min(room, limit - relative - start)
+                if room > 0:
+                    visit(child, tick + start, own_row, room, seen)
+
+    visit(0x40000, 0, None, None, set())
+    return sorted(found, key=lambda p: (p.row, p.tick))
 
 
 @dataclass(frozen=True)
@@ -336,45 +406,63 @@ class RegionNotes:
 
 
 def region_notes(records: list[Record]) -> list[RegionNotes]:
-    """Ноты MIDI-регионов верхнего уровня с параметрами. Выключенные не отбрасываются.
+    """Ноты MIDI-регионов с параметрами, папки раскрываются. Выключенные не отбрасываются.
 
-    Параметры в размещении: +0x0c бит 0 Mute, бит 0x1000 Loop, +0x1c длина повторов,
+    Параметры в размещении: +0x0c бит 0 Mute, бит 0x200 Loop, +0x1c полная длина с повторами,
     +0x35 транспонирование. Алиас: +0x08 указывает на чужую последовательность.
     Смысл полей подтверждён единичными примерами, см. docs/spikes.md.
     """
     lists = {r.idx: r for r in records if r.tag == "qSvE" and r.role == 0x17}
     sequences = {r.idx: r for r in records if r.tag == "qeSM" and r.role == 0x17}
-    body = lists[0x40000].payload
     found = []
-    for offset in placements(body):
-        if body[offset] != 0x20:
-            continue
-        flags = u32(body, offset + 0x0C)
-        child = u32(body, offset + 0x20) << 16
-        if child not in lists or child not in sequences:
-            continue
-        if placements(lists[child].payload):
-            continue
-        name = sized_string(sequences[child].payload, 0x10)
-        tick = u32(body, offset + 4) - REGION_ORIGIN
-        row = u16(body, offset + 0x14) - 1
-        source = u32(body, offset + 0x08) << 16
-        if source == 0 or source not in lists:
-            source = child
-        transpose = struct.unpack_from("<b", body, offset + 0x35)[0]
-        notes = [
-            NoteEvent(n.tick, n.pitch + transpose, n.velocity, n.length, n.channel)
-            for n in sequence_notes(lists[source].payload)
-        ]
-        muted = bool(flags & 1)
-        found.append(RegionNotes(name, tick, row, muted, notes))
-        if flags & 0x1000:
+
+    def visit(idx: int, base: int, row: int | None, limit: int | None, parent_muted: bool, seen: set[int]) -> None:
+        if idx in seen or idx not in lists:
+            return
+        seen = seen | {idx}
+        body = lists[idx].payload
+        for offset in placements(body):
+            if body[offset] != 0x20:
+                continue
+            flags = u32(body, offset + 0x0C)
+            child = u32(body, offset + 0x20) << 16
+            relative = u32(body, offset + 4) - REGION_ORIGIN
+            if child not in lists or child not in sequences:
+                continue
+            if limit is not None and relative >= limit:
+                continue
+            tick = base + relative
+            own_row = row if row is not None else u16(body, offset + 0x14) - 1
+            muted = parent_muted or bool(flags & 1)
             length = midi_length(sequences[child].payload)
-            extra = u32(body, offset + 0x1C)
-            for start in range(length, extra + length, length):
-                visible = [n for n in notes if n.tick < extra + length - start]
+            total = u32(body, offset + 0x1C)
+            if placements(lists[child].payload):
+                end = total if flags & LOOP else length
+                for start in loop_passes(length, flags, total):
+                    room = min(length, end - start)
+                    if limit is not None:
+                        room = min(room, limit - relative - start)
+                    if room > 0:
+                        visit(child, tick + start, own_row, room, muted, seen)
+                continue
+            name = sized_string(sequences[child].payload, 0x10)
+            source = u32(body, offset + 0x08) << 16
+            if source == 0 or source not in lists:
+                source = child
+            transpose = struct.unpack_from("<b", body, offset + 0x35)[0]
+            notes = [
+                NoteEvent(n.tick, n.pitch + transpose, n.velocity, n.length, n.channel)
+                for n in sequence_notes(lists[source].payload)
+                if limit is None or relative + n.tick < limit
+            ]
+            found.append(RegionNotes(name, tick, own_row, muted, notes))
+            for start in loop_passes(length, flags, total)[1:]:
+                end = total - start if limit is None else min(total - start, limit - relative - start)
+                visible = [n for n in notes if n.tick < end]
                 if visible:
-                    found.append(RegionNotes(name, tick + start, row, muted, visible))
+                    found.append(RegionNotes(name, tick + start, own_row, muted, visible))
+
+    visit(0x40000, 0, None, None, False, set())
     return found
 
 
@@ -447,6 +535,39 @@ def cmd_notes(args: argparse.Namespace) -> None:
             print(f"  {note}")
 
 
+def cmd_positions(args: argparse.Namespace) -> None:
+    """Сетка дорожки для анализа: JSON с темпом, позициями и слышимыми нотами."""
+    _, data = load(args.project, args.alt)
+    records = walk(data)
+    rows = arrange_rows(records)
+    row = args.row
+    if row is None:
+        row = next(i for i, entry in enumerate(rows) if entry[2] == args.track)
+    tempo = tempo_map(records)
+    if len({bpm for _, bpm in tempo}) != 1:
+        sys.exit("анализ рассчитан на постоянный темп")
+    grid = {
+        "track": rows[row][2],
+        "row": row,
+        "bpm": tempo[0][1],
+        "positions": [
+            {"tick": p.tick, "name": p.name, "loop_end": p.loop_end}
+            for p in audio_positions(records)
+            if p.row == row
+        ],
+        "notes": sorted(
+            (
+                {"tick": r.tick + n.tick, "pitch": n.pitch, "velocity": n.velocity, "length": n.length}
+                for r in region_notes(records)
+                if r.row == row and not r.muted
+                for n in r.notes
+            ),
+            key=lambda n: (n["tick"], n["pitch"]),
+        ),
+    }
+    json.dump(grid, sys.stdout, ensure_ascii=False, indent=1)
+
+
 def keyed(records: list[Record]) -> dict[tuple[str, int, int, int, int], Record]:
     seen: Counter[tuple[str, int, int, int]] = Counter()
     result = {}
@@ -500,6 +621,12 @@ def main() -> None:
     note_list.add_argument("--alt")
     note_list.add_argument("--limit", type=int, default=20)
     note_list.set_defaults(run=cmd_notes)
+    position_list = commands.add_parser("positions")
+    position_list.add_argument("project", type=Path)
+    position_list.add_argument("--track")
+    position_list.add_argument("--row", type=int)
+    position_list.add_argument("--alt")
+    position_list.set_defaults(run=cmd_positions)
     tree = commands.add_parser("tree")
     tree.add_argument("project", type=Path)
     tree.add_argument("--alt")
