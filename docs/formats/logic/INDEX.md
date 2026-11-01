@@ -15,4 +15,4 @@
 | Перепись | [records.txt](records.txt), [layouts.txt](layouts.txt) | Все теги, роли, размеры, побайтовая разметка |
 | Реквесты | [requests/](requests/) | LOGIC-R-NNN |
 
-Главные пробелы: 16 тегов без смысла, поля `unknown` в заголовке и Trak, Mute дорожки, смещение региона в файле, Track Alternatives.
+Главные пробелы: 16 тегов без смысла, поля `unknown` в заголовке и Trak, Mute дорожки, Track Alternatives.

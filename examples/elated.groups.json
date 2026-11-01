@@ -1,0 +1,11 @@
+{
+ "song": "ELA",
+ "groups": {
+  "Drums": {"code": "DR", "method": "drum"},
+  "Bass": {"code": "BS", "method": "drum"},
+  "Synth": {"code": "SY", "method": "drum"},
+  "Lead": {"code": "SY", "method": "drum"},
+  "Keys": {"code": "SY", "method": "drum"},
+  "FX": {"code": "FX", "method": "drum"}
+ }
+}

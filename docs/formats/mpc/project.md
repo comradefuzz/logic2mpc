@@ -175,3 +175,10 @@
 | `ratchet` | 1 | Рэтчет | hypothesis |
 | `articulation` | 197 | Неизвестно | unknown |
 | `modifierValue0–15`, `modifierActiveState0–15`, `selectedModifierType` | постоянные | Модификаторы ноты | hypothesis |
+
+### MPC-035 Длина секвенции
+- status: hypothesis
+- applies: firmware 3.10.0.49, Live 2
+- evidence: MPC-R-001, S-010: поля записаны в сборке Elated, на Live 2 не открывалось; в образцах `lengthBars` 4 и 8, `loopEndBar` только 4, `loopEndPulses` только 15360, длина ноты 44–15360
+- fact: Длина секвенции задаётся полями `lengthBars`, `lengthPulses`, `loopEndBar`, `loopEndPulses` секвенции и `endPulses`, `loopEndPulses` каждого клипа. Сборка пишет их согласованно, конец цикла равен длине. Значения 16 тактов, 61440 тиков и длина ноты до 61440 вне образцов. Ключи секвенций по убыванию, как в `Rataklang - Brassic`. Поднять статус после открытия проекта на Live 2.
+- updated: 2026-11-02
