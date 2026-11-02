@@ -31,6 +31,7 @@ class PlanPiece:
     start_open: bool = False
     end_open: bool = False
     lead: int = 0
+    merged_into: str | None = None
 
 
 @dataclass
@@ -69,6 +70,18 @@ class Plan:
     notes_extended: int = 0
     notes_outside: int = 0
     muted_tracks: list[str] = field(default_factory=list)
+    edits: list[dict] = field(default_factory=list)
+
+
+def is_exported(piece: PlanPiece) -> bool:
+    """Кусок, слитый в другой, пэда не получает, но остаётся в плане (AN-070)."""
+    return piece.export and piece.merged_into is None
+
+
+def occurrences_of(track: PlanTrack, piece: PlanPiece) -> list[Occurrence]:
+    """Вхождения куска и всех кусков дорожки, слитых в него."""
+    found = [o for p in track.pieces if p is piece or p.merged_into == piece.name for o in p.occurrences]
+    return sorted(found, key=lambda o: o.tick)
 
 
 def to_json(plan: Plan) -> str:

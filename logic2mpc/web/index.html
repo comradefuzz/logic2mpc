@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Logic → MPC: план экспорта</title>
+<style>
+:root{--bg:#f6f5f2;--card:#fff;--line:#e2dfd8;--tx:#1f1e1b;--tx2:#6b6a64;--ac:#2f6fdb;--acbg:#e6effc;--warn:#9a5a00;--warnbg:#fdf0d8;--ok:#2d7a3e;--okbg:#e4f3e7}
+@media (prefers-color-scheme:dark){:root{--bg:#1b1b19;--card:#262623;--line:#3a3a36;--tx:#ecebe6;--tx2:#a3a29b;--ac:#6ea0f5;--acbg:#25344d;--warn:#f0b45a;--warnbg:#463a22;--ok:#7fd093;--okbg:#25382b}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button{font:inherit;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:7px;padding:5px 11px;cursor:pointer}
+button:hover{border-color:var(--tx2)}
+button.pri{background:var(--ac);border-color:var(--ac);color:#fff}
+button.ghost{border-color:transparent;background:transparent;padding:3px 7px;color:var(--tx2)}
+button.ghost:hover{color:var(--tx);background:var(--acbg)}
+input[type=checkbox]{accent-color:var(--ac);width:15px;height:15px;margin:0;cursor:pointer}
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding:10px 20px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+header h1{font-size:16px;font-weight:600;margin:0}
+.meta{color:var(--tx2);font-size:13px}
+.sp{flex:1}
+.pill{background:var(--card);border:1px solid var(--line);border-radius:99px;padding:2px 10px;font-size:12px;color:var(--tx2)}
+.bar{position:sticky;top:var(--hh,53px);z-index:4;margin:0 20px;padding:8px 12px;background:var(--acbg);border:1px solid var(--ac);border-radius:9px;display:none;gap:10px;align-items:center;margin-top:10px}
+.bar.on{display:flex}
+main{padding:14px 20px 60px;max-width:1040px;margin:0 auto}
+.hint{color:var(--tx2);font-size:13px;margin:0 0 12px}
+.grp{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:0 0 12px;transition:border-color .1s}
+.grp.over{border-color:var(--ac);box-shadow:0 0 0 2px var(--acbg)}
+.gh{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line)}
+.gname{font-weight:600;font-size:15px;cursor:text}
+.gname:hover{text-decoration:underline dotted}
+.ginp{font:inherit;font-weight:600;font-size:15px;border:1px solid var(--ac);border-radius:6px;padding:1px 6px;background:var(--card);color:var(--tx);width:170px}
+.gh .cnt{color:var(--tx2);font-size:12px}
+.trk{border-bottom:1px solid var(--line)}
+.trk:last-child{border-bottom:0}
+.th{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 10px;cursor:grab}
+.th.drag{opacity:.4}
+.grip{color:var(--tx2);cursor:grab;user-select:none;letter-spacing:-2px}
+.tn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.tn b{font-weight:500}
+.chev{transition:transform .1s;display:inline-block;color:var(--tx2);margin-right:2px}
+.trk.open .chev{transform:rotate(90deg)}
+select{font:inherit;font-size:12px;background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:6px;padding:2px 4px;max-width:120px}
+.pcs{display:none;padding:2px 12px 10px 38px}
+.trk.open .pcs{display:block}
+.sech{display:grid;grid-template-columns:22px 28px 190px 1fr 56px 70px;gap:8px;font-size:10px;color:var(--tx2)}
+.sech .secs{display:flex;gap:2px}
+.sech .secs span{overflow:hidden;white-space:nowrap;text-overflow:clip}
+.pc{display:grid;grid-template-columns:22px 28px 190px 1fr 56px 70px;gap:8px;align-items:center;padding:4px 0;border-top:1px dashed var(--line)}
+.pc.sel{background:var(--acbg);border-radius:6px}
+.pc .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc .nm small{color:var(--tx2)}
+.pc.low .nm{color:var(--warn)}
+.play{width:26px;height:26px;border-radius:50%;padding:0;display:grid;place-items:center;font-size:10px}
+.play.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.strip{display:flex;gap:2px;align-items:stretch}
+.seg{height:18px;border-radius:3px;background:var(--bg);border:1px solid var(--line);position:relative;overflow:hidden}
+.seg i{position:absolute;inset:0;background:var(--ac)}
+.seg.pr::after{content:"";position:absolute;top:0;bottom:0;left:var(--p);width:2px;background:var(--tx)}
+.badge{font-size:11px;border-radius:99px;padding:1px 8px;background:var(--okbg);color:var(--ok);white-space:nowrap}
+.badge.w{background:var(--warnbg);color:var(--warn)}
+.num{font-size:12px;color:var(--tx2);text-align:right}
+.prog{height:3px;background:var(--line);border-radius:2px;margin-top:2px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--ac);width:0}
+.log{position:fixed;left:20px;bottom:14px;background:var(--tx);color:var(--bg);padding:6px 12px;border-radius:8px;font-size:12px;opacity:0;transition:opacity .2s;pointer-events:none}
+.log.on{opacity:.95}
+.newg{border:1.5px dashed var(--line);border-radius:12px;padding:14px;text-align:center;color:var(--tx2);margin-bottom:12px}
+.newg.over{border-color:var(--ac);color:var(--ac)}
+.note{font-size:12px;color:var(--tx2);margin-top:6px}
+@media (max-width:720px){.pcs{padding-left:12px}.sech{display:none}.pc{grid-template-columns:22px 28px 1fr auto;grid-template-areas:'a b c d' '. . e f'}.pc>:nth-child(1){grid-area:a}.pc>:nth-child(2){grid-area:b}.pc>:nth-child(3){grid-area:c}.pc>:nth-child(4){grid-area:e}.pc>:nth-child(5){grid-area:d}.pc>:nth-child(6){grid-area:f}header{position:static}.bar{top:0}select{max-width:90px}}
+header .ok{color:var(--ok)}
+header .warn{color:var(--warn)}
+.rep{display:none;margin:12px 20px;max-width:1040px;max-height:45vh;overflow:auto;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:10px;white-space:pre-wrap;font:12px/1.5 ui-monospace,Menlo,monospace}
+.rep.on{display:block}
+.exp{flex-basis:100%;display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center;padding-top:8px;border-top:1px solid var(--line)}
+.exp label{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--tx2)}
+.exp label input{flex:1;font:13px ui-monospace,Menlo,monospace;color:var(--tx);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:4px 8px;min-width:0}
+.final{grid-column:1/-1;font:12px/1.4 ui-monospace,Menlo,monospace;color:var(--tx2);word-break:break-all}
+.final b{color:var(--tx);font-weight:500}
+.spin{display:inline-block;width:11px;height:11px;margin-right:7px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .8s linear infinite;vertical-align:-1px}
+@keyframes sp{to{transform:rotate(360deg)}}
+body.busy main,body.busy #bar{opacity:.5;pointer-events:none}
+.final .okmsg{color:var(--ok)}
+.tools{display:flex;gap:8px;margin:0 0 10px}
+.grp.col .gh{border-bottom:0}
+.chv{background:none;border:0;padding:0 4px;color:var(--tx2);cursor:pointer;font-size:12px;transition:transform .1s}
+.grp.col .chv{transform:rotate(-90deg)}
+body.dragging .newg{position:sticky;bottom:12px;background:var(--bg);z-index:3}
+.done{margin:10px 20px;padding:8px 12px;background:var(--okbg);color:var(--ok);border-radius:9px;display:none}
+.done.on{display:block}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="song"></h1>
+  <span class="meta" id="meta"></span>
+  <span class="sp"></span>
+  <span class="pill" id="sum"></span>
+  <button id="undo">Отменить</button>
+  <button id="rep">Отчёт</button>
+  <div class="exp" id="exp">
+    <label>Папка <input id="folder" type="text" placeholder="Выберите папку для проекта MPC" spellcheck="false"></label>
+    <button id="pick">Выбрать папку…</button>
+    <label>Имя проекта <input id="pname" type="text" spellcheck="false"></label>
+    <button class="pri" id="finish">Сохранить и собрать</button>
+    <button id="cancel" style="display:none">Отмена</button>
+    <div class="final" id="final"></div>
+  </div>
+</header>
+<div class="bar" id="bar"></div>
+<div class="done" id="done"></div>
+<div class="rep" id="report"></div>
+<main>
+  <p class="hint">Тащите дорожку за ⋮⋮ в другую группу или в пунктирную зону внизу. Клик по имени группы переименовывает. Галки у фрагментов одной дорожки включают объединение, галки у групп включают объединение групп. Правки хранятся в памяти. «Сохранить и собрать» сначала показывает отчёт о потерях, после «Подтвердить и собрать» записывает правки новой версией (прежняя не меняется), подтверждает её и собирает проект в выбранную папку.</p>
+  <div class="tools"><button id="colall">Свернуть все группы</button><button id="expall">Развернуть все группы</button></div>
+  <div id="groups"></div>
+  <div class="newg" id="newg">Перетащите дорожку сюда, чтобы создать новую группу</div>
+</main>
+<div class="log" id="log"></div>
+<audio id="au" preload="none"></audio>
+<script>
+let collapsed=new Set(),S=null,selG=new Set(),selP=new Set(),target=null,renaming=null,dragT=null,playing=null,openT=new Set(),openG=new Set();
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sum=a=>a.reduce((x,y)=>x+y,0);
+function say(t){const l=$('log');l.textContent=t;l.classList.add('on');clearTimeout(say.t);say.t=setTimeout(()=>l.classList.remove('on'),3500)}
+async function call(path,body){
+  const r=await fetch(path,{method:'POST',headers:{'content-type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});
+  let j=null;
+  try{j=await r.json()}catch(e){}
+  if(!r.ok){say((j&&j.error)||('ошибка сервера '+r.status));return null}
+  return j;
+}
+function cancelReview(){lastBuilt=null;$('done').className='done';if(armed){armed=false;$('report').classList.remove('on')}}
+function setBusy(on){
+  busy=on;document.body.classList.toggle('busy',on);clearInterval(busyTimer);
+  if(on){busyStart=Date.now();busyTimer=setInterval(renderExport,500)}
+  renderExport();
+}
+async function waitWhileBusy(){
+  setBusy(true);
+  while(true){await new Promise(r=>setTimeout(r,1000));const j=await (await fetch('/api/state')).json();if(!j.busy){S=j;break}}
+  setBusy(false);render();
+}
+$('cancel').onclick=()=>{cancelReview();renderExport()};
+async function edit(op,msg){const j=await call('/api/edit',op);if(j){cancelReview();S=j;if(msg)say(msg);render()}return j}
+const groups=()=>S.plan.groups;
+const pieces=t=>t.pieces;
+const visible=t=>t.pieces.filter(p=>!p.merged_into);
+const absorbed=(t,p)=>t.pieces.filter(x=>x.merged_into===p.name);
+const occ=(t,p)=>[p,...absorbed(t,p)].flatMap(x=>x.occurrences);
+function secCounts(list){
+  const st=S.plan.sections.map(s=>s.start);
+  const c=st.map(()=>0);
+  list.forEach(o=>{let k=0;st.forEach((s,i)=>{if(o.tick>=s)k=i});c[k]++});
+  return c;
+}
+function findPiece(name){for(const g of groups())for(const t of g.tracks)for(const p of t.pieces)if(p.name===name)return[g,t,p]}
+
+function render(){
+  $('song').textContent=S.plan.song;
+  $('meta').textContent=S.plan.bpm+' BPM · '+S.plan.sections.length+' секций · '+S.version;
+  let nt=0,np=0;groups().forEach(g=>g.tracks.forEach(t=>{nt++;np+=visible(t).length}));
+  $('sum').textContent=groups().length+' групп · '+nt+' дорожек · '+np+' фрагментов';
+  const st=S.dirty?'<span class="warn">есть несохранённые правки</span>':(S.confirmed?'<span class="ok">подтверждена</span>':'');
+  $('meta').innerHTML+=' · '+st;
+  $('undo').style.display=S.dirty?'':'none';
+  renderExport();
+  [...selG].forEach(n=>{if(!groups().some(g=>g.name===n))selG.delete(n)});
+  [...selP].forEach(n=>{if(!findPiece(n))selP.delete(n)});
+  const lockT=selP.size?findPiece([...selP][0])[1].row:null;
+  const root=$('groups');root.innerHTML='';
+  groups().forEach(g=>{
+    const el=document.createElement('section');el.className='grp'+(collapsed.has(g.name)?' col':'');el.dataset.g=g.name;
+    const n=S.pads[g.name];
+    let h='<div class="gh"><button class="chv" data-gc="'+esc(g.name)+'" title="'+(collapsed.has(g.name)?'Развернуть группу':'Свернуть группу')+'">▼</button><input type="checkbox" data-sg="'+esc(g.name)+'"'+(selG.has(g.name)?' checked':'')+' title="Выбрать для объединения">';
+    h+=renaming===g.name?'<input class="ginp" id="ren" value="'+esc(g.name)+'">':'<span class="gname" data-rn="'+esc(g.name)+'" title="Переименовать">'+esc(g.name)+'</span>';
+    h+='<span class="cnt">'+esc(g.code)+' · '+g.tracks.length+' дорожек · '+n+' пэдов</span><span class="sp"></span>';
+    h+='<button class="ghost" data-gt="'+esc(g.name)+'">'+(openG.has(g.name)?'Скрыть':'Показать')+' фрагменты</button></div>';
+    if(!collapsed.has(g.name))g.tracks.forEach(t=>{
+      const vis=visible(t),low=vis.filter(p=>p.confidence<0.5).length,isOpen=openT.has(t.row);
+      h+='<div class="trk'+(isOpen?' open':'')+'"><div class="th" draggable="true" data-dt="'+t.row+'"><span class="grip">⋮⋮</span>';
+      h+='<span class="tn" data-tt="'+t.row+'"><span class="chev">▸</span><b>'+esc(t.name)+'</b></span>';
+      h+=(low?'<span class="badge w">неуверенно: '+low+'</span>':'')+'<span class="num">'+vis.length+' фр.</span>';
+      h+='<select data-mv="'+t.row+'"><option value="">В группу…</option>'+groups().filter(x=>x!==g).map(x=>'<option value="'+esc(x.name)+'">'+esc(x.name)+'</option>').join('')+'</select></div>';
+      h+='<div class="pcs"><div class="sech"><span></span><span></span><span>фрагмент</span><div class="secs">'+S.plan.sections.map(s=>'<span style="flex:'+s.bars+'">'+esc(s.name)+'</span>').join('')+'</div><span></span><span></span></div>';
+      vis.forEach(p=>{
+        const ab=absorbed(t,p),all=occ(t,p),isP=playing===p.name,lk=lockT!==null&&lockT!==t.row;
+        h+='<div class="pc'+(selP.has(p.name)?' sel':'')+(p.confidence<0.5?' low':'')+'">';
+        h+='<input type="checkbox" data-sp="'+esc(p.name)+'"'+(selP.has(p.name)?' checked':'')+(lk?' disabled':'')+' title="'+(lk?'Объединять можно только фрагменты одной дорожки':'Выбрать для объединения')+'">';
+        h+='<button class="play'+(isP?' on':'')+'" data-pl="'+esc(p.name)+'" title="Прослушать">'+(isP?'■':'▶')+'</button>';
+        h+='<div class="nm" title="'+esc(p.name)+'">'+esc(p.name)+(ab.length?' <span class="badge">объединён: '+(ab.length+1)+'</span>':'')+(p.confidence<0.5?' <small>уверенность '+p.confidence+'</small>':'')+'<div class="prog"><i id="pg-'+esc(p.name)+'"></i></div></div>';
+        h+='<div class="strip">'+secCounts(all).map((c,k)=>'<div class="seg" style="flex:'+S.plan.sections[k].bars+'" title="'+esc(S.plan.sections[k].name)+': '+c+'">'+(c?'<i style="opacity:'+(0.25+0.75*Math.min(1,c/8)).toFixed(2)+'"></i>':'')+'</div>').join('')+'</div>';
+        h+='<span class="num">'+all.length+' вх.</span>';
+        h+=ab.length?'<button class="ghost" data-split="'+esc(p.name)+'" data-row="'+t.row+'" title="Вернуть объединённые фрагменты">Разделить</button>':'<span></span>';
+        h+='</div>';
+      });
+      h+='</div></div>';
+    });
+    el.innerHTML=h;root.appendChild(el);
+  });
+  if(renaming){const r=$('ren');if(r){r.focus();r.select()}}
+  renderBar();bind();
+}
+
+let nameTimer=null,armed=false,nameError=null,busy=false,busyStart=0,busyTimer=null,lastBuilt=null;
+const reviewing=()=>armed;
+function renderExport(){
+  const e=S.export;
+  if(document.activeElement!==$('folder'))$('folder').value=e.folder||'';
+  if(document.activeElement!==$('pname'))$('pname').value=e.name;
+  let h;
+  if(busy)h='<span class="spin"></span>Сохраняю версию, подтверждаю план, собираю проект… '+Math.round((Date.now()-busyStart)/1000)+' с. Не закрывайте страницу.';
+  else if(lastBuilt)h='<span class="okmsg">✓ Проект собран: <b>'+esc(lastBuilt)+'</b></span>';
+  else if(nameError)h='<span class="warn">'+esc(nameError)+'</span>';
+  else if(!e.project)h='Итог: выберите папку';
+  else h='Итог: <b>'+esc(e.project)+'</b><br>и папка <b>'+esc(e.data)+'/</b>'+(e.exists?'<br><span class="warn">Проект с таким именем уже есть: файл и папка данных будут заменены целиком</span>':'');
+  $('final').innerHTML=h;
+  $('finish').innerHTML=busy?'<span class="spin"></span>Собираю проект…':(armed?(e.exists?'Подтвердить и перезаписать':'Подтвердить и собрать'):'Сохранить и собрать');
+  $('finish').disabled=busy;$('pick').disabled=busy;$('pname').disabled=busy;$('folder').disabled=busy;
+  $('cancel').style.display=armed&&!busy?'':'none';
+  document.body.style.setProperty('--hh',document.querySelector('header').offsetHeight+'px');
+}
+async function setExport(body){
+  const e=S.export;
+  const changed=(body.name!==undefined&&body.name!==e.name)||(body.folder!==undefined&&body.folder!==e.folder);
+  if(!changed&&!nameError)return;
+  const r=await fetch('/api/export',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
+  const j=await r.json();
+  if(!r.ok){nameError=j.error;renderExport();return}
+  nameError=null;cancelReview();S=j;renderExport();
+}
+$('pname').oninput=()=>{clearTimeout(nameTimer);nameTimer=setTimeout(()=>setExport({name:$('pname').value}),250)};
+$('folder').onchange=()=>setExport({folder:$('folder').value.trim()});
+async function flushFields(){
+  clearTimeout(nameTimer);
+  await setExport({name:$('pname').value,folder:$('folder').value.trim()||null});
+  return !nameError;
+}
+async function refresh(){S=await (await fetch('/api/state')).json();render()}
+$('pick').onclick=async()=>{const j=await call('/api/pick-folder');if(j){S=j;nameError=null;cancelReview();renderExport()}};
+$('finish').onclick=async()=>{
+  if(!await flushFields()){say('Исправьте имя или папку проекта');return}
+  if(!S.export.folder){say('Выберите папку для проекта');return}
+  if(!armed){
+    await loadReport();$('report').classList.add('on');armed=true;renderExport();
+    $('report').scrollIntoView({behavior:'smooth',block:'start'});
+    say('Проверьте отчёт о потерях и подтвердите сборку');return;
+  }
+  const overwrite=S.export.exists;armed=false;
+  setBusy(true);
+  let j=null;
+  try{j=await call('/api/finish',{overwrite})}finally{setBusy(false)}
+  if(j){S=j;selP.clear();selG.clear();lastBuilt=j.project;$('report').classList.remove('on');$('done').textContent='Проект собран: '+j.project+'. Скопируйте .xpj и папку _[ProjectData] на SD-карту.';$('done').className='done on';loadReport();render();window.scrollTo({top:0,behavior:'smooth'});say('Проект собран')}
+  else await refresh();
+};
+
+function renderBar(){
+  const b=$('bar'),pcs=[...selP].map(findPiece).filter(Boolean);
+  let h='';
+  if(selG.size>1){const first=groups().find(g=>selG.has(g.name)).name;h+='<span>Групп выбрано: '+selG.size+'. Результат: «'+esc(first)+'»</span><button class="pri" id="mg">Объединить группы</button><button id="cg">Сбросить</button>'}
+  if(selP.size>1){
+    if(!selP.has(target))target=pcs[0][2].name;
+    h+='<div style="flex:1"><div style="font-weight:600;margin-bottom:4px">Объединение '+selP.size+' фрагментов из «'+esc(pcs[0][1].name)+'». Целевой: его звук и имя останутся</div>';
+    h+=pcs.map(x=>'<label style="display:block;cursor:pointer"><input type="radio" name="tg" data-tg="'+esc(x[2].name)+'"'+(x[2].name===target?' checked':'')+'> '+esc(x[2].name)+' <span style="color:var(--tx2)">· '+occ(x[1],x[2]).length+' вх.</span></label>').join('');
+    h+='<div class="note">Остальные фрагменты остаются в плане, но не экспортируются, их вхождения играет целевой. «Разделить» вернёт всё обратно.</div></div>';
+    h+='<button class="pri" id="mp">Объединить в «'+esc(target)+'»</button><button id="cp">Сбросить</button>';
+  }
+  b.className='bar'+(h?' on':'');b.innerHTML=h;
+  if($('mg'))$('mg').onclick=async()=>{const names=groups().filter(g=>selG.has(g.name)).map(g=>g.name);selG.clear();await edit({op:'merge_groups',groups:names},'Группы объединены в «'+names[0]+'»')};
+  if($('cg'))$('cg').onclick=()=>{selG.clear();render()};
+  if($('mp'))$('mp').onclick=async()=>{const[,t]=findPiece(target);const src=[...selP].filter(n=>n!==target);selP.clear();await edit({op:'merge_pieces',track:t.row,target,sources:src},'Фрагменты объединены в «'+target+'»')};
+  if($('cp'))$('cp').onclick=()=>{selP.clear();render()};
+  document.querySelectorAll('[data-tg]').forEach(r=>r.onchange=()=>{target=r.dataset.tg;renderBar()});
+}
+
+function bind(){
+  const all=(s,f)=>document.querySelectorAll(s).forEach(f);
+  all('[data-sg]',c=>c.onchange=()=>{c.checked?selG.add(c.dataset.sg):selG.delete(c.dataset.sg);renderBar()});
+  all('[data-sp]',c=>c.onchange=()=>{c.checked?selP.add(c.dataset.sp):selP.delete(c.dataset.sp);render()});
+  all('[data-tt]',c=>c.onclick=()=>{const r=+c.dataset.tt;openT.has(r)?openT.delete(r):openT.add(r);render()});
+  all('[data-gt]',c=>c.onclick=()=>{const g=groups().find(x=>x.name===c.dataset.gt);const open=!openG.has(g.name);open?openG.add(g.name):openG.delete(g.name);g.tracks.forEach(t=>open?openT.add(t.row):openT.delete(t.row));render()});
+  all('[data-gc]',c=>c.onclick=()=>{const n=c.dataset.gc;collapsed.has(n)?collapsed.delete(n):collapsed.add(n);render()});
+  all('[data-rn]',c=>c.onclick=()=>{renaming=c.dataset.rn;render()});
+  const r=$('ren');
+  if(r){const old=renaming;let busy=false;
+    const done=async ok=>{if(busy||renaming===null)return;busy=true;const v=r.value.trim();renaming=null;
+      if(ok&&v&&v!==old){const j=await edit({op:'rename_group',group:old,name:v},'Группа переименована: '+v);if(j){if(collapsed.delete(old))collapsed.add(v);render();return}}render()};
+    r.onkeydown=e=>{if(e.key==='Enter')done(true);if(e.key==='Escape')done(false)};r.onblur=()=>done(true)}
+  all('[data-mv]',c=>c.onchange=()=>{if(c.value)edit({op:'move_track',track:+c.dataset.mv,to:c.value},'Дорожка перенесена в «'+c.value+'»')});
+  all('[data-pl]',c=>c.onclick=()=>toggle(c.dataset.pl));
+  all('[data-split]',c=>c.onclick=()=>edit({op:'split_piece',track:+c.dataset.row,target:c.dataset.split},'Объединение снято'));
+  all('[data-dt]',c=>{c.ondragstart=e=>{dragT=+c.dataset.dt;document.body.classList.add('dragging');c.classList.add('drag');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',String(dragT))};c.ondragend=()=>{dragT=null;document.body.classList.remove('dragging');c.classList.remove('drag');all('.over',x=>x.classList.remove('over'))}});
+  all('.grp',c=>{c.ondragover=e=>{if(dragT!==null){e.preventDefault();c.classList.add('over')}};c.ondragleave=e=>{if(!c.contains(e.relatedTarget))c.classList.remove('over')};c.ondrop=e=>{e.preventDefault();c.classList.remove('over');if(dragT!==null)edit({op:'move_track',track:dragT,to:c.dataset.g},'Дорожка перенесена в «'+c.dataset.g+'»')}});
+  const ng=$('newg');
+  ng.ondragover=e=>{if(dragT!==null){e.preventDefault();ng.classList.add('over')}};ng.ondragleave=()=>ng.classList.remove('over');
+  ng.ondrop=e=>{e.preventDefault();ng.classList.remove('over');if(dragT!==null)edit({op:'move_track',track:dragT,to:null},'Создана новая группа')};
+}
+
+const au=$('au');
+function toggle(name){
+  const was=playing;au.pause();playing=null;
+  if(was!==name){playing=name;au.src='/api/audio?name='+encodeURIComponent(name);au.play().catch(()=>{say('Не удалось воспроизвести');playing=null;render()})}
+  render();
+}
+au.ontimeupdate=()=>{if(!playing||!au.duration)return;const e=document.getElementById('pg-'+playing);if(e)e.style.width=(100*au.currentTime/au.duration)+'%'};
+au.onended=()=>{playing=null;render()};
+
+$('colall').onclick=()=>{groups().forEach(g=>collapsed.add(g.name));render()};
+$('expall').onclick=()=>{collapsed.clear();render()};
+$('undo').onclick=async()=>{const j=await call('/api/undo');if(j){cancelReview();S=j;render()}};
+async function loadReport(){$('report').textContent=await (await fetch('/api/report')).text()}
+$('rep').onclick=async()=>{await loadReport();$('report').classList.toggle('on')};
+fetch('/api/state').then(r=>r.json()).then(j=>{if(!j.export){document.body.innerHTML='<p style="margin:20px;padding:12px;background:var(--warnbg);color:var(--warn);border-radius:9px">Сервер запущен старой версией кода и не знает панель «Экспорт». Остановите его (Ctrl+C) и запустите команду ui заново.</p>';return}S=j;if(groups().length){openG.add(groups()[0].name)}render();if(S.busy)waitWhileBusy()});
+</script>
+</body>
+</html>

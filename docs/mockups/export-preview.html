@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Logic → MPC: предэкспорт (макет)</title>
+<style>
+:root{--bg:#f6f5f2;--card:#fff;--line:#e2dfd8;--tx:#1f1e1b;--tx2:#6b6a64;--ac:#2f6fdb;--acbg:#e6effc;--warn:#9a5a00;--warnbg:#fdf0d8;--ok:#2d7a3e;--okbg:#e4f3e7}
+@media (prefers-color-scheme:dark){:root{--bg:#1b1b19;--card:#262623;--line:#3a3a36;--tx:#ecebe6;--tx2:#a3a29b;--ac:#6ea0f5;--acbg:#25344d;--warn:#f0b45a;--warnbg:#463a22;--ok:#7fd093;--okbg:#25382b}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button{font:inherit;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:7px;padding:5px 11px;cursor:pointer}
+button:hover{border-color:var(--tx2)}
+button.pri{background:var(--ac);border-color:var(--ac);color:#fff}
+button.ghost{border-color:transparent;background:transparent;padding:3px 7px;color:var(--tx2)}
+button.ghost:hover{color:var(--tx);background:var(--acbg)}
+input[type=checkbox]{accent-color:var(--ac);width:15px;height:15px;margin:0;cursor:pointer}
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding:10px 20px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+header h1{font-size:16px;font-weight:600;margin:0}
+.meta{color:var(--tx2);font-size:13px}
+.sp{flex:1}
+.pill{background:var(--card);border:1px solid var(--line);border-radius:99px;padding:2px 10px;font-size:12px;color:var(--tx2)}
+.bar{position:sticky;top:53px;z-index:4;margin:0 20px;padding:8px 12px;background:var(--acbg);border:1px solid var(--ac);border-radius:9px;display:none;gap:10px;align-items:center;margin-top:10px}
+.bar.on{display:flex}
+main{padding:14px 20px 60px;max-width:1040px;margin:0 auto}
+.hint{color:var(--tx2);font-size:13px;margin:0 0 12px}
+.grp{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:0 0 12px;transition:border-color .1s}
+.grp.over{border-color:var(--ac);box-shadow:0 0 0 2px var(--acbg)}
+.gh{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line)}
+.gname{font-weight:600;font-size:15px;cursor:text}
+.gname:hover{text-decoration:underline dotted}
+.ginp{font:inherit;font-weight:600;font-size:15px;border:1px solid var(--ac);border-radius:6px;padding:1px 6px;background:var(--card);color:var(--tx);width:170px}
+.gh .cnt{color:var(--tx2);font-size:12px}
+.trk{border-bottom:1px solid var(--line)}
+.trk:last-child{border-bottom:0}
+.th{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 10px;cursor:grab}
+.th.drag{opacity:.4}
+.grip{color:var(--tx2);cursor:grab;user-select:none;letter-spacing:-2px}
+.tn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.tn b{font-weight:500}
+.chev{transition:transform .1s;display:inline-block;color:var(--tx2);margin-right:2px}
+.trk.open .chev{transform:rotate(90deg)}
+select{font:inherit;font-size:12px;background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:6px;padding:2px 4px;max-width:120px}
+.pcs{display:none;padding:2px 12px 10px 38px}
+.trk.open .pcs{display:block}
+.sech{display:grid;grid-template-columns:22px 28px 190px 1fr 56px 70px;gap:8px;font-size:10px;color:var(--tx2)}
+.sech .secs{display:flex;gap:2px}
+.sech .secs span{overflow:hidden;white-space:nowrap;text-overflow:clip}
+.pc{display:grid;grid-template-columns:22px 28px 190px 1fr 56px 70px;gap:8px;align-items:center;padding:4px 0;border-top:1px dashed var(--line)}
+.pc.sel{background:var(--acbg);border-radius:6px}
+.pc .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc .nm small{color:var(--tx2)}
+.pc.low .nm{color:var(--warn)}
+.play{width:26px;height:26px;border-radius:50%;padding:0;display:grid;place-items:center;font-size:10px}
+.play.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.strip{display:flex;gap:2px;align-items:stretch}
+.seg{height:18px;border-radius:3px;background:var(--bg);border:1px solid var(--line);position:relative;overflow:hidden}
+.seg i{position:absolute;inset:0;background:var(--ac)}
+.seg.pr::after{content:"";position:absolute;top:0;bottom:0;left:var(--p);width:2px;background:var(--tx)}
+.badge{font-size:11px;border-radius:99px;padding:1px 8px;background:var(--okbg);color:var(--ok);white-space:nowrap}
+.badge.w{background:var(--warnbg);color:var(--warn)}
+.num{font-size:12px;color:var(--tx2);text-align:right}
+.prog{height:3px;background:var(--line);border-radius:2px;margin-top:2px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--ac);width:0}
+.log{position:fixed;left:20px;bottom:14px;background:var(--tx);color:var(--bg);padding:6px 12px;border-radius:8px;font-size:12px;opacity:0;transition:opacity .2s;pointer-events:none}
+.log.on{opacity:.95}
+.newg{border:1.5px dashed var(--line);border-radius:12px;padding:14px;text-align:center;color:var(--tx2);margin-bottom:12px}
+.newg.over{border-color:var(--ac);color:var(--ac)}
+.note{font-size:12px;color:var(--tx2);margin-top:6px}
+@media (max-width:720px){.pcs{padding-left:12px}.sech{display:none}.pc{grid-template-columns:22px 28px 1fr auto;grid-template-areas:'a b c d' '. . e f'}.pc>:nth-child(1){grid-area:a}.pc>:nth-child(2){grid-area:b}.pc>:nth-child(3){grid-area:c}.pc>:nth-child(4){grid-area:e}.pc>:nth-child(5){grid-area:d}.pc>:nth-child(6){grid-area:f}header{position:static}.bar{top:0}select{max-width:90px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Elated</h1>
+  <span class="meta">код ELA · 120 BPM · 4/4 · 10 секций · план v3</span>
+  <span class="sp"></span>
+  <span class="pill" id="sum"></span>
+  <button id="undo">Отменить</button>
+  <button class="pri" id="go">Подтвердить и собрать проект…</button>
+</header>
+<div class="bar" id="bar"></div>
+<main>
+  <p class="hint">Макет: данные из <code>plan/v3</code>, воспроизведение имитируется. Тащите дорожку за ⋮⋮ в другую группу или на пустую зону внизу. Клик по имени группы переименовывает. Галки у групп и фрагментов включают кнопки объединения вверху.</p>
+  <div id="groups"></div>
+  <div class="newg" id="newg">Перетащите дорожку сюда, чтобы создать новую группу</div>
+</main>
+<div class="log" id="log"></div>
+
+<script>
+const D={"sections":[["Intro",8],["Intro B",8],["Main A",16],["Bridge A",8],["Main B",16],["Main C",16],["Bridge B",16],["Main D",16],["Main E",16],["Outro",4]],"groups":[{"n":"Drums","t":[{"n":"DS_LENNO_drum_kick_nerve","p":[{"n":"KickNerve_01","o":[0,27,64,0,56,63,0,47,63,0],"c":1.0}]},{"n":"DS_LENNO_drum_clap_boys","p":[{"n":"ClapBoys_01","o":[16,15,32,0,31,32,0,27,32,0],"c":1.0}]},{"n":"DS_LENNO_drum_snare_package","p":[{"n":"SnarePackage_01","o":[0,0,32,0,28,32,0,12,32,0],"c":1.0}]},{"n":"HH","p":[{"n":"HH_01","o":[0,4,0,0,0,0,0,4,0,0],"c":1.0}]},{"n":"Audio 48","p":[{"n":"Audio48_01","o":[0,0,16,0,14,16,0,6,16,0],"c":1.0}]},{"n":"HH Meat","p":[{"n":"Meat_01","o":[0,0,8,0,7,8,0,3,8,0],"c":1.0}]},{"n":"shs_roam_breaks_loop_120_surge_full","p":[{"n":"ShsRoamBreaksSurge_01","o":[0,0,1,0,1,1,0,1,2,0],"c":0.98},{"n":"ShsRoamBreaksSurge_02","o":[0,0,1,0,1,1,0,1,2,0],"c":1.0},{"n":"ShsRoamBreaksSurge_03","o":[0,0,1,0,1,1,0,1,2,0],"c":1.0},{"n":"ShsRoamBreaksSurge_04","o":[0,0,1,0,0,1,0,0,2,0],"c":1.0}]},{"n":"JAFUNK_120_shaker_laid_back","p":[{"n":"ShakerLaidBack_01","o":[0,0,0,0,4,4,0,2,0,0],"c":1.0}]},{"n":"JAFUNK_120_tamborine_medium_crunch","p":[{"n":"TamborineMediumCrunch_01","o":[0,0,0,0,0,0,0,0,4,0],"c":1.0}]},{"n":"Fill B","p":[{"n":"FillB_01","o":[0,1,0,1,1,0,1,0,1,0],"c":1.0}]},{"n":"Fill JaBouncy","p":[{"n":"FillJaBouncy_01","o":[0,0,1,0,1,1,0,1,0,0],"c":1.0},{"n":"FillJaBouncy_02","o":[0,0,0,0,0,0,0,0,1,0],"c":1.0}]},{"n":"Fill Long","p":[{"n":"FillLong_01","o":[0,0,1,0,0,0,0,0,0,0],"c":1.0},{"n":"FillLong_02","o":[0,0,0,0,0,0,0,1,0,0],"c":1.0}]},{"n":"TS_VB_120_drum_soundstage_verb_coldsweat_variation_S1000_drum_breaks","p":[{"n":"SoundstageVerbColdsweatVariationS1000Breaks_01","o":[0,0,0,2,0,0,0,0,0,0],"c":1.0}]},{"n":"CC_120_drums_fills_buildup_snare_01","p":[{"n":"FillsBuildupSnare_01","o":[0,0,0,0,0,1,0,1,0,0],"c":1.0}]},{"n":"JAFUNK_110_fx_martian_downlifter_short","p":[{"n":"MartianDownlifterShort_01","o":[0,0,0,0,0,0,1,0,0,0],"c":1.0}]},{"n":"JAFUNK_120_fx_sweep","p":[{"n":"Sweep_01","o":[0,0,0,0,0,1,0,1,0,0],"c":1.0}]},{"n":"DSC_NGL_120_percussion_loop_claps_group","p":[{"n":"ClapsGroup_01","o":[0,0,0,0,0,0,4,0,0,0],"c":1.0}]},{"n":"SO_WA2_122_perc_shaker_bissap","p":[{"n":"ShakerBissap_01","o":[0,0,0,0,0,0,2,0,0,0],"c":1.0}]},{"n":"ESM_GFS_120_drums_stripped_loop_timeshifttiktoks_foley_rythmic_build_up","p":[{"n":"StrippedTimeshifttiktoksFoleyRythmicBuildUp_01","o":[0,0,0,0,0,0,1,0,0,0],"c":1.0}]},{"n":"Build Up","p":[{"n":"BuildUp_01","o":[0,0,0,0,0,0,1,0,0,0],"c":1.0}]}]},{"n":"Bass","t":[{"n":"Bass Oliver","p":[{"n":"BassOliver_01","o":[0,1,2,0,2,2,0,2,2,0],"c":0.92},{"n":"BassOliver_02","o":[1,0,0,0,0,0,0,0,0,0],"c":1.0}]},{"n":"MO_WS_BS_Normal_Reese","p":[{"n":"NormalReese_01","o":[0,0,0,1,0,0,1,0,0,0],"c":0.3},{"n":"NormalReese_02","o":[0,0,0,0,0,0,1,0,0,0],"c":0.3},{"n":"NormalReese_03","o":[0,0,0,0,0,0,0,1,0,0],"c":0.3}]},{"n":"Slap Bass","p":[{"n":"SlapBass_01","o":[0,0,0,0,2,2,0,1,2,0],"c":0.83}]}]},{"n":"Synth","t":[{"n":"LD Saw Harm","p":[{"n":"SawHarm_01","o":[1,0,2,0,1,2,0,1,2,0],"c":0.24},{"n":"SawHarm_02","o":[0,1,0,0,0,0,0,0,0,0],"c":1.0},{"n":"SawHarm_03","o":[0,0,0,0,1,0,0,0,0,0],"c":1.0},{"n":"SawHarm_04","o":[0,0,0,0,0,0,0,1,0,0],"c":1.0}]},{"n":"SY - Fire Glow","p":[{"n":"FireGlow_01","o":[0,0,2,0,2,2,0,1,2,0],"c":0.69},{"n":"FireGlow_02","o":[0,1,0,0,0,0,0,0,0,0],"c":1.0}]},{"n":"LD Saw Harm Ending","p":[{"n":"SawHarmEnding_01","o":[0,0,0,0,0,0,0,0,0,1],"c":1.0}]},{"n":"Talk Box 1","p":[{"n":"TalkBox1_01","o":[0,0,1,0,0,2,0,1,2,0],"c":1.0}]},{"n":"Talk Box 1","p":[{"n":"TalkBox1_02","o":[0,0,2,0,2,2,0,2,2,0],"c":1.0}]},{"n":"DS_LENNO_lead_talkbox","p":[{"n":"Talkbox_01","o":[0,0,0,0,0,0,0,1,0,0],"c":0.3}]},{"n":"SY - Jupiter Duality","p":[{"n":"JupiterDuality_01","o":[0,0,0,0,0,0,0,1,0,0],"c":0.3}]},{"n":"ARP - Altar","p":[{"n":"Altar_01","o":[0,0,0,0,2,4,0,1,4,0],"c":0.88}]},{"n":"ZEN_STR_120_lead_synth_missing_Em","p":[{"n":"Missing_01","o":[0,0,0,0,0,0,2,0,0,0],"c":0.48},{"n":"Missing_02","o":[0,0,0,0,0,0,1,0,0,0],"c":1.0},{"n":"Missing_03","o":[0,0,0,0,0,0,1,0,0,0],"c":1.0}]}]},{"n":"Lead","t":[{"n":"Lothar BM","p":[{"n":"LotharBM_01","o":[0,0,0,0,2,2,0,0,2,0],"c":0.8}]},{"n":"Angry","p":[{"n":"Angry_01","o":[0,0,0,0,0,2,0,0,1,0],"c":1.0}]},{"n":"LD - Hypa Saw","p":[{"n":"HypaSaw_01","o":[0,0,0,0,0,0,1,0,0,0],"c":0.3}]},{"n":"BL_Actually_Beautiful","p":[{"n":"ActuallyBeautiful_01","o":[0,0,0,0,0,0,1,0,0,0],"c":0.3},{"n":"ActuallyBeautiful_02","o":[0,0,0,0,0,0,1,0,0,0],"c":0.3}]}]},{"n":"Keys","t":[{"n":"PN - Piano Space","p":[{"n":"PianoSpace_01","o":[0,0,0,0,0,2,0,2,2,0],"c":1.0}]},{"n":"SY - Interesting Sines","p":[{"n":"InterestingSines_01","o":[0,0,0,1,0,0,2,0,0,0],"c":1.0}]},{"n":"PN - Ambient Piano","p":[{"n":"AmbientPiano_01","o":[0,0,0,1,0,0,2,0,0,0],"c":1.0}]}]},{"n":"FX","t":[{"n":"91V_XTC_vocal_fx_one_shot_ah_hard_impact_E","p":[{"n":"VocalAhHardImpact_01","o":[0,0,0,0,8,0,0,0,8,0],"c":1.0}]},{"n":"KSHMR_sok5_fx_impact_high_spark","p":[{"n":"Sok5ImpactHighSpark_01","o":[0,0,0,0,1,2,0,2,2,0],"c":1.0}]},{"n":"ah_vox_115_emeli_E","p":[{"n":"AhVoxEmeli_01","o":[0,0,0,0,0,0,1,0,0,0],"c":1.0}]},{"n":"BOS_EC3_FX_Arp_One_Shot_Happy_Em","p":[{"n":"ArpHappy_01","o":[1,0,0,0,0,0,0,0,0,0],"c":1.0}]},{"n":"DS_LENNO_122_drum_fill_tableware","p":[{"n":"FillTableware_01","o":[0,0,2,0,2,2,0,2,2,0],"c":1.0}]},{"n":"DS_LENNO_synth_arp_quick_F#min","p":[{"n":"ArpQuick_01","o":[0,0,2,0,2,2,0,2,2,0],"c":1.0}]},{"n":"BOS_CCS_125_Texture_Loop_Gated_Vox_Em","p":[{"n":"TextureGatedVox_01","o":[0,0,1,0,1,1,0,1,1,0],"c":1.0}]},{"n":"DS_ECT2_fx_swell_tonal_one_shot_sanctum_Emin","p":[{"n":"SwellTonalSanctum_01","o":[0,0,0,0,1,0,0,0,0,0],"c":1.0}]},{"n":"PD Gated Pad [AS]","p":[{"n":"GatedPad_01","o":[0,0,1,0,0,0,0,0,0,0],"c":0.3}]},{"n":"RKU_IOG_Fx_Rise_Excellent_Em","p":[{"n":"RiseExcellent_01","o":[0,0,0,1,0,0,1,0,0,0],"c":1.0},{"n":"RiseExcellent_02","o":[0,0,0,0,0,1,0,0,0,0],"c":1.0}]},{"n":"JAFUNK_120_fx_alien_downlifter","p":[{"n":"AlienDownlifter_01","o":[0,0,0,0,0,0,1,0,0,0],"c":1.0}]},{"n":"UEH_Kit3_Revers_Crash_B","p":[{"n":"Kit3ReversCrash_01","o":[0,0,0,0,0,0,1,0,0,0],"c":1.0}]},{"n":"JAFUNK_crash_groovy_warmth","p":[{"n":"CrashGroovyWarmth_01","o":[0,0,0,0,0,0,0,0,1,0],"c":1.0}]},{"n":"STCR2_NAH_110_Kit_One_Shot_Stress_Revers_Crash","p":[{"n":"StressReversCrash_01","o":[0,0,0,0,0,0,0,1,0,0],"c":1.0}]},{"n":"DIRTY_downlifter_impact_03","p":[{"n":"DownlifterImpact_01","o":[0,0,0,0,0,0,0,1,0,0],"c":1.0}]},{"n":"JAFUNK_crash_groovy_warmth_1","p":[{"n":"CrashGroovyWarmth_02","o":[0,0,0,0,0,0,0,1,0,0],"c":1.0}]},{"n":"FSS_DPHE2_fx_downlifter_one_shot_visit","p":[{"n":"DownlifterVisit_01","o":[0,0,0,0,0,0,0,1,0,0],"c":1.0}]},{"n":"DIRTY_downlifter_impact_02","p":[{"n":"DownlifterImpact_02","o":[0,0,0,1,0,0,1,0,0,0],"c":1.0}]},{"n":"FSS_MTPE_122_kit_atmosphere_02_loop_think_of_me_Emin","p":[{"n":"AtmosphereThinkOfMe_01","o":[0,0,1,0,1,1,0,1,1,0],"c":1.0}]}]}]};
+const SEC=D.sections;
+let uid=1;
+const nid=()=>'x'+(uid++);
+let groups=D.groups.map(g=>({id:nid(),name:g.n,open:false,tracks:g.t.map(t=>({id:nid(),name:t.n,open:false,pieces:t.p.map(p=>({id:nid(),name:p.n,occ:p.o,conf:p.c,parts:null}))}))}));
+let picking=false,target=null,selG=new Set(),selP=new Set(),history=[],play=null,timer=null,dragT=null,renaming=null;
+
+const snap=()=>history.push(JSON.stringify(groups));
+function say(t){const l=document.getElementById('log');l.textContent=t;l.classList.add('on');clearTimeout(say.t);say.t=setTimeout(()=>l.classList.remove('on'),2200)}
+const sum=a=>a.reduce((x,y)=>x+y,0);
+const findT=id=>{for(const g of groups)for(const t of g.tracks)if(t.id===id)return[g,t]};
+const findP=id=>{for(const g of groups)for(const t of g.tracks)for(const p of t.pieces)if(p.id===id)return[g,t,p]};
+
+function render(){
+  let tp=0,tt=0;groups.forEach(g=>{tt+=g.tracks.length;g.tracks.forEach(t=>tp+=t.pieces.length)});
+  document.getElementById('sum').textContent=groups.length+' групп · '+tt+' дорожек · '+tp+' фрагментов';
+  const lockT=selP.size?findP([...selP][0])[1].id:null;
+  const root=document.getElementById('groups');
+  root.innerHTML='';
+  groups.forEach(g=>{
+    const el=document.createElement('section');el.className='grp';el.dataset.g=g.id;
+    const n=g.tracks.reduce((a,t)=>a+t.pieces.length,0);
+    let h='<div class="gh"><input type="checkbox" data-sg="'+g.id+'"'+(selG.has(g.id)?' checked':'')+' title="Выбрать для объединения">';
+    h+=renaming===g.id?'<input class="ginp" id="ren" value="'+g.name.replace(/"/g,'&quot;')+'">':'<span class="gname" data-rn="'+g.id+'" title="Переименовать">'+g.name+'</span>';
+    h+='<span class="cnt">'+g.tracks.length+' дорожек · '+n+' фрагментов</span><span class="sp"></span>';
+    h+='<button class="ghost" data-gt="'+g.id+'">'+(g.open?'Свернуть':'Развернуть')+' всё</button></div>';
+    g.tracks.forEach(t=>{
+      const low=t.pieces.filter(p=>p.conf<0.5).length;
+      h+='<div class="trk'+(t.open?' open':'')+'" data-t="'+t.id+'"><div class="th" draggable="true" data-dt="'+t.id+'"><span class="grip">⋮⋮</span>';
+      h+='<span class="tn" data-tt="'+t.id+'"><span class="chev">▸</span><b>'+t.name+'</b></span>';
+      h+=(low?'<span class="badge w">неуверенно: '+low+'</span>':'')+'<span class="num">'+t.pieces.length+' фр.</span>';
+      h+='<select data-mv="'+t.id+'"><option>В группу…</option>'+groups.filter(x=>x.id!==g.id).map(x=>'<option value="'+x.id+'">'+x.name+'</option>').join('')+'</select></div>';
+      h+='<div class="pcs"><div class="sech"><span></span><span></span><span>фрагмент</span><div class="secs">'+SEC.map(s=>'<span style="flex:'+s[1]+'">'+s[0]+'</span>').join('')+'</div><span></span><span></span></div>';
+      t.pieces.forEach(p=>{
+        const isP=play&&play.id===p.id;
+        const cnt=sum(p.occ);
+        h+='<div class="pc'+(selP.has(p.id)?' sel':'')+(p.conf<0.5?' low':'')+'" data-p="'+p.id+'">';
+        const lk=lockT&&lockT!==t.id;
+        h+='<input type="checkbox" data-sp="'+p.id+'"'+(selP.has(p.id)?' checked':'')+(lk?' disabled':'')+' title="'+(lk?'Объединять можно только фрагменты одной дорожки':'Выбрать для объединения')+'">';
+        h+='<button class="play'+(isP?' on':'')+'" data-pl="'+p.id+'" title="Прослушать">'+(isP?'■':'▶')+'</button>';
+        h+='<div class="nm" title="'+p.name+'">'+p.name+(p.parts?' <span class="badge">объединён: '+p.parts.length+'</span>':'')+(p.conf<0.5?' <small>уверенность '+p.conf+'</small>':'')+'<div class="prog"><i id="pg-'+p.id+'"></i></div></div>';
+        h+='<div class="strip">'+p.occ.map((c,k)=>'<div class="seg" style="flex:'+SEC[k][1]+'" title="'+SEC[k][0]+': '+c+'">'+(c?'<i style="opacity:'+(0.25+0.75*Math.min(1,c/8)).toFixed(2)+'"></i>':'')+'</div>').join('')+'</div>';
+        h+='<span class="num">'+cnt+' вх.</span>';
+        h+=p.parts?'<button class="ghost" data-sp2="'+p.id+'">Разделить</button>':'<span></span>';
+        h+='</div>';
+      });
+      h+='</div></div>';
+    });
+    el.innerHTML=h;root.appendChild(el);
+  });
+  if(renaming){const r=document.getElementById('ren');if(r){r.focus();r.select()}}
+  bar();bind();
+}
+
+function bar(){
+  const b=document.getElementById('bar');
+  const pcs=[...selP].map(findP).filter(Boolean);
+    let h='';
+  if(selG.size>1)h+='<span>Групп выбрано: '+selG.size+'</span><button class="pri" id="mg">Объединить группы</button><button id="cg">Сбросить</button>';
+  if(selP.size>1){
+    {
+      if(!selP.has(target))target=pcs[0][2].id;
+      h+='<div style="flex:1"><div style="font-weight:600;margin-bottom:4px">Объединение '+selP.size+' фрагментов из «'+pcs[0][1].name+'». Целевой: его звук и имя останутся</div>';
+      h+=pcs.map(x=>'<label style="display:block;cursor:pointer"><input type="radio" name="tg" data-tg="'+x[2].id+'"'+(x[2].id===target?' checked':'')+'> '+x[2].name+' <span style="color:var(--tx2)">· '+sum(x[2].occ)+' вх.</span></label>').join('');
+      h+='<div class="note">Остальные фрагменты уйдут из плана как отдельные сэмплы, их вхождения заиграют целевой. «Разделить» вернёт всё обратно.</div></div>';
+      h+='<button class="pri" id="mp2">Объединить в «'+findP(target)[2].name+'»</button>';
+    }
+    h+='<button id="cp">Сбросить</button>';
+  }
+  b.className='bar'+(h?' on':'');b.innerHTML=h;
+  const q=id=>document.getElementById(id);
+  if(q('mg'))q('mg').onclick=mergeGroups;if(q('cg'))q('cg').onclick=()=>{selG.clear();render()};
+  if(q('mp2'))q('mp2').onclick=mergePieces;
+  document.querySelectorAll('[data-tg]').forEach(r=>r.onchange=()=>{target=r.dataset.tg;bar()});if(q('cp'))q('cp').onclick=()=>{selP.clear();picking=false;render()};
+}
+
+function bind(){
+  const $=(s,f)=>document.querySelectorAll(s).forEach(f);
+  $('[data-sg]',c=>c.onchange=()=>{c.checked?selG.add(c.dataset.sg):selG.delete(c.dataset.sg);bar()});
+  $('[data-sp]',c=>c.onchange=()=>{c.checked?selP.add(c.dataset.sp):selP.delete(c.dataset.sp);picking=false;render()});
+  $('[data-tt]',c=>c.onclick=()=>{const[,t]=findT(c.dataset.tt);t.open=!t.open;render()});
+  $('[data-gt]',c=>c.onclick=()=>{const g=groups.find(x=>x.id===c.dataset.gt);g.open=!g.open;g.tracks.forEach(t=>t.open=g.open);render()});
+  $('[data-rn]',c=>c.onclick=()=>{renaming=c.dataset.rn;render()});
+  const r=document.getElementById('ren');
+  if(r){const done=ok=>{if(renaming===null)return;const g=groups.find(x=>x.id===renaming);const v=r.value.trim();renaming=null;if(ok&&v&&v!==g.name){snap();g.name=v;say('Группа переименована: '+v)}render()};
+    r.onkeydown=e=>{if(e.key==='Enter')done(true);if(e.key==='Escape')done(false)};r.onblur=()=>done(true)}
+  $('[data-mv]',c=>c.onchange=()=>{if(c.value&&c.value!=='В группу…')moveTrack(c.dataset.mv,c.value)});
+  $('[data-pl]',c=>c.onclick=()=>toggle(c.dataset.pl));
+  $('[data-sp2]',c=>c.onclick=()=>split(c.dataset.sp2));
+  $('[data-dt]',c=>{c.ondragstart=e=>{dragT=c.dataset.dt;c.classList.add('drag');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',dragT)};c.ondragend=()=>{dragT=null;c.classList.remove('drag');$('.over',x=>x.classList.remove('over'))}});
+  $('.grp',c=>{c.ondragover=e=>{if(dragT){e.preventDefault();c.classList.add('over')}};c.ondragleave=e=>{if(!c.contains(e.relatedTarget))c.classList.remove('over')};c.ondrop=e=>{e.preventDefault();c.classList.remove('over');if(dragT)moveTrack(dragT,c.dataset.g)}});
+  const ng=document.getElementById('newg');
+  ng.ondragover=e=>{if(dragT){e.preventDefault();ng.classList.add('over')}};ng.ondragleave=()=>ng.classList.remove('over');
+  ng.ondrop=e=>{e.preventDefault();ng.classList.remove('over');if(dragT)moveTrack(dragT,null)};
+}
+
+function moveTrack(tid,gid){
+  const[from,t]=findT(tid);if(gid===from.id)return;
+  snap();from.tracks=from.tracks.filter(x=>x!==t);
+  let to=gid&&groups.find(x=>x.id===gid);
+  if(!to){to={id:nid(),name:'Новая группа',open:false,tracks:[]};groups.push(to)}
+  to.tracks.push(t);t.open=true;
+  say('«'+t.name+'» → '+to.name);render();
+}
+function mergeGroups(){
+  const gs=groups.filter(g=>selG.has(g.id));if(gs.length<2)return;
+  snap();const base=gs[0];
+  gs.slice(1).forEach(g=>{base.tracks.push(...g.tracks);groups=groups.filter(x=>x!==g)});
+  selG.clear();say('Группы объединены в «'+base.name+'». Переименуйте при необходимости');renaming=base.id;render();
+}
+function mergePieces(){
+  const ps=[...selP].map(findP).filter(Boolean);if(ps.length<2)return;
+  const t=ps[0][1];if(ps.some(x=>x[1]!==t))return;
+  snap();
+  const sel=t.pieces.filter(p=>selP.has(p.id));
+  const tg=sel.find(p=>p.id===target)||sel[0];
+  const m={id:nid(),name:tg.name,occ:sel[0].occ.map((_,k)=>sum(sel.map(p=>p.occ[k]))),conf:Math.min(...sel.map(p=>p.conf)),parts:sel.flatMap(p=>p.parts||[p])};
+  const at=t.pieces.indexOf(tg);
+  t.pieces=t.pieces.filter(p=>!selP.has(p.id));t.pieces.splice(Math.max(0,at-sel.slice(0,sel.indexOf(tg)).length),0,m);
+  selP.clear();picking=false;target=null;say('Фрагменты объединены: '+m.parts.length+' → 1 сэмпл «'+m.name+'»');render();
+}
+function split(pid){
+  const[,t,p]=findP(pid);snap();const at=t.pieces.indexOf(p);
+  t.pieces.splice(at,1,...p.parts);say('Фрагмент разделён на '+p.parts.length);render();
+}
+function toggle(pid){
+  stop();
+  if(play&&play.id===pid){play=null;render();return}
+  const[,,p]=findP(pid);play={id:pid,t0:Date.now(),len:2200};render();
+  timer=setInterval(()=>{
+    if(!play)return;const f=(Date.now()-play.t0)/play.len;
+    if(f>=1){stop();play=null;render();return}
+    const e=document.getElementById('pg-'+pid);if(e)e.style.width=(f*100)+'%';
+  },50);
+}
+function stop(){clearInterval(timer);timer=null}
+document.getElementById('undo').onclick=()=>{if(!history.length){say('Нечего отменять');return}groups=JSON.parse(history.pop());selG.clear();selP.clear();say('Отменено');render()};
+document.getElementById('go').onclick=()=>say('Макет: здесь откроется сводка потерь и кнопка confirm');
+groups[0].open=true;groups[0].tracks[0].open=true;
+render();
+</script>
+</body>
+</html>

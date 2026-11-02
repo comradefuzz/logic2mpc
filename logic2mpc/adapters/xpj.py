@@ -15,7 +15,7 @@ from typing import Any
 
 from ..core.model import BAR
 from ..core.names import transliterate
-from ..core.plan import Group, Plan, PlanPiece
+from ..core.plan import Group, Occurrence, Plan, PlanPiece, is_exported, occurrences_of
 from ..core.sections import Section, place
 
 HEADER_LINES = 5
@@ -177,7 +177,13 @@ def make_sequences(project: Project, sections: list[Section]) -> None:
 
 
 def exported(group: Group) -> list[PlanPiece]:
-    return [p for t in group.tracks for p in t.pieces if p.export]
+    return [p for t in group.tracks for p in t.pieces if is_exported(p)]
+
+
+def plays(group: Group, piece: PlanPiece) -> list[Occurrence]:
+    """Вхождения куска вместе с вхождениями слитых в него, AN-070."""
+    track = next(t for t in group.tracks if any(p is piece for p in t.pieces))
+    return occurrences_of(track, piece)
 
 
 def clip_of(value: dict[str, Any], track: str) -> dict[str, Any]:
@@ -189,11 +195,12 @@ def notes_of(value: dict[str, Any], track: str) -> list[tuple[int, int]]:
 
 
 def add_notes(
-    project: Project, track: str, pitch: int, piece: PlanPiece, sections: list[Section], template: dict[str, Any]
+    project: Project, track: str, pitch: int, piece: PlanPiece, occurrences: list[Occurrence],
+    sections: list[Section], template: dict[str, Any],
 ) -> None:
     by_key = {s["key"]: s["value"] for s in project.data["sequences"]}
-    loudest = max((o.gain for o in piece.occurrences), default=0.0)
-    for occurrence in piece.occurrences:
+    loudest = max((o.gain for o in occurrences), default=0.0)
+    for occurrence in occurrences:
         number, attack = place(occurrence.tick, sections)
         tick = max(attack - piece.lead, 0)
         room = sections[number].bars * BAR - tick
@@ -227,7 +234,7 @@ def write_project(plan: Plan, samples: Path, out: Path, name: str) -> Path:
     data["samples"] = []
     hands = rename_first_track(project, HANDS)
     copies: list[tuple[Path, str]] = []
-    chosen: list[tuple[str, list[PlanPiece]]] = []
+    chosen: list[tuple[str, Group, list[PlanPiece]]] = []
     for group in plan.groups:
         pieces = exported(group)
         track = copy.deepcopy(hands)
@@ -240,12 +247,12 @@ def write_project(plan: Plan, samples: Path, out: Path, name: str) -> Path:
             copies.append((samples / piece.file, entry["path"]))
         title = transliterate(group.name)
         insert_track(project, track, title)
-        chosen.append((title, pieces))
+        chosen.append((title, group, pieces))
     make_sequences(project, plan.sections)
-    for title, pieces in chosen:
+    for title, group, pieces in chosen:
         map_notes = next(t for t in data["tracks"] if t["name"] == title)["program"]["padNoteMap"]["noteForPad"]
         for pad, piece in enumerate(pieces):
-            add_notes(project, title, map_notes[f"value{pad}"], piece, plan.sections, template)
+            add_notes(project, title, map_notes[f"value{pad}"], piece, plays(group, piece), plan.sections, template)
     for sequence in data["sequences"]:
         for clips in sequence["value"]["trackClipMaps"]:
             for item in clips:
