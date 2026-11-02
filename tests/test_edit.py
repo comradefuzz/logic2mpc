@@ -360,3 +360,31 @@ def test_an070_unrenamed_samples_are_in_journal_and_report() -> None:
     plan = apply(plan, {"op": "move_track", "track": 3, "to": "Drums"})
     assert plan.edits[-1]["unrenamed"] == ["MyBass"]
     assert "MyBass: имя не по правилу, код не изменён" in render(plan)
+
+
+def test_an070_set_code_changes_group_code_and_renames_samples() -> None:
+    plan = apply(make_plan(), {"op": "set_code", "group": "Bass", "code": "BX"})
+    group = next(g for g in plan.groups if g.name == "Bass")
+    assert group.code == "BX" and group.origin == "user"
+    assert names(plan, "Bass") == ["ELA_BX_Bass_01", "ELA_BX_Bass_02"]
+    assert find(plan, "ELA_BX_Bass_01").file == "ELA_BX_Bass_01.wav"
+    assert plan.edits[-1]["renamed"] == {"ELA_BS_Bass_01": "ELA_BX_Bass_01", "ELA_BS_Bass_02": "ELA_BX_Bass_02"}
+
+
+def test_an070_set_code_keeps_merged_into_and_same_code_is_noop() -> None:
+    plan = apply(make_plan(), {"op": "merge_pieces", "track": 3, "target": "ELA_BS_Bass_01", "sources": ["ELA_BS_Bass_02"]})
+    plan = apply(plan, {"op": "set_code", "group": "Bass", "code": "BX"})
+    assert find(plan, "ELA_BX_Bass_02").merged_into == "ELA_BX_Bass_01"
+    plan = apply(plan, {"op": "set_code", "group": "Bass", "code": "BX"})
+    assert plan.edits[-1]["renamed"] == {}
+
+
+def test_an070_set_code_to_code_of_other_group_keeps_numbers_unique() -> None:
+    plan = apply(make_plan(), {"op": "set_code", "group": "Bass", "code": "SY"})
+    assert names(plan, "Bass") == ["ELA_SY_Bass_02", "ELA_SY_Bass_03"]
+
+
+@pytest.mark.parametrize("code", ["", "b", "BSS", "bs", "B1", "БС", 5])
+def test_an070_set_code_refuses_bad_codes(code) -> None:
+    with pytest.raises(EditError):
+        apply(make_plan(), {"op": "set_code", "group": "Bass", "code": code})

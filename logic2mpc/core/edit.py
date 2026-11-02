@@ -175,6 +175,21 @@ def merge_groups(plan: Plan, op: dict) -> dict:
     return {"renamed": renamed, "unrenamed": skipped}
 
 
+def set_code(plan: Plan, op: dict) -> dict:
+    group = find_group(plan, op["group"])
+    code = op["code"]
+    if not isinstance(code, str) or not re.fullmatch(r"[A-Z]{2}", code):
+        raise EditError("код группы это две заглавные латинские буквы")
+    taken = all_names(plan)
+    renamed: dict[str, str] = {}
+    skipped: list[str] = []
+    for track in group.tracks:
+        renamed.update(rename_for(plan, track, group.code, code, taken, skipped))
+    group.code = code
+    group.origin = "user"
+    return {"renamed": renamed, "unrenamed": skipped}
+
+
 def move_track(plan: Plan, op: dict) -> dict:
     source, track = find_track(plan, op["track"])
     to = op["to"]
@@ -203,4 +218,5 @@ HANDLERS = {
     "rename_group": rename_group,
     "merge_groups": merge_groups,
     "move_track": move_track,
+    "set_code": set_code,
 }

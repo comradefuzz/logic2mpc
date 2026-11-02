@@ -326,9 +326,11 @@ def tone(frames: int = 96000) -> np.ndarray:
     return np.stack([wave, wave], axis=1)
 
 
-def test_analyze_track_outside_stack_is_error(analyzed) -> None:
-    with pytest.raises(ValueError, match="вне стека.*Bass"):
-        analyzed([Track(0, "Bass", None, [], [AudioRegion(0)])], {1: tone()})
+def test_an071_track_outside_stack_goes_to_other_group(analyzed) -> None:
+    folder = analyzed([Track(0, "Bass", None, [], [AudioRegion(0)])], {1: tone()})
+    plan = from_json((folder / "plan.json").read_text(encoding="utf-8"))
+    assert [(g.name, g.code) for g in plan.groups] == [("Прочее", "OT")]
+    assert plan.groups[0].tracks[0].pieces[0].name == "ELA_OT_Bass_01"
 
 
 def test_analyze_unknown_group_is_error(analyzed) -> None:

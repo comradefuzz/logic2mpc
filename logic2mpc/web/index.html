@@ -86,18 +86,81 @@ body.busy main,body.busy #bar{opacity:.5;pointer-events:none}
 .chv{background:none;border:0;padding:0 4px;color:var(--tx2);cursor:pointer;font-size:12px;transition:transform .1s}
 .grp.col .chv{transform:rotate(-90deg)}
 body.dragging .newg{position:sticky;bottom:12px;background:var(--bg);z-index:3}
+.st{max-width:720px;margin:40px auto;padding:0 20px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+.st h1{grid-column:1/-1;font-size:20px;margin:0}
+.st .hint,.st .sinfo,.st .sprog,.st .meta{grid-column:1/-1}
+.st label{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--tx2)}
+.st label input{flex:1;font:13px ui-monospace,Menlo,monospace;color:var(--tx);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:5px 8px;min-width:0}
+.sinfo{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.6}
+.gcode{font:11px ui-monospace,Menlo,monospace;background:var(--acbg);color:var(--ac);border-radius:4px;padding:0 5px;cursor:text}
+.codeinp{font:12px ui-monospace,Menlo,monospace;width:34px;text-transform:uppercase;border:1px solid var(--ac);border-radius:4px;padding:0 3px;background:var(--card);color:var(--tx)}
+.vw{max-width:900px;margin:24px auto;padding:0 20px}
+.vh{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.vh h1{font-size:18px;margin:0}
+.vw h2{font-size:14px;margin:22px 0 8px;font-weight:600}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.card b{display:block;font-size:20px;font-weight:600}
+.card span{font-size:12px;color:var(--tx2)}
+.vt{background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:8px}
+.vth{display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer}
+.vth .kind{font-size:11px;color:var(--tx2);background:var(--bg);border-radius:4px;padding:0 6px}
+.vgrid{display:none;padding:4px 12px 12px}
+.vt.open .vgrid{display:block}
+.banks{display:flex;gap:6px;margin-bottom:8px}
+.banks button{padding:2px 10px;font-size:12px}
+.banks button.on{background:var(--acbg);border-color:var(--ac);color:var(--ac)}
+.pads{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;max-width:520px}
+.vp{height:64px;border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:5px 6px;font-size:11px;line-height:1.25;text-align:left;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;cursor:pointer}
+.vp.empty{border-style:dashed;background:transparent;cursor:default;color:var(--tx2)}
+.vp.sounding{border-color:var(--ac);background:var(--acbg)}
+.vp.gone{border-color:var(--warn);color:var(--warn)}
+.vp .n{color:var(--tx2);font-size:10px}
+.vp .s{word-break:break-all}
+.vs{display:flex;gap:10px;padding:5px 12px;border-bottom:1px solid var(--line);background:var(--card);font-size:13px}
+.vs:first-child{border-radius:10px 10px 0 0}.vs:last-child{border-radius:0 0 10px 10px;border-bottom:0}
 .done{margin:10px 20px;padding:8px 12px;background:var(--okbg);color:var(--ok);border-radius:9px;display:none}
 .done.on{display:block}
 </style>
 </head>
 <body>
+<section id="start" style="display:none">
+  <div class="st">
+    <h1>Logic → MPC</h1>
+    <p class="hint">Выберите проект Logic и папку с экспортом его дорожек. Группы построятся по папкам Logic, коды групп и имена можно поправить в редакторе.</p>
+    <label>Проект Logic <input id="sproject" type="text" placeholder="/путь/Проект.logicx" spellcheck="false"></label>
+    <button id="spick1">Выбрать проект…</button>
+    <label>Папка экспорта <input id="sexport" type="text" placeholder="/путь/к/экспорту" spellcheck="false"></label>
+    <button id="spick2">Выбрать папку…</button>
+    <label>Код песни <input id="ssong" type="text" maxlength="3" spellcheck="false" style="max-width:90px;text-transform:uppercase"></label>
+    <span class="meta">три латинские буквы, идут в имена сэмплов</span>
+    <div class="sinfo" id="sinfo">Выберите проект и папку экспорта.</div>
+    <div class="sprog" id="sprog" style="display:none"><div class="prog"><i id="sbar"></i></div><div id="sstep"></div></div>
+    <button class="pri" id="sgo" style="grid-column:1/-1;justify-self:start">Анализировать</button>
+    <div class="warn" id="serr" style="grid-column:1/-1"></div>
+  </div>
+</section>
+<section id="viewer" style="display:none">
+  <div class="vw">
+    <div class="vh"><button id="vback">← Назад к плану</button><h1>Проект MPC</h1><span class="meta" id="vpath"></span></div>
+    <div class="cards" id="vcards"></div>
+    <div id="vprob"></div>
+    <h2>Треки</h2>
+    <div id="vtracks"></div>
+    <h2>Секвенции</h2>
+    <div id="vseq"></div>
+  </div>
+</section>
+<div id="editor">
 <header>
+  <button id="home" title="Вернуться к выбору проекта Logic">← К выбору проекта</button>
   <h1 id="song"></h1>
   <span class="meta" id="meta"></span>
   <span class="sp"></span>
   <span class="pill" id="sum"></span>
   <button id="undo">Отменить</button>
   <button id="rep">Отчёт</button>
+  <button id="showproj" style="display:none">Показать проект</button>
   <div class="exp" id="exp">
     <label>Папка <input id="folder" type="text" placeholder="Выберите папку для проекта MPC" spellcheck="false"></label>
     <button id="pick">Выбрать папку…</button>
@@ -116,10 +179,11 @@ body.dragging .newg{position:sticky;bottom:12px;background:var(--bg);z-index:3}
   <div id="groups"></div>
   <div class="newg" id="newg">Перетащите дорожку сюда, чтобы создать новую группу</div>
 </main>
+</div>
 <div class="log" id="log"></div>
 <audio id="au" preload="none"></audio>
 <script>
-let collapsed=new Set(),S=null,selG=new Set(),selP=new Set(),target=null,renaming=null,dragT=null,playing=null,openT=new Set(),openG=new Set();
+let codeEdit=null,collapsed=new Set(),S=null,selG=new Set(),selP=new Set(),target=null,renaming=null,dragT=null,playing=null,openT=new Set(),openG=new Set();
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const sum=a=>a.reduce((x,y)=>x+y,0);
@@ -143,7 +207,7 @@ async function waitWhileBusy(){
   setBusy(false);render();
 }
 $('cancel').onclick=()=>{cancelReview();renderExport()};
-async function edit(op,msg){const j=await call('/api/edit',op);if(j){cancelReview();S=j;if(msg)say(msg);render()}return j}
+async function edit(op,msg){const j=await call('/api/edit',op);if(j){homeArmed=false;cancelReview();S=j;if(msg)say(msg);render()}return j}
 const groups=()=>S.plan.groups;
 const pieces=t=>t.pieces;
 const visible=t=>t.pieces.filter(p=>!p.merged_into);
@@ -175,7 +239,8 @@ function render(){
     const n=S.pads[g.name];
     let h='<div class="gh"><button class="chv" data-gc="'+esc(g.name)+'" title="'+(collapsed.has(g.name)?'Развернуть группу':'Свернуть группу')+'">▼</button><input type="checkbox" data-sg="'+esc(g.name)+'"'+(selG.has(g.name)?' checked':'')+' title="Выбрать для объединения">';
     h+=renaming===g.name?'<input class="ginp" id="ren" value="'+esc(g.name)+'">':'<span class="gname" data-rn="'+esc(g.name)+'" title="Переименовать">'+esc(g.name)+'</span>';
-    h+='<span class="cnt">'+esc(g.code)+' · '+g.tracks.length+' дорожек · '+n+' пэдов</span><span class="sp"></span>';
+    h+=(codeEdit===g.name?'<input class="codeinp" id="cin" maxlength="2" value="'+esc(g.code)+'">':'<span class="gcode" data-gcode="'+esc(g.name)+'" title="Код в именах сэмплов, кликните для правки">'+esc(g.code)+'</span>');
+    h+='<span class="cnt">'+g.tracks.length+' дорожек · '+n+' пэдов</span><span class="sp"></span>';
     h+='<button class="ghost" data-gt="'+esc(g.name)+'">'+(openG.has(g.name)?'Скрыть':'Показать')+' фрагменты</button></div>';
     if(!collapsed.has(g.name))g.tracks.forEach(t=>{
       const vis=visible(t),low=vis.filter(p=>p.confidence<0.5).length,isOpen=openT.has(t.row);
@@ -203,7 +268,7 @@ function render(){
   renderBar();bind();
 }
 
-let nameTimer=null,armed=false,nameError=null,busy=false,busyStart=0,busyTimer=null,lastBuilt=null;
+let homeArmed=false,nameTimer=null,armed=false,nameError=null,busy=false,busyStart=0,busyTimer=null,lastBuilt=null;
 const reviewing=()=>armed;
 function renderExport(){
   const e=S.export;
@@ -219,6 +284,8 @@ function renderExport(){
   $('finish').innerHTML=busy?'<span class="spin"></span>Собираю проект…':(armed?(e.exists?'Подтвердить и перезаписать':'Подтвердить и собрать'):'Сохранить и собрать');
   $('finish').disabled=busy;$('pick').disabled=busy;$('pname').disabled=busy;$('folder').disabled=busy;
   $('cancel').style.display=armed&&!busy?'':'none';
+  $('showproj').style.display=S.built?'':'none';
+  $('home').textContent=homeArmed?'Сбросить правки и выйти?':'← К выбору проекта';
   document.body.style.setProperty('--hh',document.querySelector('header').offsetHeight+'px');
 }
 async function setExport(body){
@@ -251,7 +318,7 @@ $('finish').onclick=async()=>{
   setBusy(true);
   let j=null;
   try{j=await call('/api/finish',{overwrite})}finally{setBusy(false)}
-  if(j){S=j;selP.clear();selG.clear();lastBuilt=j.project;$('report').classList.remove('on');$('done').textContent='Проект собран: '+j.project+'. Скопируйте .xpj и папку _[ProjectData] на SD-карту.';$('done').className='done on';loadReport();render();window.scrollTo({top:0,behavior:'smooth'});say('Проект собран')}
+  if(j){S=j;selP.clear();selG.clear();lastBuilt=j.project;$('report').classList.remove('on');$('done').textContent='Проект собран: '+j.project+'. Скопируйте .xpj и папку _[ProjectData] на SD-карту.';$('done').className='done on';loadReport();render();say('Проект собран');showViewer()}
   else await refresh();
 };
 
@@ -281,6 +348,13 @@ function bind(){
   all('[data-tt]',c=>c.onclick=()=>{const r=+c.dataset.tt;openT.has(r)?openT.delete(r):openT.add(r);render()});
   all('[data-gt]',c=>c.onclick=()=>{const g=groups().find(x=>x.name===c.dataset.gt);const open=!openG.has(g.name);open?openG.add(g.name):openG.delete(g.name);g.tracks.forEach(t=>open?openT.add(t.row):openT.delete(t.row));render()});
   all('[data-gc]',c=>c.onclick=()=>{const n=c.dataset.gc;collapsed.has(n)?collapsed.delete(n):collapsed.add(n);render()});
+  all('[data-gcode]',c=>c.onclick=()=>{codeEdit=c.dataset.gcode;render()});
+  const ci=$('cin');
+  if(ci){ci.focus();ci.select();const old=codeEdit;let busyC=false;
+    const done=async ok=>{if(busyC||codeEdit===null)return;busyC=true;const v=ci.value.trim().toUpperCase();codeEdit=null;
+      const cur=groups().find(g=>g.name===old);
+      if(ok&&cur&&v&&v!==cur.code){const j=await edit({op:'set_code',group:old,code:v},'Код группы '+old+': '+v);if(j)return}render()};
+    ci.onkeydown=e=>{if(e.key==='Enter')done(true);if(e.key==='Escape')done(false)};ci.onblur=()=>done(true)}
   all('[data-rn]',c=>c.onclick=()=>{renaming=c.dataset.rn;render()});
   const r=$('ren');
   if(r){const old=renaming;let busy=false;
@@ -311,7 +385,103 @@ $('expall').onclick=()=>{collapsed.clear();render()};
 $('undo').onclick=async()=>{const j=await call('/api/undo');if(j){cancelReview();S=j;render()}};
 async function loadReport(){$('report').textContent=await (await fetch('/api/report')).text()}
 $('rep').onclick=async()=>{await loadReport();$('report').classList.toggle('on')};
-fetch('/api/state').then(r=>r.json()).then(j=>{if(!j.export){document.body.innerHTML='<p style="margin:20px;padding:12px;background:var(--warnbg);color:var(--warn);border-radius:9px">Сервер запущен старой версией кода и не знает панель «Экспорт». Остановите его (Ctrl+C) и запустите команду ui заново.</p>';return}S=j;if(groups().length){openG.add(groups()[0].name)}render();if(S.busy)waitWhileBusy()});
+const OLD='<p style="margin:20px;padding:12px;background:var(--warnbg);color:var(--warn);border-radius:9px">Сервер запущен старой версией кода. Остановите его (Ctrl+C) и запустите команду ui заново.</p>';
+$('home').onclick=async()=>{
+  if(busy){say('Идёт сборка');return}
+  if(S.dirty&&!homeArmed){homeArmed=true;renderExport();say('Есть несохранённые правки: нажмите ещё раз, чтобы выйти без них');return}
+  const j=await call('/api/close',{discard:!!S.dirty});
+  homeArmed=false;
+  if(!j){renderExport();return}
+  [selP,selG,collapsed,openT,openG].forEach(x=>x.clear());
+  armed=false;lastBuilt=null;nameError=null;V=null;vOpen.clear();vBank={};
+  $('done').className='done';$('report').className='rep';$('viewer').style.display='none';
+  route(j);
+};
+const mb=b=>(b/1048576).toFixed(1)+' МБ';
+let V=null,vBank={},vOpen=new Set(),vPlay=null;
+const vau=new Audio();vau.onended=()=>{vPlay=null;renderViewer()};
+async function showViewer(){
+  const r=await fetch('/api/project');let j=null;try{j=await r.json()}catch(e){}
+  if(!r.ok){say((j&&j.error)||'не удалось прочитать проект');return}
+  V=j;vau.pause();vPlay=null;$('editor').style.display='none';$('viewer').style.display='';renderViewer();window.scrollTo({top:0});
+}
+function renderViewer(){
+  $('vpath').textContent=V.project;
+  $('vcards').innerHTML=[[V.tracks.length,'треков'],[V.sequences.length,'секвенций'],[V.samples,'сэмплов'],[mb(V.size.total),'весь проект']].map(c=>'<div class="card"><b>'+c[0]+'</b><span>'+c[1]+'</span></div>').join('')
+    +'<div class="card"><b>'+mb(V.size.samples)+'</b><span>сэмплы в папке данных</span></div>';
+  let pr='';
+  if(V.missing.length)pr+='<div class="sinfo"><span class="warn">Нет файлов сэмплов (на Live 2 будет Sample not found): '+V.missing.map(esc).join(', ')+'</span></div>';
+  if(V.extra.length)pr+='<div class="sinfo"><span class="warn">Лишние файлы в папке данных: '+V.extra.map(esc).join(', ')+'</span></div>';
+  $('vprob').innerHTML=pr;
+  $('vtracks').innerHTML=V.tracks.map((t,i)=>{
+    const open=vOpen.has(i);
+    let h='<div class="vt'+(open?' open':'')+'"><div class="vth" data-vt="'+i+'"><b>'+esc(t.name)+'</b><span class="kind">'+esc(t.kind)+'</span><span class="sp"></span><span class="meta">'+(t.kind==='drum'?t.filled+' пэдов':'')+'</span></div>';
+    if(t.kind==='drum'&&open){
+      const banks=[...new Set(t.pads.map(p=>p.bank))];
+      const cur=vBank[i]&&banks.includes(vBank[i])?vBank[i]:(banks[0]||'A');
+      h+='<div class="vgrid">';
+      if(!banks.length)h+='<span class="meta">Пэды пусты</span>';
+      else{
+        h+='<div class="banks">'+banks.map(b=>'<button data-vb="'+i+':'+b+'"'+(b===cur?' class="on"':'')+'>Банк '+b+'</button>').join('')+'</div><div class="pads">';
+        const byPad={};t.pads.filter(p=>p.bank===cur).forEach(p=>byPad[p.number]=p);
+        for(let r=3;r>=0;r--)for(let c=0;c<4;c++){
+          const n=r*4+c+1,p=byPad[n];
+          h+=p?'<button class="vp'+(vPlay===p.file?' sounding':'')+(p.exists?'':' gone')+'" data-vf="'+esc(p.file)+'" title="'+esc(p.file)+(p.exists?'':' — файла нет')+'"><span class="n">'+cur+n+' · нота '+(p.note===null||p.note===undefined?'—':esc(p.note))+'</span><span class="s">'+esc(p.sample)+'</span></button>':'<div class="vp empty"><span class="n">'+cur+n+'</span></div>';
+        }
+        h+='</div>';
+      }
+      h+='</div>';
+    }
+    return h+'</div>';
+  }).join('');
+  $('vseq').innerHTML=V.sequences.map((q,i)=>'<div class="vs"><span class="meta">'+(i+1)+'</span><b>'+esc(q.name)+'</b><span class="sp"></span><span class="meta">'+q.bars+' тактов</span></div>').join('');
+  document.querySelectorAll('[data-vt]').forEach(c=>c.onclick=()=>{const i=+c.dataset.vt;vOpen.has(i)?vOpen.delete(i):vOpen.add(i);renderViewer()});
+  document.querySelectorAll('[data-vb]').forEach(c=>c.onclick=()=>{const[i,b]=c.dataset.vb.split(':');vBank[+i]=b;renderViewer()});
+  document.querySelectorAll('[data-vf]').forEach(c=>c.onclick=()=>{const f=c.dataset.vf;vau.pause();if(vPlay===f){vPlay=null}else{vPlay=f;vau.src='/api/project/audio?name='+encodeURIComponent(f);vau.play().catch(()=>{vPlay=null;renderViewer()})}renderViewer()});
+}
+$('vback').onclick=()=>{vau.pause();vPlay=null;$('viewer').style.display='none';$('editor').style.display=''};
+$('showproj').onclick=showViewer;
+function route(j){
+  if(!j.mode){document.body.innerHTML=OLD;return}
+  if(j.mode==='start'){$('editor').style.display='none';$('start').style.display='';startView(j);return}
+  $('start').style.display='none';$('editor').style.display='';
+  S=j;if(groups().length&&!openG.size)openG.add(groups()[0].name);render();if(S.busy)waitWhileBusy();
+}
+let inspected=null,songTouched=false,inspectTimer=null,poll=null;
+function startView(j){
+  const job=j.job||{};
+  const run=!!job.running;
+  $('sgo').disabled=run;['sproject','sexport','ssong','spick1','spick2'].forEach(id=>$(id).disabled=run);
+  $('sprog').style.display=(run||job.error)?'':'none';
+  $('sbar').style.width=job.total?(100*job.done/job.total)+'%':'0%';
+  $('sstep').innerHTML=run?'<span class="spin"></span>Анализ: '+job.done+' из '+job.total+(job.track?' · '+esc(job.track):''):'';
+  $('serr').textContent=job.error||'';
+  $('sgo').innerHTML=run?'<span class="spin"></span>Анализирую…':'Анализировать';
+  if(run&&!poll)poll=setInterval(async()=>{const k=await (await fetch('/api/state')).json();if(!(k.job&&k.job.running)){clearInterval(poll);poll=null}route(k)},700);
+}
+async function inspect(){
+  const project=$('sproject').value.trim(),exp=$('sexport').value.trim();
+  if(!project||!exp){$('sinfo').textContent='Выберите проект и папку экспорта.';inspected=null;return}
+  const r=await fetch('/api/inspect',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({project,export:exp})});
+  const k=await r.json();
+  if(!r.ok){inspected=null;$('sinfo').innerHTML='<span class="warn">'+esc(k.error)+'</span>';return}
+  inspected=k;
+  if(!songTouched)$('ssong').value=k.song;
+  $('sinfo').innerHTML='Проект <b>'+esc(k.name)+'</b> · '+k.bpm+' BPM · дорожек со звуком: '+k.tracks+'<br>Группы: '+k.groups.map(g=>esc(g.name)+' <span class="gcode">'+esc(g.code)+'</span> ('+g.tracks+')').join(', ')
+    +(k.missing.length?'<br><span class="warn">Нет файла экспорта у дорожек: '+k.missing.map(esc).join(', ')+'</span>':'');
+}
+function scheduleInspect(){clearTimeout(inspectTimer);inspectTimer=setTimeout(inspect,350)}
+$('sproject').oninput=scheduleInspect;$('sexport').oninput=scheduleInspect;$('ssong').oninput=()=>{songTouched=true};
+$('spick1').onclick=async()=>{const j=await call('/api/pick-logic');if(j&&j.path){$('sproject').value=j.path;inspect()}};
+$('spick2').onclick=async()=>{const j=await call('/api/pick-export');if(j&&j.path){$('sexport').value=j.path;inspect()}};
+$('sgo').onclick=async()=>{
+  await inspect();
+  if(!inspected){say('Проверьте проект и папку экспорта');return}
+  if(inspected.missing.length){say('Нет файла экспорта у дорожек: '+inspected.missing.join(', '));return}
+  const j=await call('/api/analyze',{project:inspected.project,export:inspected.export,song:$('ssong').value.trim()});
+  if(j)route(j);
+};
+fetch('/api/state').then(r=>r.json()).then(route);
 </script>
 </body>
 </html>

@@ -20,6 +20,8 @@ def describe(edit: dict) -> list[str]:
         lines = [f"группа {edit['group']} → {edit['name']}"]
     elif op == "merge_groups":
         lines = [f"группы {', '.join(edit['groups'])} объединены в {edit['groups'][0]}"]
+    elif op == "set_code":
+        lines = [f"код группы {edit['group']} → {edit['code']}"]
     elif op == "move_track":
         lines = [f"дорожка {edit['track']} перенесена в {edit['to'] or 'новую группу'}"]
     else:

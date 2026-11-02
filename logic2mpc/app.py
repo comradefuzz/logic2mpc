@@ -17,6 +17,7 @@ from .core import edit as editing
 from .core import report, signal
 from .core.analysis import analyze_track
 from .core.model import BAR, Cut, Track
+from .core.groups import OTHER, default_groups, song_code
 from .core.names import clean_name, sample_name, transliterate
 from .core.plan import Group, Occurrence, Plan, PlanPiece, PlanTrack, from_json, plan_hash, to_json
 from .core.sections import sections_from_markers
@@ -75,17 +76,70 @@ def plan_track(
     )
 
 
-def analyze(project: Path, export: Path, groups_file: Path, out: Path, decisiveness: float = DEFAULT) -> Path:
-    """Режет дорожки, пишет новую версию: сэмплы, план, отчёт. Проект MPC здесь не создаётся."""
-    config = json.loads(groups_file.read_text(encoding="utf-8"))
+def check_song_code(song: str | None) -> None:
+    """Код песни идёт в имена файлов: только три заглавные латинские буквы."""
+    if song is not None and not re.fullmatch(r"[A-Z]{3}", song):
+        raise ValueError("код песни: три заглавные латинские буквы")
+
+
+def group_of(track: Track) -> str:
+    """Папка Logic, дорожка вне папок входит в «Прочее», AN-071."""
+    return track.group or OTHER
+
+
+def inspect_project(project: Path, export: Path) -> dict:
+    """Проверка перед анализом: что нашлось в проекте и в экспорте. Звук не читается."""
+    if project.suffix.lower() != ".logicx":
+        raise ValueError("нужен проект Logic с расширением logicx")
+    if not project.exists():
+        raise ValueError(f"нет проекта {project}")
+    if not export.is_dir():
+        raise ValueError(f"нет папки с экспортом {export}")
     song = logic.read_project(project)
-    files = export_files(export)
     content = [t for t in song.tracks if audible(t)]
-    muted = [f"{t.name} (строка {t.row + 1})" for t in song.tracks if not audible(t) and (t.midi_regions or t.audio_regions)]
-    outside = [t.name for t in content if t.group is None]
-    if outside:
-        raise ValueError("дорожки вне стека, группы у них нет: " + ", ".join(outside))
-    unknown = sorted({t.group for t in content} - set(config["groups"]))
+    if not content:
+        raise ValueError("в проекте нет дорожек со звуком")
+    files = export_files(export)
+    names: list[str] = list(dict.fromkeys(group_of(t) for t in content))
+    groups = default_groups(names)
+    return {
+        "project": str(project), "export": str(export), "name": project.stem, "song": song_code(project.stem),
+        "bpm": song.bpm, "tracks": len(content),
+        "groups": [{"name": n, "code": groups[n]["code"], "tracks": sum(group_of(t) == n for t in content)} for n in names],
+        "missing": [t.name for t in content if t.row + 1 not in files],
+    }
+
+
+def find_version(folder: Path) -> Path | None:
+    """Папка версии плана: с `plan.json` или последняя `vN` внутри."""
+    if (folder / "plan.json").is_file():
+        return folder
+    numbers = {int(p.name[1:]): p for p in folder.glob("v*") if p.is_dir() and p.name[1:].isdigit()} if folder.is_dir() else {}
+    return numbers[max(numbers)] if numbers else None
+
+
+def analyze(
+    project: Path, export: Path, groups_file: Path | None, out: Path, decisiveness: float = DEFAULT,
+    progress=None, *, song: str | None = None,
+) -> Path:
+    """Режет дорожки, пишет новую версию: сэмплы, план, отчёт. Проект MPC здесь не создаётся.
+
+    Без файла групп группы строятся по папкам Logic (`AN-071`), `progress(сделано, всего, дорожка)`.
+    """
+    check_song_code(song)
+    proj = logic.read_project(project)
+    files = export_files(export)
+    content = [t for t in proj.tracks if audible(t)]
+    if groups_file is not None:
+        config = json.loads(groups_file.read_text(encoding="utf-8"))
+    else:
+        config = {"song": song or song_code(project.stem), "groups": default_groups(list(dict.fromkeys(group_of(t) for t in content)))}
+    if song is not None:
+        config["song"] = song
+    check_song_code(config["song"])
+    config["groups"].setdefault(OTHER, default_groups([OTHER])[OTHER])
+    muted = [f"{t.name} (строка {t.row + 1})" for t in proj.tracks if not audible(t) and (t.midi_regions or t.audio_regions)]
+    unknown = sorted({group_of(t) for t in content} - set(config["groups"]))
     if unknown:
         raise ValueError("нет группы в настройках: " + ", ".join(unknown))
     lost = [t.name for t in content if t.row + 1 not in files]
@@ -96,18 +150,24 @@ def analyze(project: Path, export: Path, groups_file: Path, out: Path, decisiven
     samples.mkdir()
     used: Counter = Counter()
     groups = []
+    total, done = len(content), 0
     for name, settings in config["groups"].items():
         tracks = []
-        for track in (t for t in content if t.group == name):
-            print(f"{name}: {track.name}", flush=True)
+        for track in (t for t in content if group_of(t) == name):
+            if progress:
+                progress(done, total, track.name)
             audio, sr = sf.read(files[track.row + 1], always_2d=True)
-            cut = analyze_track(track, audio, sr, song.bpm, decisiveness)
-            tracks.append(plan_track(track, cut, audio, sr, song.bpm, config["song"], settings["code"], used, samples))
-        groups.append(Group(name, settings["code"], settings.get("method", "drum"), tracks))
+            cut = analyze_track(track, audio, sr, proj.bpm, decisiveness)
+            tracks.append(plan_track(track, cut, audio, sr, proj.bpm, config["song"], settings["code"], used, samples))
+            done += 1
+        if tracks:
+            groups.append(Group(name, settings["code"], settings.get("method", "drum"), tracks))
+    if progress:
+        progress(total, total, "")
     ends = [o.tick + p.ticks for g in groups for t in g.tracks for p in t.pieces for o in p.occurrences]
     plan = Plan(
-        config["song"], song.bpm, song.sr, decisiveness, sections_from_markers(song.markers, max(ends, default=BAR)),
-        groups, notes_extended=song.notes_extended, notes_outside=song.notes_outside, muted_tracks=muted,
+        config["song"], proj.bpm, proj.sr, decisiveness, sections_from_markers(proj.markers, max(ends, default=BAR)),
+        groups, notes_extended=proj.notes_extended, notes_outside=proj.notes_outside, muted_tracks=muted,
     )
     (folder / "plan.json").write_text(to_json(plan), encoding="utf-8")
     (folder / "report.md").write_text(report.render(plan), encoding="utf-8")
@@ -158,6 +218,7 @@ class Session:
         self.folder: Path | None = None
         self.name: str = self.plan.song
         self.lock = threading.Lock()
+        self.built: Path | None = None
 
     def set_target(self, folder: Path | None, name: str | None) -> None:
         """Куда собирать проект MPC: папка и имя. Пустое значение оставляет прежнее."""
@@ -273,7 +334,8 @@ class Session:
         if not self.lock.acquire(blocking=False):
             raise BusyError("сборка уже идёт")
         try:
-            return build(self.version, out, name)
+            self.built = build(self.version, out, name)
+            return self.built
         finally:
             self.lock.release()
 
@@ -294,6 +356,67 @@ class Session:
                 self.save()
             if not self.confirmed:
                 self.confirm()
-            return build(self.version, self.folder, self.name)
+            self.built = build(self.version, self.folder, self.name)
+            return self.built
         finally:
             self.lock.release()
+
+
+class Workspace:
+    """Что открыто в интерфейсе: стартовый экран без сессии или редактор с сессией. Анализ идёт в фоне."""
+
+    def __init__(self, session: Session | None = None, analyzer=None) -> None:
+        self.session = session
+        self.analyzer = analyzer or analyze
+        self.job: dict = {"running": False, "done": 0, "total": 0, "track": "", "error": None}
+        self._lock = threading.Lock()
+        self._thread: threading.Thread | None = None
+
+    def start(self, project: Path, export: Path, song: str) -> None:
+        if self.session is not None:
+            raise BusyError("план уже открыт: анализ запускается только на стартовом экране")
+        info = inspect_project(project, export)
+        check_song_code(song)
+        if info["missing"]:
+            raise FileNotFoundError("нет файла экспорта у дорожек: " + ", ".join(info["missing"]))
+        if not self._lock.acquire(blocking=False):
+            raise BusyError("анализ уже идёт")
+        self.job = {"running": True, "done": 0, "total": info["tracks"], "track": "", "error": None}
+        self._thread = threading.Thread(target=self._run, args=(project, export, song), daemon=True)
+        self._thread.start()
+
+    def _progress(self, done: int, total: int, track: str) -> None:
+        self.job.update(done=done, total=total, track=track)
+
+    def _run(self, project: Path, export: Path, song: str) -> None:
+        try:
+            version = self.analyzer(project, export, None, export / "plan", progress=self._progress, song=song)
+            session = Session(version)
+            try:
+                session.set_target(None, project.stem)
+            except ExportTargetError:
+                pass
+            self.session = session
+        except Exception as error:  # ошибка показывается на экране, поток не падает молча
+            self.job["error"] = str(error) or error.__class__.__name__
+        finally:
+            self.job["running"] = False
+            self._lock.release()
+
+    def close(self, discard: bool = False) -> None:
+        """Назад на стартовый экран. Файлы версий остаются на диске, несохранённые правки теряются только с `discard`."""
+        if self.job["running"]:
+            raise BusyError("анализ ещё идёт")
+        session = self.session
+        if session is None:
+            return
+        if session.busy:
+            raise BusyError("идёт сборка, выйти нельзя")
+        if session.dirty and not discard:
+            raise ConfirmationError("есть несохранённые правки: сохраните версию или сбросьте их")
+        self.session = None
+        self.job = {"running": False, "done": 0, "total": 0, "track": "", "error": None}
+
+    def join(self) -> None:
+        if self._thread:
+            self._thread.join()
