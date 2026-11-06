@@ -1,6 +1,6 @@
 ---
 id: S-003
-title: Спайк: MIDI из Logic
+title: "Спайк: MIDI из Logic"
 type: spike
 status: done
 ---

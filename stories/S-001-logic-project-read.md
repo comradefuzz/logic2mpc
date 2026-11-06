@@ -1,6 +1,6 @@
 ---
 id: S-001
-title: Спайк: что читается из проекта Logic
+title: "Спайк: что читается из проекта Logic"
 type: spike
 status: done
 ---

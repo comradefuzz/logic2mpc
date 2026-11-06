@@ -37,7 +37,7 @@ def parse_story(text: str, path: str) -> Story:
         for line in match.group(1).splitlines():
             key, sep, value = line.partition(":")
             if sep:
-                fields[key.strip()] = value.strip()
+                fields[key.strip()] = value.strip().strip('"')
     return Story(
         id=fields.get("id", "?"),
         title=fields.get("title", "?"),

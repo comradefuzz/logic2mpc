@@ -1,6 +1,6 @@
 ---
 id: S-015
-title: Спайк: описание XPJ для экспорта
+title: "Спайк: описание XPJ для экспорта"
 type: spike
 status: done
 ---

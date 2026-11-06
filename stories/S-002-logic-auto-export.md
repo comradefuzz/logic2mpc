@@ -1,6 +1,6 @@
 ---
 id: S-002
-title: Спайк: автоэкспорт из Logic
+title: "Спайк: автоэкспорт из Logic"
 type: spike
 status: done
 ---

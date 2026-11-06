@@ -1,6 +1,6 @@
 ---
 id: S-005
-title: Спайк: сборка проекта MPC
+title: "Спайк: сборка проекта MPC"
 type: spike
 status: done
 ---
