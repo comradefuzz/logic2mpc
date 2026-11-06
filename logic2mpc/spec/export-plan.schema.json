@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "export-plan.schema.json",
+  "title": "Вход экспортёра .xpj: Export Plan",
+  "description": "Только поля, которые читает экспортёр. Остальные поля плана разрешены и игнорируются. Единицы: тики PPQ 960 (такт 3840), кадры сэмплов.",
+  "type": "object",
+  "required": ["version", "bpm", "sections", "groups"],
+  "properties": {
+    "version": {"const": 1, "description": "Версия плана (PLAN_VERSION), она же версия контракта входа"},
+    "bpm": {"type": "number", "exclusiveMinimum": 0, "description": "Темп проекта, уд/мин"},
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Секции песни, каждая станет секвенцией",
+      "items": {
+        "type": "object",
+        "required": ["name", "start", "bars"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "start": {"type": "integer", "minimum": 0, "description": "Начало секции, тики"},
+          "bars": {"type": "integer", "minimum": 1, "description": "Длина секции, такты 4/4"}
+        }
+      }
+    },
+    "groups": {
+      "type": "array",
+      "description": "Группы, каждая станет драм-треком",
+      "items": {
+        "type": "object",
+        "required": ["name", "tracks"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "tracks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["pieces"],
+              "properties": {
+                "pieces": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["name", "file", "ticks", "lead", "export", "merged_into", "occurrences"],
+                    "properties": {
+                      "name": {"type": "string", "minLength": 1, "description": "Имя сэмпла, из него имя файла в папке проекта"},
+                      "file": {"type": "string", "minLength": 1, "description": "WAV во входной папке сэмплов"},
+                      "ticks": {"type": "integer", "minimum": 1, "description": "Длина фрагмента, тики"},
+                      "lead": {"type": "integer", "minimum": 0, "description": "Запас перед атакой, тики"},
+                      "export": {"type": "boolean"},
+                      "merged_into": {"type": ["string", "null"], "description": "Имя фрагмента, в который слит этот"},
+                      "occurrences": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "required": ["tick", "gain", "length"],
+                          "properties": {
+                            "tick": {"type": "integer", "minimum": 0, "description": "Позиция атаки, тики"},
+                            "gain": {"type": "number", "minimum": 0},
+                            "length": {"type": ["integer", "null"], "description": "Длина недоигранного прохода, тики"}
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

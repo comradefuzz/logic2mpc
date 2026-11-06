@@ -373,7 +373,7 @@ def test_web_os_errors_and_wrong_types_are_json_errors(picked: tuple[TestClient,
         answer = client.post("/api/export", json=body)
         assert answer.status_code == 400 and answer.json()["error"]
     client.post("/api/export", json={"folder": str(tmp_path), "name": "Song"})
-    monkeypatch.setattr("logic2mpc.app.build", lambda *a, **k: (_ for _ in ()).throw(PermissionError("нет прав")))
+    monkeypatch.setattr("logic2mpc.app.build_result", lambda *a, **k: (_ for _ in ()).throw(PermissionError("нет прав")))
     answer = client.post("/api/finish")
     assert answer.status_code == 400 and "нет прав" in answer.json()["error"]
 
@@ -417,7 +417,7 @@ def test_failed_overwrite_keeps_old_project_and_leaves_no_temp_folder(version: P
         (out / "half.txt").write_text("x", encoding="utf-8")
         raise FileNotFoundError("нет сэмплов: X")
 
-    monkeypatch.setattr("logic2mpc.app.xpj.write_project", broken)
+    monkeypatch.setattr("logic2mpc.app.xpj.export_project", broken)
     with pytest.raises(FileNotFoundError):
         session.build(out, "Song")
     assert digest(out) == before

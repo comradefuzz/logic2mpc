@@ -1,0 +1,14 @@
+{
+"version": 2,
+"time": 0,
+"type": 3,
+"channel": 0,
+"muted": false,
+"invented": false,
+"note": {
+"note": 36,
+"velocity": 1.0,
+"length": 480,
+"EnumCerealisationWrapper(selectedModifierType)": "Tuning (coarse)"
+}
+}

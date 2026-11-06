@@ -1,78 +1,53 @@
-"""Сборка проекта MPC из шаблона. Устройство файла описано в docs/formats/mpc/, приём из spikes/mpc_build/patch.py.
+"""Сборка проекта MPC по описанию формата (`xpj_spec`), без донорского проекта.
 
-Числа хранятся как текст: Live 2 пишет float с 17 знаками, и обычный json их округлит.
+Устройство файла: docs/formats/mpc/, контракт экспортёра: docs/contracts/xpj-export.md. Вход проверяется по JSON Schema
+`logic2mpc/spec/export-plan.schema.json` до записи.
 """
 from __future__ import annotations
 
-import copy
-import gzip
+import gzip  # noqa: F401  (доступен тестам как xpj.gzip)
 import json
 import shutil
 import struct
-import zlib
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
+import jsonschema
+
 from ..core.model import BAR
 from ..core.names import transliterate
-from ..core.overview import summarize
 from ..core.plan import Group, Occurrence, Plan, PlanPiece, is_exported, occurrences_of
 from ..core.sections import Section, place
+from . import xpj_spec
+from .mpcfile import Number, Project, dump, load, pack, parse, render  # noqa: F401  (часть интерфейса модуля)
 
-HEADER_LINES = 5
 PADS = 128
-TEMPLATE = Path(__file__).resolve().parent.parent / "template" / "template.xpj"
-BASE_TRACK = "Drum 001"
 HANDS = "HANDS"
 MIN_VELOCITY = 0.05
+SCHEMA = xpj_spec.SPEC / "export-plan.schema.json"
+SERVICE_LOSS = (
+    "Проект собран без служебных треков Out, Submix, Return (MPC-112): в MIX нет Submix и Return, "
+    "Live 2 их не пересоздаёт"
+)
 
 
-class Number(str):
-    """Число JSON в исходной записи."""
+class ContractError(ValueError):
+    """План не соответствует контракту экспортёра."""
 
 
 @dataclass
-class Project:
-    header: bytes
-    data: dict[str, Any]
+class ExportResult:
+    path: Path
+    losses: list[str] = field(default_factory=list)
 
 
-def parse(raw: bytes) -> Project:
-    parts = raw.split(b"\n", HEADER_LINES)
-    header = b"\n".join(parts[:HEADER_LINES]) + b"\n"
-    root = json.loads(parts[HEADER_LINES], parse_float=Number)
-    return Project(header, root["data"])
-
-
-def load(path: Path) -> Project:
-    return parse(gzip.decompress(path.read_bytes()))
-
-
-def dump(node: Any) -> str:
-    if isinstance(node, Number):
-        return str(node)
-    if isinstance(node, dict):
-        if not node:
-            return "{}"
-        items = ",\n".join(f"{json.dumps(k, ensure_ascii=False)}: {dump(v)}" for k, v in node.items())
-        return "{\n" + items + "\n}"
-    if isinstance(node, list):
-        if not node:
-            return "[]"
-        return "[\n" + ",\n".join(dump(v) for v in node) + "\n]"
-    return json.dumps(node, ensure_ascii=False)
-
-
-def render(project: Project) -> bytes:
-    return project.header + dump({"data": project.data}).encode("utf-8")
-
-
-def pack(raw: bytes) -> bytes:
-    data = bytearray(gzip.compress(raw, mtime=0))
-    data[8] = 0  # заголовок как у файлов с Live 2
-    data[9] = 3
-    return bytes(data)
+def validate_plan(plan: dict[str, Any]) -> None:
+    schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
+    errors = sorted(jsonschema.Draft202012Validator(schema).iter_errors(plan), key=lambda e: list(e.absolute_path))
+    if errors:
+        where = "/".join(str(x) for x in errors[0].absolute_path) or "план"
+        raise ContractError(f"план не соответствует контракту: {where}: {errors[0].message}")
 
 
 def frames(path: Path) -> int:
@@ -90,100 +65,12 @@ def frames(path: Path) -> int:
     raise ValueError(f"нет данных в {path}")
 
 
-def note_template(project: Project) -> dict[str, Any]:
-    for sequence in project.data["sequences"]:
-        for clips in sequence["value"]["trackClipMaps"]:
-            for item in clips:
-                for event in item["value"]["eventList"]["events"]:
-                    if "note" in event:
-                        return copy.deepcopy(event)
-    raise ValueError("в шаблоне нет ни одной ноты")
-
-
-def make_event(template: dict[str, Any], tick: int, pitch: int, velocity: float, length: int) -> dict[str, Any]:
-    event = copy.deepcopy(template)
-    event["time"] = tick
-    event["note"]["note"] = pitch
-    event["note"]["velocity"] = float(velocity)
-    event["note"]["length"] = length
-    return event
-
-
-def clear_pads(program: dict[str, Any]) -> None:
-    instruments = program["drum"]["instruments"]
-    for pad in range(len(instruments) - 1):
-        instruments[pad] = copy.deepcopy(instruments[-1])
-    program["samples"] = []
-
-
-def set_pad(program: dict[str, Any], filled: dict[str, Any], pad: int, entry: dict[str, Any], length: int) -> None:
-    program["drum"]["instruments"][pad] = copy.deepcopy(filled)
-    layer = program["drum"]["instruments"][pad]["layersv"][0]
-    layer["sampleName"] = entry["name"]
-    layer["sampleFile"] = entry["path"]
-    layer["sliceInfo"]["End"] = length - 1
-    program["samples"].append(copy.deepcopy(entry))
-
-
-def insert_track(project: Project, track: dict[str, Any], name: str) -> None:
-    """Ставит трек перед служебными, добавляет пустой клип в секвенцию шаблона."""
-    track["name"] = name
-    track["program"]["name"] = name
-    tracks = project.data["tracks"]
-    position = next(i for i, t in enumerate(tracks) if t["program"]["type"] >= 7)
-    tracks.insert(position, track)
-    clips = project.data["sequences"][0]["value"]["trackClipMaps"][0]
-    base = copy.deepcopy(clips[0])
-    base["key"] = name
-    base["value"]["name"] = name
-    base["value"]["eventList"]["events"] = []
-    clips.append(base)
-    clips.sort(key=lambda c: c["key"])
-
-
-def rename_first_track(project: Project, name: str) -> dict[str, Any]:
-    """Трек шаблона становится пустым HANDS: так он остаётся первым."""
-    track = project.data["tracks"][0]
-    track["name"] = name
-    track["program"]["name"] = name
-    clear_pads(track["program"])
-    clips = project.data["sequences"][0]["value"]["trackClipMaps"][0]
-    clip = next(c for c in clips if c["key"] == BASE_TRACK)
-    clip["key"] = name
-    clip["value"]["name"] = name
-    clip["value"]["eventList"]["events"] = []
-    clips.sort(key=lambda c: c["key"])
-    return track
-
-
-def set_length(value: dict[str, Any], section: Section) -> None:
-    pulses = section.bars * BAR
-    value["lengthBars"] = value["loopEndBar"] = section.bars
-    value["lengthPulses"] = value["loopEndPulses"] = pulses
-    for clips in value["trackClipMaps"]:
-        for item in clips:
-            item["value"]["endPulses"] = item["value"]["loopEndPulses"] = pulses
-
-
-def make_sequences(project: Project, sections: list[Section]) -> None:
-    base = project.data["sequences"][0]
-    made = []
-    for number, section in enumerate(sections):
-        item = copy.deepcopy(base)
-        item["key"] = number
-        item["value"]["name"] = transliterate(section.name)
-        set_length(item["value"], section)
-        made.append(item)
-    project.data["sequences"] = list(reversed(made))
-    project.data["currentSequence"] = 0
-
-
 def exported(group: Group) -> list[PlanPiece]:
     return [p for t in group.tracks for p in t.pieces if is_exported(p)]
 
 
 def plays(group: Group, piece: PlanPiece) -> list[Occurrence]:
-    """Вхождения куска вместе с вхождениями слитых в него, AN-070."""
+    """Вхождения фрагмента вместе с вхождениями слитых в него, AN-070."""
     track = next(t for t in group.tracks if any(p is piece for p in t.pieces))
     return occurrences_of(track, piece)
 
@@ -197,18 +84,23 @@ def notes_of(value: dict[str, Any], track: str) -> list[tuple[int, int]]:
 
 
 def add_notes(
-    project: Project, track: str, pitch: int, piece: PlanPiece, occurrences: list[Occurrence],
-    sections: list[Section], template: dict[str, Any],
-) -> None:
-    by_key = {s["key"]: s["value"] for s in project.data["sequences"]}
+    by_key: dict[int, dict[str, Any]], track: str, pitch: int, piece: PlanPiece, occurrences: list[Occurrence],
+    sections: list[Section],
+) -> int:
+    """Ставит ноты фрагмента в клипы секций. Возвращает число нот, у которых длина усечена по концу секции."""
+    cut = 0
     loudest = max((o.gain for o in occurrences), default=0.0)
     for occurrence in occurrences:
         number, attack = place(occurrence.tick, sections)
         tick = max(attack - piece.lead, 0)
         room = sections[number].bars * BAR - tick
         velocity = max(occurrence.gain / loudest, MIN_VELOCITY) if loudest else 1.0
-        event = make_event(template, tick, pitch, velocity, max(min(occurrence.length or piece.ticks, room), 1))
+        wanted = occurrence.length or piece.ticks
+        length = max(min(wanted, room), 1)
+        cut += length < wanted
+        event = xpj_spec.note_event(tick, pitch, velocity, length)
         clip_of(by_key[number], track)["eventList"]["events"].append(event)
+    return cut
 
 
 def check(plan: Plan, samples: Path) -> None:
@@ -216,75 +108,86 @@ def check(plan: Plan, samples: Path) -> None:
     for group in plan.groups:
         pieces = exported(group)
         if len(pieces) > PADS:
-            raise ValueError(f"группа {group.name}: {len(pieces)} кусков при лимите {PADS} пэдов")
+            raise ValueError(f"группа {group.name}: {len(pieces)} фрагментов при лимите {PADS} пэдов")
+    titles = [HANDS] + [transliterate(g.name) for g in plan.groups]
+    twins = sorted({t for t in titles if titles.count(t) > 1})
+    if twins:
+        raise ValueError("совпадают имена треков после транслитерации: " + ", ".join(twins))
     missing = sorted(p.file for g in plan.groups for p in exported(g) if not (samples / p.file).is_file())
     if missing:
         raise FileNotFoundError("нет сэмплов: " + ", ".join(missing))
 
 
-def write_project(plan: Plan, samples: Path, out: Path, name: str) -> Path:
+def drum_track(number: int, title: str, pieces: list[PlanPiece], samples: Path, bpm: float) -> tuple[dict[str, Any], list[tuple[Path, str]]]:
+    """Трек HANDS (без фрагментов) или трек группы: 128 пэдов, на первых сэмплы фрагментов."""
+    track = xpj_spec.drum_track(title, armed=number == 0)
+    program = track["program"]
+    copies = []
+    for index in range(PADS):
+        if index < len(pieces):
+            piece = pieces[index]
+            path = f"{piece.name}.wav"
+            program["samples"].append(xpj_spec.sample_entry(piece.name, path, bpm, in_program=True))
+            copies.append((samples / piece.file, path))
+            made = xpj_spec.pad(number * PADS + index, (piece.name, path, frames(samples / piece.file)), bpm)
+        else:
+            made = xpj_spec.pad(number * PADS + index, None, bpm)
+        program["drum"]["instruments"].append(made)
+    return track, copies
+
+
+def export_project(plan: Plan, samples: Path, out: Path, name: str) -> ExportResult:
+    validate_plan(asdict(plan))
     check(plan, samples)
     name = transliterate(name)
-    project = load(TEMPLATE)
-    template = note_template(project)
-    data = project.data
-    filled = copy.deepcopy(data["tracks"][0]["program"]["drum"]["instruments"][0])
-    entry_base = copy.deepcopy(data["samples"][0])
-    entry_base["metadata"]["tempo"] = Number(str(float(plan.bpm)))
-    data["masterTempo"] = float(plan.bpm)
-    data["sequences"][0]["value"]["bpm"] = float(plan.bpm)
-    data["samples"] = []
-    hands = rename_first_track(project, HANDS)
+    bpm = float(plan.bpm)
+    data = xpj_spec.root(bpm)
+    losses = [SERVICE_LOSS]
     copies: list[tuple[Path, str]] = []
     chosen: list[tuple[str, Group, list[PlanPiece]]] = []
-    for group in plan.groups:
-        pieces = exported(group)
-        track = copy.deepcopy(hands)
-        for pad, piece in enumerate(pieces):
-            entry = copy.deepcopy(entry_base)
-            entry["name"] = piece.name
-            entry["path"] = f"{piece.name}.wav"
-            data["samples"].append(copy.deepcopy(entry))
-            set_pad(track["program"], filled, pad, entry, frames(samples / piece.file))
-            copies.append((samples / piece.file, entry["path"]))
-        title = transliterate(group.name)
-        insert_track(project, track, title)
-        chosen.append((title, group, pieces))
-    make_sequences(project, plan.sections)
+    titles = [HANDS]
+    for number, group in enumerate([None, *plan.groups]):
+        pieces = exported(group) if group else []
+        title = transliterate(group.name) if group else HANDS
+        track, made = drum_track(number, title, pieces, samples, bpm)
+        data["tracks"].append(track)
+        copies += made
+        for piece in pieces:
+            data["samples"].append(xpj_spec.sample_entry(piece.name, f"{piece.name}.wav", bpm))
+        if group:
+            chosen.append((title, group, pieces))
+            titles.append(title)
+    made_sequences = []
+    for number, section in enumerate(plan.sections):
+        pulses = section.bars * BAR
+        item = xpj_spec.sequence(number, transliterate(section.name), section.bars, pulses, bpm)
+        item["value"]["trackClipMaps"] = [sorted((xpj_spec.clip(t, pulses) for t in titles), key=lambda c: c["key"])]
+        made_sequences.append(item)
+    data["sequences"] = list(reversed(made_sequences))
+    by_key = {s["key"]: s["value"] for s in data["sequences"]}
+    cut = 0
     for title, group, pieces in chosen:
-        map_notes = next(t for t in data["tracks"] if t["name"] == title)["program"]["padNoteMap"]["noteForPad"]
+        notes = next(t for t in data["tracks"] if t["name"] == title)["program"]["padNoteMap"]["noteForPad"]
         for pad, piece in enumerate(pieces):
-            add_notes(project, title, map_notes[f"value{pad}"], piece, plays(group, piece), plan.sections, template)
+            cut += add_notes(by_key, title, notes[f"value{pad}"], piece, plays(group, piece), plan.sections)
     for sequence in data["sequences"]:
         for clips in sequence["value"]["trackClipMaps"]:
             for item in clips:
                 item["value"]["eventList"]["events"].sort(key=lambda e: e["time"])
+    if cut:
+        losses.append(f"Длина ноты усечена по концу секции: {cut}")
+    merged = sum(1 for g in plan.groups for t in g.tracks for p in t.pieces if p.merged_into is not None)
+    if merged:
+        losses.append(f"Фрагментов слито в другие, пэда у них нет, ноты перенесены на основной: {merged}")
     out.mkdir(parents=True, exist_ok=True)
     folder = out / f"{name}_[ProjectData]"
     folder.mkdir(exist_ok=True)
     for source, target in copies:
         shutil.copy2(source, folder / target)
     path = out / f"{name}.xpj"
-    path.write_bytes(pack(render(project)))
-    return path
+    path.write_bytes(pack(render(Project(xpj_spec.header(), data))))
+    return ExportResult(path, losses)
 
 
-def read_overview(project: Path) -> dict[str, Any]:
-    """Сводка собранного `.xpj` и папки `<имя>_[ProjectData]`: треки с пэдами, секвенции, сэмплы, размеры."""
-    if not project.is_file():
-        raise ValueError(f"нет проекта {project}")
-    folder = project.parent / f"{project.stem}_[ProjectData]"
-    try:
-        files = {p.name: p.stat().st_size for p in folder.iterdir() if p.is_file()} if folder.is_dir() else {}
-        view = summarize(load(project).data, files)
-    except (OSError, ValueError, KeyError, TypeError, IndexError, EOFError, zlib.error) as error:
-        raise ValueError(f"не удалось прочитать проект {project.name}: {error.__class__.__name__}") from None
-    samples = sum(files.values())
-    try:
-        size = project.stat().st_size
-    except OSError as error:
-        raise ValueError(f"не удалось прочитать проект {project.name}: {error.__class__.__name__}") from None
-    return {
-        "project": str(project), "folder": str(folder), **view,
-        "size": {"project": size, "samples": samples, "total": size + samples},
-    }
+def write_project(plan: Plan, samples: Path, out: Path, name: str) -> Path:
+    return export_project(plan, samples, out, name).path

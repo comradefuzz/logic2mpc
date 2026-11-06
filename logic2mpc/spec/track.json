@@ -1,0 +1,1228 @@
+{
+"name": "Drum 001",
+"volume": 1.0,
+"volumeKnown": false,
+"mute": false,
+"colour": 8959,
+"program": {
+"name": "Drum 001",
+"type": 0,
+"programPads": {
+"Universal": {
+"value0": true
+},
+"Type": {
+"value0": 5
+},
+"universalPad": 65280,
+"pads": {
+"value0": 0,
+"value1": 0,
+"value2": 0,
+"value3": 0,
+"value4": 0,
+"value5": 0,
+"value6": 0,
+"value7": 0,
+"value8": 0,
+"value9": 0,
+"value10": 0,
+"value11": 0,
+"value12": 0,
+"value13": 0,
+"value14": 0,
+"value15": 0,
+"value16": 0,
+"value17": 0,
+"value18": 0,
+"value19": 0,
+"value20": 0,
+"value21": 0,
+"value22": 0,
+"value23": 0,
+"value24": 0,
+"value25": 0,
+"value26": 0,
+"value27": 0,
+"value28": 0,
+"value29": 0,
+"value30": 0,
+"value31": 0,
+"value32": 0,
+"value33": 0,
+"value34": 0,
+"value35": 0,
+"value36": 0,
+"value37": 0,
+"value38": 0,
+"value39": 0,
+"value40": 0,
+"value41": 0,
+"value42": 0,
+"value43": 0,
+"value44": 0,
+"value45": 0,
+"value46": 0,
+"value47": 0,
+"value48": 0,
+"value49": 0,
+"value50": 0,
+"value51": 0,
+"value52": 0,
+"value53": 0,
+"value54": 0,
+"value55": 0,
+"value56": 0,
+"value57": 0,
+"value58": 0,
+"value59": 0,
+"value60": 0,
+"value61": 0,
+"value62": 0,
+"value63": 0,
+"value64": 0,
+"value65": 0,
+"value66": 0,
+"value67": 0,
+"value68": 0,
+"value69": 0,
+"value70": 0,
+"value71": 0,
+"value72": 0,
+"value73": 0,
+"value74": 0,
+"value75": 0,
+"value76": 0,
+"value77": 0,
+"value78": 0,
+"value79": 0,
+"value80": 0,
+"value81": 0,
+"value82": 0,
+"value83": 0,
+"value84": 0,
+"value85": 0,
+"value86": 0,
+"value87": 0,
+"value88": 0,
+"value89": 0,
+"value90": 0,
+"value91": 0,
+"value92": 0,
+"value93": 0,
+"value94": 0,
+"value95": 0,
+"value96": 0,
+"value97": 0,
+"value98": 0,
+"value99": 0,
+"value100": 0,
+"value101": 0,
+"value102": 0,
+"value103": 0,
+"value104": 0,
+"value105": 0,
+"value106": 0,
+"value107": 0,
+"value108": 0,
+"value109": 0,
+"value110": 0,
+"value111": 0,
+"value112": 0,
+"value113": 0,
+"value114": 0,
+"value115": 0,
+"value116": 0,
+"value117": 0,
+"value118": 0,
+"value119": 0,
+"value120": 0,
+"value121": 0,
+"value122": 0,
+"value123": 0,
+"value124": 0,
+"value125": 0,
+"value126": 0,
+"value127": 0
+},
+"UnusedPads": {
+"value0": 1
+},
+"PadsFollowTrackColour": {
+"value0": false
+}
+},
+"customQLinks": [
+{
+"name": "",
+"controlType": 0,
+"targetData": [],
+"momentary": 0,
+"controlValue": 0.0
+},
+{
+"name": "",
+"controlType": 0,
+"targetData": [],
+"momentary": 0,
+"controlValue": 0.0
+},
+{
+"name": "",
+"controlType": 0,
+"targetData": [],
+"momentary": 0,
+"controlValue": 0.0
+},
+{
+"name": "",
+"controlType": 0,
+"targetData": [],
+"momentary": 0,
+"controlValue": 0.0
+},
+{
+"name": "",
+"controlType": 0,
+"targetData": [],
+"momentary": 0,
+"controlValue": 0.0
+},
+{
+"name": "",
+"controlType": 0,
+"targetData": [],
+"momentary": 0,
+"controlValue": 0.0
+},
+{
+"name": "",
+"controlType": 0,
+"targetData": [],
+"momentary": 0,
+"controlValue": 0.0
+},
+{
+"name": "",
+"controlType": 0,
+"targetData": [],
+"momentary": 0,
+"controlValue": 0.0
+},
+{
+"name": "",
+"controlType": 0,
+"targetData": [],
+"momentary": 0,
+"controlValue": 0.0
+},
+{
+"name": "",
+"controlType": 0,
+"targetData": [],
+"momentary": 0,
+"controlValue": 0.0
+},
+{
+"name": "",
+"controlType": 0,
+"targetData": [],
+"momentary": 0,
+"controlValue": 0.0
+},
+{
+"name": "",
+"controlType": 0,
+"targetData": [],
+"momentary": 0,
+"controlValue": 0.0
+},
+{
+"name": "",
+"controlType": 0,
+"targetData": [],
+"momentary": 0,
+"controlValue": 0.0
+},
+{
+"name": "",
+"controlType": 0,
+"targetData": [],
+"momentary": 0,
+"controlValue": 0.0
+},
+{
+"name": "",
+"controlType": 0,
+"targetData": [],
+"momentary": 0,
+"controlValue": 0.0
+},
+{
+"name": "",
+"controlType": 0,
+"targetData": [],
+"momentary": 0,
+"controlValue": 0.0
+}
+],
+"midiEventsFilter": {
+"channelFilterData": {
+"channel": 255
+},
+"velocityFilterData": {
+"min": 0.0,
+"max": 1.0
+},
+"noteFilterData": {
+"noteRange": {
+"type": 2,
+"data": "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+}
+},
+"automationFilterData": {
+"filteredParams": "00000000000000000"
+}
+},
+"mixable": {
+"version": 1,
+"audioRoute": {
+"destination": 2,
+"audioRouteSubIndex": 0,
+"channelBitmap": {
+"type": 0,
+"data": 3
+}
+},
+"volume": 0.7079457640647888,
+"mute": false,
+"solo": false,
+"pan": 0.5,
+"automationFilter": 1,
+"sends": [
+0.0,
+0.0,
+0.0,
+0.0
+],
+"inserts": {
+"insertsEnabled": true,
+"effects": []
+}
+},
+"customisable": {
+"mapping": []
+},
+"renderable": {
+"sendToCueBus": false
+},
+"padNoteMap": {
+"noteForPad": {
+"value0": 36,
+"value1": 37,
+"value2": 38,
+"value3": 39,
+"value4": 40,
+"value5": 41,
+"value6": 42,
+"value7": 43,
+"value8": 44,
+"value9": 45,
+"value10": 46,
+"value11": 47,
+"value12": 48,
+"value13": 49,
+"value14": 50,
+"value15": 51,
+"value16": 52,
+"value17": 53,
+"value18": 54,
+"value19": 55,
+"value20": 56,
+"value21": 57,
+"value22": 58,
+"value23": 59,
+"value24": 60,
+"value25": 61,
+"value26": 62,
+"value27": 63,
+"value28": 64,
+"value29": 65,
+"value30": 66,
+"value31": 67,
+"value32": 68,
+"value33": 69,
+"value34": 70,
+"value35": 71,
+"value36": 72,
+"value37": 73,
+"value38": 74,
+"value39": 75,
+"value40": 76,
+"value41": 77,
+"value42": 78,
+"value43": 79,
+"value44": 80,
+"value45": 81,
+"value46": 82,
+"value47": 83,
+"value48": 84,
+"value49": 85,
+"value50": 86,
+"value51": 87,
+"value52": 88,
+"value53": 89,
+"value54": 90,
+"value55": 91,
+"value56": 92,
+"value57": 93,
+"value58": 94,
+"value59": 95,
+"value60": 96,
+"value61": 97,
+"value62": 98,
+"value63": 99,
+"value64": 100,
+"value65": 101,
+"value66": 102,
+"value67": 103,
+"value68": 104,
+"value69": 105,
+"value70": 106,
+"value71": 107,
+"value72": 108,
+"value73": 109,
+"value74": 110,
+"value75": 111,
+"value76": 112,
+"value77": 113,
+"value78": 114,
+"value79": 115,
+"value80": 116,
+"value81": 117,
+"value82": 118,
+"value83": 119,
+"value84": 120,
+"value85": 121,
+"value86": 122,
+"value87": 123,
+"value88": 124,
+"value89": 125,
+"value90": 126,
+"value91": 127,
+"value92": 0,
+"value93": 1,
+"value94": 2,
+"value95": 3,
+"value96": 4,
+"value97": 5,
+"value98": 6,
+"value99": 7,
+"value100": 8,
+"value101": 9,
+"value102": 10,
+"value103": 11,
+"value104": 12,
+"value105": 13,
+"value106": 14,
+"value107": 15,
+"value108": 16,
+"value109": 17,
+"value110": 18,
+"value111": 19,
+"value112": 20,
+"value113": 21,
+"value114": 22,
+"value115": 23,
+"value116": 24,
+"value117": 25,
+"value118": 26,
+"value119": 27,
+"value120": 28,
+"value121": 29,
+"value122": 30,
+"value123": 31,
+"value124": 32,
+"value125": 33,
+"value126": 34,
+"value127": 35
+}
+},
+"drum": {
+"version": 11,
+"pitch": 0.0,
+"coarseTune": 0,
+"fineTune": 0,
+"monophonic": false,
+"poliphony": 16,
+"portamentoTime": 0.0,
+"portamentoLegato": false,
+"padGroup": {
+"value0": 0,
+"value1": 0,
+"value2": 0,
+"value3": 0,
+"value4": 0,
+"value5": 0,
+"value6": 0,
+"value7": 0,
+"value8": 0,
+"value9": 0,
+"value10": 0,
+"value11": 0,
+"value12": 0,
+"value13": 0,
+"value14": 0,
+"value15": 0,
+"value16": 0,
+"value17": 0,
+"value18": 0,
+"value19": 0,
+"value20": 0,
+"value21": 0,
+"value22": 0,
+"value23": 0,
+"value24": 0,
+"value25": 0,
+"value26": 0,
+"value27": 0,
+"value28": 0,
+"value29": 0,
+"value30": 0,
+"value31": 0,
+"value32": 0,
+"value33": 0,
+"value34": 0,
+"value35": 0,
+"value36": 0,
+"value37": 0,
+"value38": 0,
+"value39": 0,
+"value40": 0,
+"value41": 0,
+"value42": 0,
+"value43": 0,
+"value44": 0,
+"value45": 0,
+"value46": 0,
+"value47": 0,
+"value48": 0,
+"value49": 0,
+"value50": 0,
+"value51": 0,
+"value52": 0,
+"value53": 0,
+"value54": 0,
+"value55": 0,
+"value56": 0,
+"value57": 0,
+"value58": 0,
+"value59": 0,
+"value60": 0,
+"value61": 0,
+"value62": 0,
+"value63": 0,
+"value64": 0,
+"value65": 0,
+"value66": 0,
+"value67": 0,
+"value68": 0,
+"value69": 0,
+"value70": 0,
+"value71": 0,
+"value72": 0,
+"value73": 0,
+"value74": 0,
+"value75": 0,
+"value76": 0,
+"value77": 0,
+"value78": 0,
+"value79": 0,
+"value80": 0,
+"value81": 0,
+"value82": 0,
+"value83": 0,
+"value84": 0,
+"value85": 0,
+"value86": 0,
+"value87": 0,
+"value88": 0,
+"value89": 0,
+"value90": 0,
+"value91": 0,
+"value92": 0,
+"value93": 0,
+"value94": 0,
+"value95": 0,
+"value96": 0,
+"value97": 0,
+"value98": 0,
+"value99": 0,
+"value100": 0,
+"value101": 0,
+"value102": 0,
+"value103": 0,
+"value104": 0,
+"value105": 0,
+"value106": 0,
+"value107": 0,
+"value108": 0,
+"value109": 0,
+"value110": 0,
+"value111": 0,
+"value112": 0,
+"value113": 0,
+"value114": 0,
+"value115": 0,
+"value116": 0,
+"value117": 0,
+"value118": 0,
+"value119": 0,
+"value120": 0,
+"value121": 0,
+"value122": 0,
+"value123": 0,
+"value124": 0,
+"value125": 0,
+"value126": 0,
+"value127": 0
+},
+"instruments": [],
+"driftSpeed": 0.0,
+"portamentoQuantised": false,
+"monoRetrigger": false,
+"freeRunningLfoData": {
+"value0": {
+"version": 29,
+"lfoLevel": 1.0,
+"lfoWaveformType": 0,
+"lfoRate": 0.5,
+"lfoSync": 0
+},
+"value1": {
+"version": 29,
+"lfoLevel": 1.0,
+"lfoWaveformType": 0,
+"lfoRate": 0.5,
+"lfoSync": 0
+}
+},
+"legatoThreshold": 127,
+"pressureGlide": false,
+"sameVoiceLegato": false,
+"editSelection": 0,
+"drumVersion": 12
+},
+"fxRackQLinks": [],
+"customMacroSceneData": {
+"value0": {
+"first": "",
+"second": []
+},
+"value1": {
+"first": "",
+"second": []
+},
+"value2": {
+"first": "",
+"second": []
+},
+"value3": {
+"first": "",
+"second": []
+},
+"value4": {
+"first": "",
+"second": []
+},
+"value5": {
+"first": "",
+"second": []
+},
+"value6": {
+"first": "",
+"second": []
+},
+"value7": {
+"first": "",
+"second": []
+}
+},
+"fxRackMacroSceneData": {
+"value0": {
+"first": "",
+"second": []
+},
+"value1": {
+"first": "",
+"second": []
+},
+"value2": {
+"first": "",
+"second": []
+},
+"value3": {
+"first": "",
+"second": []
+},
+"value4": {
+"first": "",
+"second": []
+},
+"value5": {
+"first": "",
+"second": []
+},
+"value6": {
+"first": "",
+"second": []
+},
+"value7": {
+"first": "",
+"second": []
+}
+},
+"base.customXFaders": [],
+"base.customXFaderMacroSceneData": {
+"value0": {
+"first": "",
+"second": []
+},
+"value1": {
+"first": "",
+"second": []
+},
+"value2": {
+"first": "",
+"second": []
+},
+"value3": {
+"first": "",
+"second": []
+},
+"value4": {
+"first": "",
+"second": []
+},
+"value5": {
+"first": "",
+"second": []
+},
+"value6": {
+"first": "",
+"second": []
+},
+"value7": {
+"first": "",
+"second": []
+}
+},
+"base.fxRackXFaders": [],
+"base.fxRackXFaderMacroSceneData": {
+"value0": {
+"first": "",
+"second": []
+},
+"value1": {
+"first": "",
+"second": []
+},
+"value2": {
+"first": "",
+"second": []
+},
+"value3": {
+"first": "",
+"second": []
+},
+"value4": {
+"first": "",
+"second": []
+},
+"value5": {
+"first": "",
+"second": []
+},
+"value6": {
+"first": "",
+"second": []
+},
+"value7": {
+"first": "",
+"second": []
+}
+},
+"base.customXYPad1": [],
+"base.customXYPad1MacroSceneData": {
+"value0": {
+"first": "",
+"second": []
+},
+"value1": {
+"first": "",
+"second": []
+},
+"value2": {
+"first": "",
+"second": []
+},
+"value3": {
+"first": "",
+"second": []
+},
+"value4": {
+"first": "",
+"second": []
+},
+"value5": {
+"first": "",
+"second": []
+},
+"value6": {
+"first": "",
+"second": []
+},
+"value7": {
+"first": "",
+"second": []
+}
+},
+"base.fxRackXYPad1": [],
+"base.fxRackXYPad1MacroSceneData": {
+"value0": {
+"first": "",
+"second": []
+},
+"value1": {
+"first": "",
+"second": []
+},
+"value2": {
+"first": "",
+"second": []
+},
+"value3": {
+"first": "",
+"second": []
+},
+"value4": {
+"first": "",
+"second": []
+},
+"value5": {
+"first": "",
+"second": []
+},
+"value6": {
+"first": "",
+"second": []
+},
+"value7": {
+"first": "",
+"second": []
+}
+},
+"base.customXYPad2": [],
+"base.customXYPad2MacroSceneData": {
+"value0": {
+"first": "",
+"second": []
+},
+"value1": {
+"first": "",
+"second": []
+},
+"value2": {
+"first": "",
+"second": []
+},
+"value3": {
+"first": "",
+"second": []
+},
+"value4": {
+"first": "",
+"second": []
+},
+"value5": {
+"first": "",
+"second": []
+},
+"value6": {
+"first": "",
+"second": []
+},
+"value7": {
+"first": "",
+"second": []
+}
+},
+"base.fxRackXYPad2": [],
+"base.fxRackXYPad2MacroSceneData": {
+"value0": {
+"first": "",
+"second": []
+},
+"value1": {
+"first": "",
+"second": []
+},
+"value2": {
+"first": "",
+"second": []
+},
+"value3": {
+"first": "",
+"second": []
+},
+"value4": {
+"first": "",
+"second": []
+},
+"value5": {
+"first": "",
+"second": []
+},
+"value6": {
+"first": "",
+"second": []
+},
+"value7": {
+"first": "",
+"second": []
+}
+},
+"base.customXYPad3": [],
+"base.customXYPad3MacroSceneData": {
+"value0": {
+"first": "",
+"second": []
+},
+"value1": {
+"first": "",
+"second": []
+},
+"value2": {
+"first": "",
+"second": []
+},
+"value3": {
+"first": "",
+"second": []
+},
+"value4": {
+"first": "",
+"second": []
+},
+"value5": {
+"first": "",
+"second": []
+},
+"value6": {
+"first": "",
+"second": []
+},
+"value7": {
+"first": "",
+"second": []
+}
+},
+"base.fxRackXYPad3": [],
+"base.fxRackXYPad3MacroSceneData": {
+"value0": {
+"first": "",
+"second": []
+},
+"value1": {
+"first": "",
+"second": []
+},
+"value2": {
+"first": "",
+"second": []
+},
+"value3": {
+"first": "",
+"second": []
+},
+"value4": {
+"first": "",
+"second": []
+},
+"value5": {
+"first": "",
+"second": []
+},
+"value6": {
+"first": "",
+"second": []
+},
+"value7": {
+"first": "",
+"second": []
+}
+},
+"base.customXYPad4": [],
+"base.customXYPad4MacroSceneData": {
+"value0": {
+"first": "",
+"second": []
+},
+"value1": {
+"first": "",
+"second": []
+},
+"value2": {
+"first": "",
+"second": []
+},
+"value3": {
+"first": "",
+"second": []
+},
+"value4": {
+"first": "",
+"second": []
+},
+"value5": {
+"first": "",
+"second": []
+},
+"value6": {
+"first": "",
+"second": []
+},
+"value7": {
+"first": "",
+"second": []
+}
+},
+"base.fxRackXYPad4": [],
+"base.fxRackXYPad4MacroSceneData": {
+"value0": {
+"first": "",
+"second": []
+},
+"value1": {
+"first": "",
+"second": []
+},
+"value2": {
+"first": "",
+"second": []
+},
+"value3": {
+"first": "",
+"second": []
+},
+"value4": {
+"first": "",
+"second": []
+},
+"value5": {
+"first": "",
+"second": []
+},
+"value6": {
+"first": "",
+"second": []
+},
+"value7": {
+"first": "",
+"second": []
+}
+},
+"base.customPadGrid": [],
+"base.customPadGridMacroSceneData": {
+"value0": {
+"first": "",
+"second": []
+},
+"value1": {
+"first": "",
+"second": []
+},
+"value2": {
+"first": "",
+"second": []
+},
+"value3": {
+"first": "",
+"second": []
+},
+"value4": {
+"first": "",
+"second": []
+},
+"value5": {
+"first": "",
+"second": []
+},
+"value6": {
+"first": "",
+"second": []
+},
+"value7": {
+"first": "",
+"second": []
+}
+},
+"base.fxRackPadGrid": [],
+"base.fxRackPadGridMacroSceneData": {
+"value0": {
+"first": "",
+"second": []
+},
+"value1": {
+"first": "",
+"second": []
+},
+"value2": {
+"first": "",
+"second": []
+},
+"value3": {
+"first": "",
+"second": []
+},
+"value4": {
+"first": "",
+"second": []
+},
+"value5": {
+"first": "",
+"second": []
+},
+"value6": {
+"first": "",
+"second": []
+},
+"value7": {
+"first": "",
+"second": []
+}
+},
+"base.customEnvFollower": [],
+"base.customEnvFollowerMacroSceneData": {
+"value0": {
+"first": "",
+"second": []
+},
+"value1": {
+"first": "",
+"second": []
+},
+"value2": {
+"first": "",
+"second": []
+},
+"value3": {
+"first": "",
+"second": []
+},
+"value4": {
+"first": "",
+"second": []
+},
+"value5": {
+"first": "",
+"second": []
+},
+"value6": {
+"first": "",
+"second": []
+},
+"value7": {
+"first": "",
+"second": []
+}
+},
+"base.fxRackEnvFollower": [],
+"base.fxRackEnvFollowerMacroSceneData": {
+"value0": {
+"first": "",
+"second": []
+},
+"value1": {
+"first": "",
+"second": []
+},
+"value2": {
+"first": "",
+"second": []
+},
+"value3": {
+"first": "",
+"second": []
+},
+"value4": {
+"first": "",
+"second": []
+},
+"value5": {
+"first": "",
+"second": []
+},
+"value6": {
+"first": "",
+"second": []
+},
+"value7": {
+"first": "",
+"second": []
+}
+},
+"base.customPhysicalPadsAssignments": [],
+"base.fxRackPhysicalPadsAssignments": [],
+"samples": []
+},
+"midiEventsFilter": {
+"channelFilterData": {
+"channel": 255
+},
+"velocityFilterData": {
+"min": 0.0,
+"max": 1.0
+},
+"noteFilterData": {
+"noteRange": {
+"type": 2,
+"data": "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+}
+},
+"automationFilterData": {
+"filteredParams": "00000000000000000"
+}
+},
+"arrangementClipMap": [],
+"sharedClipMap": [],
+"recordArm": true,
+"midiBankAndProgramNumber": {
+"midiBankEnable": false,
+"midiBankMsb": 0,
+"midiBankLsb": 0,
+"midiProgramNumberEnable": false,
+"midiProgramNumber": 0
+},
+"midiInputRoute": {
+"inputPort": {
+"type": 0,
+"deviceName": "All Ports",
+"deviceId": "",
+"os": "Linux"
+},
+"inputChannel": 0
+},
+"midiOutputRoute": {
+"outputPort": {
+"type": 1,
+"deviceName": "<none>",
+"deviceId": "",
+"os": "Linux"
+},
+"outputChannel": 16
+},
+"midiMonitorable": {
+"state": 2
+}
+}

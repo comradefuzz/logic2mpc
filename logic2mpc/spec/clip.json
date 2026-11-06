@@ -1,0 +1,44 @@
+{
+"endPulses": 15360,
+"loopEndPulses": 15360,
+"name": "Drum 001",
+"eventList": {
+"length": 9223372036854775807,
+"events": [],
+"version": 2,
+"quantisation": {
+"version": 1,
+"pulses": 0,
+"swing": 0.0,
+"strength": 1.0
+},
+"numFilterTypes": 32
+},
+"perClipParameterValues": {
+"perClipParameterValues": [
+{
+"key": {
+"parameter": 256,
+"instrumentIndex": 256
+},
+"value": 0.0
+},
+{
+"key": {
+"parameter": 256,
+"instrumentIndex": 257
+},
+"value": 0.0
+}
+]
+},
+"timeSignatureList": {
+"timeSignatures": [
+{
+"beatsPerBar": 4,
+"beatLength": 960,
+"barStart": 0
+}
+]
+}
+}

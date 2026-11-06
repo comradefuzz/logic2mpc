@@ -182,7 +182,8 @@ def confirm(version: Path) -> Path:
     return path
 
 
-def build(version: Path, out: Path, name: str) -> Path:
+def build_result(version: Path, out: Path, name: str) -> xpj.ExportResult:
+    """Сборка подтверждённого плана: путь к проекту и потери перевода."""
     text = (version / "plan.json").read_text(encoding="utf-8")
     path = version / "confirmed.json"
     if not path.is_file():
@@ -193,18 +194,22 @@ def build(version: Path, out: Path, name: str) -> Path:
     file = transliterate(name)
     old = [out / f"{file}.xpj", out / f"{file}_[ProjectData]"]
     if not any(p.exists() for p in old):
-        return xpj.write_project(plan, samples, out, name)
+        return xpj.export_project(plan, samples, out, name)
     # Перезапись: новый проект собирается рядом и заменяет старый целиком, сбой сборки старый не трогает.
     stage = Path(tempfile.mkdtemp(prefix=".logic2mpc-", dir=out))
     try:
-        built = xpj.write_project(plan, samples, stage, name)
+        result = xpj.export_project(plan, samples, stage, name)
         for path in old:
             shutil.rmtree(path) if path.is_dir() else path.unlink(missing_ok=True)
         shutil.move(stage / f"{file}_[ProjectData]", old[1])
-        shutil.move(built, old[0])
+        shutil.move(result.path, old[0])
     finally:
         shutil.rmtree(stage, ignore_errors=True)
-    return old[0]
+    return xpj.ExportResult(old[0], result.losses)
+
+
+def build(version: Path, out: Path, name: str) -> Path:
+    return build_result(version, out, name).path
 
 
 class Session:
@@ -219,6 +224,7 @@ class Session:
         self.name: str = self.plan.song
         self.lock = threading.Lock()
         self.built: Path | None = None
+        self.losses: list[str] = []
 
     def set_target(self, folder: Path | None, name: str | None) -> None:
         """Куда собирать проект MPC: папка и имя. Пустое значение оставляет прежнее."""
@@ -334,7 +340,8 @@ class Session:
         if not self.lock.acquire(blocking=False):
             raise BusyError("сборка уже идёт")
         try:
-            self.built = build(self.version, out, name)
+            result = build_result(self.version, out, name)
+            self.built, self.losses = result.path, result.losses
             return self.built
         finally:
             self.lock.release()
@@ -356,7 +363,8 @@ class Session:
                 self.save()
             if not self.confirmed:
                 self.confirm()
-            self.built = build(self.version, self.folder, self.name)
+            result = build_result(self.version, self.folder, self.name)
+            self.built, self.losses = result.path, result.losses
             return self.built
         finally:
             self.lock.release()

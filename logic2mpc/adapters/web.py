@@ -13,7 +13,7 @@ from urllib.parse import urlsplit
 from fastapi import Body, FastAPI, Request
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse
 
-from . import xpj
+from . import xpj_view
 from ..app import BusyError, ConfirmationError, ExportTargetError, Session, Workspace, inspect_project
 from ..core import edit as editing
 from ..core import report
@@ -239,7 +239,7 @@ def create_app(
             return refuse(error, 409)
         except (OSError, ValueError) as error:
             return refuse(error, 400)
-        return {"project": str(project)}
+        return {"project": str(project), "losses": session.losses}
 
     @app.post("/api/finish")
     def post_finish(body: dict | None = Body(None)):
@@ -256,14 +256,14 @@ def create_app(
             return refuse(error, 409 if "уже есть" in str(error) else 400)
         except (OSError, ValueError) as error:
             return refuse(error, 400)
-        return {"project": str(project), **current()}
+        return {"project": str(project), "losses": session.losses, **current()}
 
     @app.get("/api/project")
     def get_project():
         if ws.session is None or ws.session.built is None:
             return refuse(RuntimeError("проект ещё не собран"), 409)
         try:
-            return xpj.read_overview(ws.session.built)
+            return xpj_view.read_overview(ws.session.built)
         except ValueError as error:
             return refuse(error, 400)
 
@@ -273,7 +273,7 @@ def create_app(
         try:
             if ws.session is None or ws.session.built is None:
                 raise KeyError(name)
-            view = xpj.read_overview(ws.session.built)
+            view = xpj_view.read_overview(ws.session.built)
             if name not in {p["file"] for t in view["tracks"] for p in t["pads"]}:
                 raise KeyError(name)
             folder = Path(view["folder"])
@@ -291,7 +291,7 @@ def create_app(
                 raise KeyError(name)
             path = ws.session.audio(name)
         except KeyError:
-            return refuse(KeyError("нет такого куска"), 404)
+            return refuse(KeyError("нет такого фрагмента"), 404)
         return FileResponse(path, media_type="audio/wav")
 
     return app

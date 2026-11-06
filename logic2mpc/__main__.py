@@ -56,7 +56,10 @@ def main() -> int:
         elif args.command == "confirm":
             print(app.confirm(args.version))
         else:
-            print(app.build(args.version, args.out, args.name))
+            result = app.build_result(args.version, args.out, args.name)
+            print(result.path)
+            for loss in result.losses:
+                print(f"потеря: {loss}", file=sys.stderr)
     except (app.ConfirmationError, FileNotFoundError, ValueError) as error:
         print(f"ошибка: {error}", file=sys.stderr)
         return 1

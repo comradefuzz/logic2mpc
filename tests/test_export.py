@@ -140,6 +140,12 @@ def test_build_hands_is_first_and_empty(tmp_path: Path) -> None:
     assert not any(i["layersv"][0]["sampleFile"] for i in hands["drum"]["instruments"])
 
 
+def test_build_arms_only_current_track(tmp_path: Path) -> None:
+    data = built(sample_plan(), tmp_path).data
+    armed = [i for i, t in enumerate(data["tracks"]) if t["recordArm"]]
+    assert armed == [data["currentTrackIndex"]]
+
+
 def test_build_name_of_file_and_folder_match(tmp_path: Path) -> None:
     plan = sample_plan()
     write_samples(plan, tmp_path / "samples")

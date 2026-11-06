@@ -8,7 +8,7 @@ import pytest
 import soundfile as sf
 from fastapi.testclient import TestClient
 
-from logic2mpc.adapters import web, xpj
+from logic2mpc.adapters import web, xpj, xpj_view
 from logic2mpc.app import Session
 from logic2mpc.core.edit import apply
 from logic2mpc.core.model import BAR
@@ -34,7 +34,7 @@ def build(plan: Plan, tmp_path: Path, name: str = "Song") -> Path:
 
 
 def test_overview_lists_tracks_with_hands_first_and_empty(tmp_path: Path) -> None:
-    view = xpj.read_overview(build(make_plan(), tmp_path))
+    view = xpj_view.read_overview(build(make_plan(), tmp_path))
     assert [t["name"] for t in view["tracks"]] == ["HANDS", "Drums", "Bass", "Synth", "Lead"]
     assert [t["filled"] for t in view["tracks"]] == [0, 4, 2, 1, 1]
     assert view["tracks"][0]["pads"] == []
@@ -42,7 +42,7 @@ def test_overview_lists_tracks_with_hands_first_and_empty(tmp_path: Path) -> Non
 
 
 def test_overview_pad_has_number_bank_note_and_sample(tmp_path: Path) -> None:
-    view = xpj.read_overview(build(make_plan(), tmp_path))
+    view = xpj_view.read_overview(build(make_plan(), tmp_path))
     drums = next(t for t in view["tracks"] if t["name"] == "Drums")
     first, second = drums["pads"][0], drums["pads"][1]
     assert (first["pad"], first["bank"], first["number"], first["note"]) == (0, "A", 1, 36)
@@ -53,14 +53,14 @@ def test_overview_pad_has_number_bank_note_and_sample(tmp_path: Path) -> None:
 def test_overview_pad_16_is_first_pad_of_bank_b(tmp_path: Path) -> None:
     plan = make_plan()
     plan.groups[0].tracks[0].pieces = [piece(f"ELA_DR_K_{i:02d}", [0]) for i in range(20)]
-    view = xpj.read_overview(build(plan, tmp_path))
+    view = xpj_view.read_overview(build(plan, tmp_path))
     pad = next(t for t in view["tracks"] if t["name"] == "Drums")["pads"][16]
     assert (pad["pad"], pad["bank"], pad["number"]) == (16, "B", 1)
 
 
 def test_overview_merged_away_piece_has_no_pad_and_is_not_a_sample(tmp_path: Path) -> None:
     plan = apply(make_plan(), merge())
-    view = xpj.read_overview(build(plan, tmp_path))
+    view = xpj_view.read_overview(build(plan, tmp_path))
     drums = next(t for t in view["tracks"] if t["name"] == "Drums")
     assert drums["filled"] == 3
     assert "ELA_DR_Kick_02.wav" not in {p["file"] for t in view["tracks"] for p in t["pads"]}
@@ -68,14 +68,14 @@ def test_overview_merged_away_piece_has_no_pad_and_is_not_a_sample(tmp_path: Pat
 
 
 def test_overview_sequences_follow_sections_with_bars(tmp_path: Path) -> None:
-    view = xpj.read_overview(build(make_plan(), tmp_path))
+    view = xpj_view.read_overview(build(make_plan(), tmp_path))
     assert view["sequences"] == [{"name": "Intro", "bars": 2}, {"name": "Main A", "bars": 2}]
 
 
 def test_overview_sizes_match_files_on_disk(tmp_path: Path) -> None:
     project = build(make_plan(), tmp_path)
     data = project.parent / "Song_[ProjectData]"
-    view = xpj.read_overview(project)
+    view = xpj_view.read_overview(project)
     wavs = sum(p.stat().st_size for p in data.iterdir())
     assert view["size"] == {"project": project.stat().st_size, "samples": wavs, "total": project.stat().st_size + wavs}
     assert view["samples"] == 8 and view["missing"] == [] and view["extra"] == []
@@ -86,10 +86,19 @@ def test_overview_names_missing_and_extra_files(tmp_path: Path) -> None:
     data = project.parent / "Song_[ProjectData]"
     (data / "ELA_DR_Kick_01.wav").unlink()
     (data / "stray.wav").write_bytes(b"x")
-    view = xpj.read_overview(project)
+    view = xpj_view.read_overview(project)
     assert view["missing"] == ["ELA_DR_Kick_01.wav"] and view["extra"] == ["stray.wav"]
     first = next(t for t in view["tracks"] if t["name"] == "Drums")["pads"][0]
     assert first["exists"] is False
+
+
+def test_overview_ignores_appledouble_files_in_extra_and_size(tmp_path: Path) -> None:
+    project = build(make_plan(), tmp_path)
+    data = project.parent / "Song_[ProjectData]"
+    before = xpj_view.read_overview(project)
+    (data / "._ELA_DR_Kick_01.wav").write_bytes(b"x" * 4096)
+    view = xpj_view.read_overview(project)
+    assert view["extra"] == [] and view["size"] == before["size"]
 
 
 def test_overview_without_data_folder_reports_everything_missing(tmp_path: Path) -> None:
@@ -97,7 +106,7 @@ def test_overview_without_data_folder_reports_everything_missing(tmp_path: Path)
 
     project = build(make_plan(), tmp_path)
     shutil.rmtree(project.parent / "Song_[ProjectData]")
-    view = xpj.read_overview(project)
+    view = xpj_view.read_overview(project)
     assert len(view["missing"]) == 8 and view["size"]["samples"] == 0
 
 
@@ -105,16 +114,16 @@ def test_overview_broken_files_are_value_errors(tmp_path: Path) -> None:
     bad = tmp_path / "Bad.xpj"
     bad.write_bytes(b"not a project")
     with pytest.raises(ValueError, match="не удалось прочитать"):
-        xpj.read_overview(bad)
+        xpj_view.read_overview(bad)
     with pytest.raises(ValueError, match="нет проекта"):
-        xpj.read_overview(tmp_path / "Nope.xpj")
+        xpj_view.read_overview(tmp_path / "Nope.xpj")
     project = build(make_plan(), tmp_path)
     broken = xpj.load(project)
     del broken.data["sequences"]
     path = tmp_path / "NoSeq.xpj"
     path.write_bytes(xpj.pack(xpj.render(broken)))
     with pytest.raises(ValueError, match="не удалось прочитать"):
-        xpj.read_overview(path)
+        xpj_view.read_overview(path)
 
 
 def test_summarize_service_tracks_hidden_and_other_types_shown_without_pads() -> None:
@@ -217,4 +226,4 @@ def test_read_overview_folder_errors_are_value_errors(tmp_path: Path, monkeypatc
 
     monkeypatch.setattr(Path, "iterdir", denied)
     with pytest.raises(ValueError, match="не удалось прочитать"):
-        xpj.read_overview(project)
+        xpj_view.read_overview(project)
