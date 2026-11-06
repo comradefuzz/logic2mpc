@@ -759,7 +759,7 @@ data.tracks[].program.drum.instruments[].synthSection.velocityToPitch	const	0.0	
 data.tracks[].program.drum.instruments[].synthSection.velocityToStart	const	0.0	unknown	0.0	MPC-110	
 data.tracks[].program.drum.instruments[].synthSection.version	const	29	unknown	29	MPC-110	
 data.tracks[].program.drum.instruments[].tempo	var	(14 значений)	unknown	из плана		decision
-data.tracks[].program.drum.instruments[].triggerMode	var	0|2	unknown	по плану: `0` ваншот, `2` Note On (MPC-115)		decision
+data.tracks[].program.drum.instruments[].triggerMode	var	0|2	unknown	по длине образца и концу секции: `0` One Shot, `2` Note On (MPC-115, AN-068)		decision
 data.tracks[].program.drum.instruments[].userSelectableWarpPoolIndex	var	14|0|8	unknown	14	MPC-110	
 data.tracks[].program.drum.instruments[].velocityScale	const	1.0	no		MPC-117	
 data.tracks[].program.drum.instruments[].version	const	29	yes	29	MPC-117	

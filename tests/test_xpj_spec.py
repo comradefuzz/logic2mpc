@@ -142,11 +142,12 @@ def test_build_is_deterministic(tmp_path: Path) -> None:
     assert first == second
 
 
-def test_lost_notes_are_reported(tmp_path: Path) -> None:
+def test_notes_past_the_section_end_are_reported(tmp_path: Path) -> None:
     plan = sample_plan()
     plan.groups[1].tracks[0].pieces[0] = PlanPiece("B", "B.wav", 1.0, 8 * 3840, 1.0, [Occurrence(3840)])
     result = build(tmp_path, plan)
-    assert any("усечена" in loss for loss in result.losses)
+    assert any("за концом секции" in loss and "One Shot" in loss for loss in result.losses)
+    assert not any("усечена" in loss for loss in result.losses)
 
 
 def test_merged_pieces_are_reported(tmp_path: Path) -> None:
@@ -318,3 +319,89 @@ ELATED_PLAN = ROOT / "test-projects" / "exports" / "elated" / "plan" / "v11" / "
 @pytest.mark.skipif(not ELATED_PLAN.is_file(), reason="нет плана Elated в test-projects")
 def test_contract_schema_accepts_the_real_elated_plan() -> None:
     xpj.validate_plan(json.loads(ELATED_PLAN.read_text(encoding="utf-8")))
+
+
+# S-017: режим пэда по длине образца и концу секции (AN-068)
+
+BAR = 3840
+
+
+def modes(tmp_path: Path, plan, group: int = 0, **options: object) -> list[int]:
+    write_samples(plan, tmp_path / "samples")
+    path = xpj.export_project(plan, tmp_path / "samples", tmp_path / "out", "Song", **options).path
+    track = xpj.load(path).data["tracks"][group]["program"]["drum"]["instruments"]
+    return [pad["triggerMode"] for pad in track[:3]]
+
+
+def plan_with(pieces: list[PlanPiece]):
+    plan = sample_plan()
+    plan.groups[0].tracks[0].pieces = pieces
+    return plan
+
+
+def one(name: str, ticks: int, *occurrences: Occurrence) -> PlanPiece:
+    return PlanPiece(name, f"{name}.wav", 1.0, ticks, 1.0, list(occurrences) or [Occurrence(0)])
+
+
+def test_an068_long_piece_inside_its_section_is_note_on(tmp_path: Path) -> None:
+    plan = plan_with([one("A", BAR, Occurrence(0), Occurrence(BAR))])  # секция 2 такта
+    assert modes(tmp_path, plan, 1)[0] == 2
+
+
+def test_an068_short_piece_and_piece_of_exactly_the_limit_are_one_shot(tmp_path: Path) -> None:
+    plan = plan_with([one("A", BAR // 4), one("B", BAR // 2), one("C", BAR // 2 + 1)])
+    assert modes(tmp_path, plan, 1) == [0, 0, 2]
+
+
+def test_an068_piece_past_the_section_end_is_one_shot(tmp_path: Path) -> None:
+    plan = plan_with([one("A", 2 * BAR, Occurrence(BAR))])  # от второго такта 2 тактов не помещается
+    assert modes(tmp_path, plan, 1)[0] == 0
+
+
+def test_an068_one_crossing_occurrence_makes_the_whole_pad_one_shot(tmp_path: Path) -> None:
+    plan = plan_with([one("A", BAR, Occurrence(0), Occurrence(BAR + BAR // 2))])
+    assert modes(tmp_path, plan, 1)[0] == 0
+
+
+def test_an068_unplayed_length_of_an_occurrence_is_used(tmp_path: Path) -> None:
+    plan = plan_with([one("A", 2 * BAR, Occurrence(BAR, length=BAR))])  # длина вхождения короче, помещается
+    assert modes(tmp_path, plan, 1)[0] == 2
+
+
+def test_an068_merged_occurrences_are_counted(tmp_path: Path) -> None:
+    main = one("A", BAR, Occurrence(0))
+    twin = PlanPiece("B", "B.wav", 1.0, BAR // 4, 1.0, [Occurrence(BAR + BAR // 2)], merged_into="A")
+    assert modes(tmp_path, plan_with([main, twin]), 1)[0] == 0
+
+
+def test_an068_threshold_is_a_parameter(tmp_path: Path) -> None:
+    piece = one("A", 3 * BAR // 4, Occurrence(0))
+    assert modes(tmp_path / "a", plan_with([piece]), 1, note_on_from="1/4")[0] == 2
+    assert modes(tmp_path / "b", plan_with([piece]), 1, note_on_from="1/1")[0] == 0
+    assert modes(tmp_path / "c", plan_with([piece]), 1)[0] == 2  # по умолчанию 2/4
+
+
+@pytest.mark.parametrize("value", ["0", "-1/4", "abc", "1/0"])
+def test_an068_invalid_threshold_is_refused_before_writing(tmp_path: Path, value: str) -> None:
+    plan = plan_with([one("A", BAR)])
+    write_samples(plan, tmp_path / "samples")
+    with pytest.raises(ValueError):
+        xpj.export_project(plan, tmp_path / "samples", tmp_path / "out", "Song", note_on_from=value)
+    assert not (tmp_path / "out").exists()
+
+
+def test_an068_note_on_pad_notes_are_not_truncated(tmp_path: Path) -> None:
+    plan = plan_with([one("A", BAR, Occurrence(BAR))])
+    write_samples(plan, tmp_path / "samples")
+    data = xpj.load(xpj.export_project(plan, tmp_path / "samples", tmp_path / "out", "Song").path).data
+    events = [e for s in data["sequences"] for c in s["value"]["trackClipMaps"][0] if c["key"] == "Drums" for e in c["value"]["eventList"]["events"]]
+    assert events and all(e["note"]["length"] == BAR for e in events)
+
+
+def test_an068_app_passes_the_threshold(version: Path, tmp_path: Path) -> None:
+    app.confirm(version)
+    strict = app.build_result(version, tmp_path / "a", "Song", note_on_from="4/1").path
+    loose = app.build_result(version, tmp_path / "b", "Song", note_on_from="1/8").path
+    one_shot = [p["triggerMode"] for p in xpj.load(strict).data["tracks"][1]["program"]["drum"]["instruments"][:2]]
+    note_on = [p["triggerMode"] for p in xpj.load(loose).data["tracks"][1]["program"]["drum"]["instruments"][:2]]
+    assert one_shot == [0, 0] and 2 in note_on

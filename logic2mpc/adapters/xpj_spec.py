@@ -53,9 +53,13 @@ def drum_track(name: str, armed: bool) -> dict[str, Any]:
     return track
 
 
-def pad(index: int, sample: tuple[str, str, int] | None, bpm: float) -> dict[str, Any]:
-    """Пэд драм-программы. `sample` это имя, файл и число кадров. `index` уникален в проекте и даёт зёрна."""
+def pad(index: int, sample: tuple[str, str, int] | None, bpm: float, trigger_mode: int = 0) -> dict[str, Any]:
+    """Пэд драм-программы. `sample` это имя, файл и число кадров. `index` уникален в проекте и даёт зёрна.
+
+    `trigger_mode`: 0 One Shot, 2 Note On (MPC-115).
+    """
     made = _object("pad.json")
+    made["triggerMode"] = trigger_mode
     made["randomPlaySeed"] = seed(index)
     for number_, layer in enumerate(made["layersv"]):
         layer["sliceIncrementRngSeed"] = seed(index, number_ + 1)

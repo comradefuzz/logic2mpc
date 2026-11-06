@@ -133,7 +133,7 @@ FIXED = {
     f"{EV}.type": "`3` (нота, MPC-034)", f"{EV}.muted": "`False`", f"{EV}.invented": "`False`",
     "tracks[].program.type": "`0` драм-трек, `4` MIDI-трек, по способу экспорта",
     "tracks[].recordArm": "`True` только у текущего трека, у остальных `False` (MPC-111)",
-    "tracks[].program.drum.instruments[].triggerMode": "по плану: `0` ваншот, `2` Note On (MPC-115)",
+    "tracks[].program.drum.instruments[].triggerMode": "по длине образца и концу секции: `0` One Shot, `2` Note On (MPC-115, AN-068)",
     "tracks[].program.drum.instruments[].monophonic": "по плану (MPC-115)",
     "tracks[].program.drum.instruments[].polyphony": "по плану (MPC-115)",
     "tracks[].program.drum.instruments[].whichMuteGroup": "по плану (MPC-115)",

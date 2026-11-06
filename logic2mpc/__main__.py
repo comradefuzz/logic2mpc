@@ -2,7 +2,7 @@
 
     python -m logic2mpc analyze <project.logicx> <export> --groups <groups.json> --out <папка>
     python -m logic2mpc confirm <папка версии>
-    python -m logic2mpc build <папка версии> --out <папка> --name <имя проекта>
+    python -m logic2mpc build <папка версии> --out <папка> --name <имя проекта> [--note-on-from 2/4]
     python -m logic2mpc ui [<папка плана или версии>] [--out <папка>] [--name <имя проекта>] [--port N]
 """
 from __future__ import annotations
@@ -30,6 +30,7 @@ def main() -> int:
     build.add_argument("version", type=Path)
     build.add_argument("--out", type=Path, required=True)
     build.add_argument("--name", required=True)
+    build.add_argument("--note-on-from", default="2/4", help="порог Note On, доля такта (AN-068)")
     ui = commands.add_parser("ui")
     ui.add_argument("version", type=Path, nargs="?")
     ui.add_argument("--out", type=Path)
@@ -56,7 +57,7 @@ def main() -> int:
         elif args.command == "confirm":
             print(app.confirm(args.version))
         else:
-            result = app.build_result(args.version, args.out, args.name)
+            result = app.build_result(args.version, args.out, args.name, args.note_on_from)
             print(result.path)
             for loss in result.losses:
                 print(f"потеря: {loss}", file=sys.stderr)

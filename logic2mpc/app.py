@@ -182,7 +182,7 @@ def confirm(version: Path) -> Path:
     return path
 
 
-def build_result(version: Path, out: Path, name: str) -> xpj.ExportResult:
+def build_result(version: Path, out: Path, name: str, note_on_from: str = "2/4") -> xpj.ExportResult:
     """Сборка подтверждённого плана: путь к проекту и потери перевода."""
     text = (version / "plan.json").read_text(encoding="utf-8")
     path = version / "confirmed.json"
@@ -194,11 +194,11 @@ def build_result(version: Path, out: Path, name: str) -> xpj.ExportResult:
     file = transliterate(name)
     old = [out / f"{file}.xpj", out / f"{file}_[ProjectData]"]
     if not any(p.exists() for p in old):
-        return xpj.export_project(plan, samples, out, name)
+        return xpj.export_project(plan, samples, out, name, note_on_from)
     # Перезапись: новый проект собирается рядом и заменяет старый целиком, сбой сборки старый не трогает.
     stage = Path(tempfile.mkdtemp(prefix=".logic2mpc-", dir=out))
     try:
-        result = xpj.export_project(plan, samples, stage, name)
+        result = xpj.export_project(plan, samples, stage, name, note_on_from)
         for path in old:
             shutil.rmtree(path) if path.is_dir() else path.unlink(missing_ok=True)
         shutil.move(stage / f"{file}_[ProjectData]", old[1])
@@ -208,8 +208,8 @@ def build_result(version: Path, out: Path, name: str) -> xpj.ExportResult:
     return xpj.ExportResult(old[0], result.losses)
 
 
-def build(version: Path, out: Path, name: str) -> Path:
-    return build_result(version, out, name).path
+def build(version: Path, out: Path, name: str, note_on_from: str = "2/4") -> Path:
+    return build_result(version, out, name, note_on_from).path
 
 
 class Session:

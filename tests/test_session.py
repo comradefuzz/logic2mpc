@@ -413,7 +413,7 @@ def test_failed_overwrite_keeps_old_project_and_leaves_no_temp_folder(version: P
     session.finish()
     before = digest(out)
 
-    def broken(plan, samples, out, name):
+    def broken(plan, samples, out, name, *options):
         (out / "half.txt").write_text("x", encoding="utf-8")
         raise FileNotFoundError("нет сэмплов: X")
 

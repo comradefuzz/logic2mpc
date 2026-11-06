@@ -10,6 +10,7 @@ import json
 import shutil
 import struct
 from dataclasses import asdict, dataclass, field
+from fractions import Fraction
 from pathlib import Path
 from typing import Any
 
@@ -23,6 +24,7 @@ from . import xpj_spec
 from .mpcfile import Number, Project, dump, load, pack, parse, render  # noqa: F401  (часть интерфейса модуля)
 
 PADS = 128
+DEFAULT_NOTE_ON_FROM = Fraction(2, 4)
 HANDS = "HANDS"
 MIN_VELOCITY = 0.05
 SCHEMA = xpj_spec.SPEC / "export-plan.schema.json"
@@ -103,6 +105,32 @@ def add_notes(
     return cut
 
 
+def threshold_ticks(value: Fraction | str) -> int:
+    """Порог режима Note On в тиках из доли такта (`2/4`, `Fraction`). Не больше 0 или не доля: `ValueError`."""
+    try:
+        share = Fraction(value)
+    except (ValueError, ZeroDivisionError):
+        raise ValueError(f"порог note_on_from не доля такта: {value!r}") from None
+    if share <= 0:
+        raise ValueError(f"порог note_on_from должен быть больше 0: {value!r}")
+    return int(share * BAR)
+
+
+def past_section_end(piece: PlanPiece, occurrences: list[Occurrence], sections: list[Section]) -> int:
+    """Число вхождений, которые звучат за концом своей секции."""
+    count = 0
+    for occurrence in occurrences:
+        number, attack = place(occurrence.tick, sections)
+        room = sections[number].bars * BAR - max(attack - piece.lead, 0)
+        count += (occurrence.length or piece.ticks) > room
+    return count
+
+
+def trigger_mode(piece: PlanPiece, occurrences: list[Occurrence], sections: list[Section], limit: int) -> int:
+    """AN-068: 2 (Note On) у длинного образца, целиком звучащего в своих секциях, иначе 0 (One Shot)."""
+    return 2 if piece.ticks > limit and not past_section_end(piece, occurrences, sections) else 0
+
+
 def check(plan: Plan, samples: Path) -> None:
     """Всё проверяется до записи: без сэмпла Live 2 покажет Sample not found, см. MPC-083."""
     for group in plan.groups:
@@ -118,7 +146,7 @@ def check(plan: Plan, samples: Path) -> None:
         raise FileNotFoundError("нет сэмплов: " + ", ".join(missing))
 
 
-def drum_track(number: int, title: str, pieces: list[PlanPiece], samples: Path, bpm: float) -> tuple[dict[str, Any], list[tuple[Path, str]]]:
+def drum_track(number: int, title: str, pieces: list[PlanPiece], modes: list[int], samples: Path, bpm: float) -> tuple[dict[str, Any], list[tuple[Path, str]]]:
     """Трек HANDS (без фрагментов) или трек группы: 128 пэдов, на первых сэмплы фрагментов."""
     track = xpj_spec.drum_track(title, armed=number == 0)
     program = track["program"]
@@ -129,15 +157,18 @@ def drum_track(number: int, title: str, pieces: list[PlanPiece], samples: Path, 
             path = f"{piece.name}.wav"
             program["samples"].append(xpj_spec.sample_entry(piece.name, path, bpm, in_program=True))
             copies.append((samples / piece.file, path))
-            made = xpj_spec.pad(number * PADS + index, (piece.name, path, frames(samples / piece.file)), bpm)
+            made = xpj_spec.pad(number * PADS + index, (piece.name, path, frames(samples / piece.file)), bpm, modes[index])
         else:
             made = xpj_spec.pad(number * PADS + index, None, bpm)
         program["drum"]["instruments"].append(made)
     return track, copies
 
 
-def export_project(plan: Plan, samples: Path, out: Path, name: str) -> ExportResult:
+def export_project(
+    plan: Plan, samples: Path, out: Path, name: str, note_on_from: Fraction | str = DEFAULT_NOTE_ON_FROM,
+) -> ExportResult:
     validate_plan(asdict(plan))
+    limit = threshold_ticks(note_on_from)
     check(plan, samples)
     name = transliterate(name)
     bpm = float(plan.bpm)
@@ -149,7 +180,8 @@ def export_project(plan: Plan, samples: Path, out: Path, name: str) -> ExportRes
     for number, group in enumerate([None, *plan.groups]):
         pieces = exported(group) if group else []
         title = transliterate(group.name) if group else HANDS
-        track, made = drum_track(number, title, pieces, samples, bpm)
+        modes = [trigger_mode(p, plays(group, p), plan.sections, limit) for p in pieces] if group else []
+        track, made = drum_track(number, title, pieces, modes, samples, bpm)
         data["tracks"].append(track)
         copies += made
         for piece in pieces:
@@ -175,7 +207,8 @@ def export_project(plan: Plan, samples: Path, out: Path, name: str) -> ExportRes
             for item in clips:
                 item["value"]["eventList"]["events"].sort(key=lambda e: e["time"])
     if cut:
-        losses.append(f"Длина ноты усечена по концу секции: {cut}")
+        late = [p for _, g, pieces in chosen for p in pieces if past_section_end(p, plays(g, p), plan.sections)]
+        losses.append(f"Звучит за концом секции (One Shot): образцов {len(late)}, вхождений {cut}")
     merged = sum(1 for g in plan.groups for t in g.tracks for p in t.pieces if p.merged_into is not None)
     if merged:
         losses.append(f"Фрагментов слито в другие, пэда у них нет, ноты перенесены на основной: {merged}")
