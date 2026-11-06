@@ -162,11 +162,13 @@ def event_cut(regions: list[AudioRegion], mono: np.ndarray, sr: int, bpm: float,
     lost: list[int] = []
     beat = signal.ticks_to_frames(BAR // 4, bpm, sr)
     for members in groups:
-        # Образец это самый длинный звук с полным запасом перед атакой.
+        # Образец это самый длинный звук с полным запасом перед атакой для сравнения.
         clean = [i for i in members if frames[i] >= pre] or members
         leader = max(clean, key=lambda i: ends[i] - frames[i])
-        begin = max(0, frames[leader] - pre)
-        lead = frames[leader] - begin
+        # AN-066: образец начинается со звука, не с начала региона и не с запаса. Пауза региона до звука
+        # переходит в тик вхождения, AN-065: звук остаётся там, где он звучал.
+        begin = signal.sound_start(mono, frames[leader], ends[leader])
+        pause = begin - frames[leader]
         attack = mono[frames[leader] : ends[leader]]
         found = []
         for i in members:
@@ -175,17 +177,20 @@ def event_cut(regions: list[AudioRegion], mono: np.ndarray, sr: int, bpm: float,
             if score >= EVENT_MATCH:
                 hit = frames[i] + lag
                 gain = signal.gain_of(mono, attack, hit)
+                placed = hit + pause
             else:
-                # Шумовой звук: волна не совпадает, сдвиг и проекция ничего не значат.
+                # Шумовой звук: волна не совпадает, сдвиг и проекция ничего не значат. Нота стоит там, где
+                # звучит начало этого вхождения (AN-065), а не со сдвигом паузы образца.
                 hit = frames[i]
                 gain = signal.loudness_ratio(mono[hit : ends[i]], attack)
+                placed = signal.sound_start(mono, frames[i], ends[i])
             # Звук короче образца: нота короче, AN-033.
             short = ends[i] - frames[i] < ends[leader] - frames[leader] - beat
             length = signal.frames_to_ticks(ends[i] - frames[i], bpm, sr) if short else None
-            found.append(Occurrence(signal.frames_to_ticks(hit, bpm, sr), gain, length))
+            found.append(Occurrence(signal.frames_to_ticks(placed, bpm, sr), gain, length))
             if short:
                 lost.append(starts[i])
-        pieces.append(Piece(begin, int(ends[leader]), 1.0, found, lead=lead))
+        pieces.append(Piece(begin, int(ends[leader]), 1.0, found))
     return Cut(rule, 1.0, pieces, lost_bars=sorted(bar_of(t) for t in lost))
 
 

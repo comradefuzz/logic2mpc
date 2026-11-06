@@ -7,7 +7,7 @@ import pytest
 from logic2mpc.core.analysis import analyze_track, join_regions, same_slice
 from logic2mpc.core.cycle import common_pass, find_cycle, fit, period
 from logic2mpc.core.model import BAR, AudioRegion, MidiRegion, Note, Track
-from logic2mpc.core.signal import alike
+from logic2mpc.core.signal import alike, frames_to_ticks, sound_start
 
 SR = 48000
 BPM = 120.0
@@ -52,7 +52,7 @@ def test_an010_identical_hits_give_one_sample() -> None:
     cut = analyze_track(audio_track(regions), stereo(mono), SR, BPM)
     assert cut.rule == "AN-010"
     assert len(cut.pieces) == 1
-    assert cut.pieces[0].lead > 0
+    assert cut.pieces[0].lead == 0  # AN-066: запаса перед звуком нет
     assert sorted(o.tick for o in cut.pieces[0].occurrences) == [r.tick for r in regions]
 
 
@@ -522,3 +522,85 @@ def test_an050_silent_edges_are_not_marked() -> None:
     cut = analyze_track(audio_track([AudioRegion(0)]), stereo(mono), SR, BPM)
     assert cut.pieces[0].start_open is False
     assert cut.pieces[0].end_open is False
+
+
+HALF = FRAMES // 2  # расстояние между ударами в тестах AN-066
+
+
+def hits_with_pauses(pauses: list[int], seed: int = 11) -> tuple[np.ndarray, list[AudioRegion]]:
+    """Одинаковые удары, регион каждого начинается за `pause` отсчётов до звука."""
+    hit = burst(np.random.default_rng(seed), 6000)
+    mono = np.zeros(HALF * (len(pauses) + 1))
+    regions = []
+    for i, pause in enumerate(pauses):
+        start = i * HALF
+        mono[start + pause : start + pause + len(hit)] += hit
+        regions.append(AudioRegion(i * BAR // 2))
+    return mono, regions
+
+
+def test_an066_sound_start_is_first_sample_above_silence() -> None:
+    mono = np.zeros(1000)
+    mono[300:400] = 0.5
+    mono[100] = 1e-5  # ниже порога тишины
+    assert sound_start(mono, 0, 1000) == 300
+    assert sound_start(mono, 350, 1000) == 350
+    assert sound_start(np.zeros(100), 10, 100) == 10
+
+
+def test_an066_hit_starts_at_sound_not_at_region_start() -> None:
+    pause = int(0.03 * SR)
+    mono, regions = hits_with_pauses([pause] * 4)
+    cut = analyze_track(audio_track(regions), stereo(mono), SR, BPM)
+    piece = cut.pieces[0]
+    assert len(cut.pieces) == 1 and piece.lead == 0
+    assert abs(piece.start % HALF - pause) <= 2
+    assert piece.confidence > 0
+
+
+def test_an066_hit_without_pause_keeps_its_start() -> None:
+    mono, regions = hits_with_pauses([0] * 4)
+    piece = analyze_track(audio_track(regions), stereo(mono), SR, BPM).pieces[0]
+    assert piece.start % HALF <= 2 and piece.lead == 0
+
+
+def test_an065_an066_note_is_where_the_sound_starts_in_the_song() -> None:
+    pause = int(0.03 * SR)
+    mono, regions = hits_with_pauses([pause] * 4)
+    piece = analyze_track(audio_track(regions), stereo(mono), SR, BPM).pieces[0]
+    expected = [r.tick + frames_to_ticks(pause, BPM, SR) for r in regions]
+    assert [o.tick for o in sorted(piece.occurrences, key=lambda o: o.tick)] == pytest.approx(expected, abs=1)
+
+
+def test_an065_an066_same_hit_with_different_pauses_is_one_sample_at_own_onsets() -> None:
+    pauses = [int(0.005 * SR), int(0.015 * SR), int(0.005 * SR), int(0.015 * SR)]
+    mono, regions = hits_with_pauses(pauses)
+    cut = analyze_track(audio_track(regions), stereo(mono), SR, BPM)
+    assert len(cut.pieces) == 1
+    ticks = sorted(o.tick for o in cut.pieces[0].occurrences)
+    expected = [r.tick + frames_to_ticks(p, BPM, SR) for r, p in zip(regions, pauses)]
+    assert ticks == pytest.approx(expected, abs=1)
+
+
+def test_gain_of_with_position_before_the_start_cuts_the_sample_head() -> None:
+    from logic2mpc.core.signal import gain_of
+
+    sample = np.r_[np.zeros(10), np.ones(20)]
+    mono = np.ones(40) * 0.5
+    assert gain_of(mono, sample, -10) == pytest.approx(0.5)
+
+
+def test_an065_noisy_hits_with_different_pauses_are_placed_at_their_own_onsets() -> None:
+    rng = np.random.default_rng(21)
+    pauses = [int(0.005 * SR), int(0.025 * SR), int(0.005 * SR), int(0.025 * SR)]
+    mono = np.zeros(HALF * (len(pauses) + 1))
+    regions = []
+    for i, pause in enumerate(pauses):
+        start = i * HALF
+        mono[start + pause : start + pause + 6000] += burst(rng, 6000)  # у каждого удара свой шум
+        regions.append(AudioRegion(i * BAR // 2, source=1, offset=0, frames=6000 + pause))
+    cut = analyze_track(audio_track(regions), stereo(mono), SR, BPM)
+    assert len(cut.pieces) == 1
+    ticks = sorted(o.tick for o in cut.pieces[0].occurrences)
+    expected = [r.tick + frames_to_ticks(p, BPM, SR) for r, p in zip(regions, pauses)]
+    assert ticks == pytest.approx(expected, abs=1)

@@ -43,6 +43,12 @@ def refine_onset(mono: np.ndarray, sr: int, point: int) -> int:
     return start + int(np.argmax(window > 0.1 * window.max()))
 
 
+def sound_start(mono: np.ndarray, start: int, limit: int) -> int:
+    """Начало звука, AN-066: первый отсчёт от `start` до `limit` выше порога тишины. Без звука это `start`."""
+    active = np.nonzero(np.abs(mono[start:limit]) > SILENCE)[0]
+    return start + int(active[0]) if active.size else start
+
+
 def sound_end(mono: np.ndarray, start: int, limit: int) -> int:
     """Конец звука: последний отсчёт до `limit` выше порога тишины."""
     active = np.nonzero(np.abs(mono[start:limit]) > SILENCE)[0]
@@ -89,7 +95,9 @@ def loudness_ratio(a: np.ndarray, b: np.ndarray) -> float:
 
 
 def gain_of(mono: np.ndarray, sample: np.ndarray, position: int) -> float:
-    """Громкость вхождения: проекция на образец."""
+    """Громкость вхождения: проекция на образец. Позиция раньше начала дорожки отсекает начало образца."""
+    if position < 0:
+        sample, position = sample[-position:], 0
     size = min(len(sample), len(mono) - position)
     if size <= 0:
         return 0.0
