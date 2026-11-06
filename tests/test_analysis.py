@@ -4,7 +4,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from logic2mpc.core.analysis import analyze_track, join_regions, same_slice
+from logic2mpc.core.analysis import analyze_track, beat_start, join_regions, midi_piece, moved, region_parts, same_slice
 from logic2mpc.core.cycle import common_pass, find_cycle, fit, period
 from logic2mpc.core.model import BAR, AudioRegion, MidiRegion, Note, Track
 from logic2mpc.core.signal import alike, frames_to_ticks, sound_start
@@ -419,7 +419,7 @@ def test_an023_note_before_region_moves_start() -> None:
     region = MidiRegion(4 * BAR, [Note(-100, 60, 100, 240), *phrase(1)[1:]])
     mono = np.random.default_rng(33).normal(0, 0.2, FRAMES * 12)
     cut = analyze_track(midi_track([region]), stereo(mono), SR, BPM)
-    assert cut.pieces[0].start == 3 * FRAMES
+    assert cut.pieces[0].start == 3 * FRAMES  # звук слышен с начала окна: AN-067 его не обрезает
 
 
 def test_an033_hit_ending_early_gets_short_note() -> None:
@@ -604,3 +604,85 @@ def test_an065_noisy_hits_with_different_pauses_are_placed_at_their_own_onsets()
     ticks = sorted(o.tick for o in cut.pieces[0].occurrences)
     expected = [r.tick + frames_to_ticks(p, BPM, SR) for r, p in zip(regions, pauses)]
     assert ticks == pytest.approx(expected, abs=1)
+
+
+QUARTER = BAR // 4
+
+
+def tone(start_frame: int, length: int, size: int) -> np.ndarray:
+    mono = np.zeros(size)
+    mono[start_frame : start_frame + length] = 0.3 * np.sin(np.arange(length) * 0.2)
+    return mono
+
+
+def test_an067_beat_start_is_last_quarter_not_after_the_first_note() -> None:
+    notes = [(4 * BAR + 500, 60, 240), (5 * BAR, 60, 240)]
+    assert beat_start(0, notes, 8 * BAR) == 4 * BAR
+    assert beat_start(0, [(2 * QUARTER, 60, 240)], 8 * BAR) == 2 * QUARTER
+    assert beat_start(0, [(100, 60, 240)], 8 * BAR) == 0
+    assert beat_start(2 * BAR, [(2 * BAR + 100, 60, 240)], 4 * BAR) == 2 * BAR  # не раньше начала окна
+
+
+def test_an067_single_phrase_starts_at_quarter_before_the_first_note() -> None:
+    first = 4 * BAR + 500  # пауза 4 такта и ещё 500 тиков от начала региона
+    start = round(first * 60 * SR / (960 * BPM))
+    mono = tone(start, SR, 12 * FRAMES)
+    region = MidiRegion(0, [note(first, 60, 1920)])
+    cut = analyze_track(midi_track([region]), stereo(mono), SR, BPM)
+    piece = cut.pieces[0]
+    assert cut.rule == "AN-023" and len(piece.occurrences) == 1
+    assert piece.occurrences[0].tick == 4 * BAR
+    assert piece.start == round(4 * BAR * 60 * SR / (960 * BPM))
+    assert piece.start <= start
+
+
+def test_an067_note_on_a_quarter_keeps_no_pause() -> None:
+    first = 2 * QUARTER
+    start = round(first * 60 * SR / (960 * BPM))
+    cut = analyze_track(midi_track([MidiRegion(0, [note(first, 60, 1920)])]), stereo(tone(start, SR, 6 * FRAMES)), SR, BPM)
+    assert cut.pieces[0].occurrences[0].tick == first
+
+
+def test_an067_two_occurrences_keep_the_window_start() -> None:
+    a = [note(2 * QUARTER, 60, 960)]
+    regions = [MidiRegion(0, a), MidiRegion(8 * BAR, a)]
+    mono = tone(round(2 * QUARTER * 60 * SR / (960 * BPM)), SR // 2, 24 * FRAMES)
+    mono += tone(round((8 * BAR + 2 * QUARTER) * 60 * SR / (960 * BPM)), SR // 2, 24 * FRAMES)
+    cut = analyze_track(midi_track(regions), stereo(mono), SR, BPM)
+    twin = max(cut.pieces, key=lambda p: len(p.occurrences))
+    assert len(twin.occurrences) == 2 and twin.occurrences[0].tick == 0
+
+
+def test_an067_cycle_variant_with_one_pass_starts_at_the_beat_of_its_first_note() -> None:
+    notes = [(2 * BAR + 100, 60, 240), (3 * BAR, 62, 240)]  # вступление на третьем такте окна
+    mono = tone(round((2 * BAR + 100) * 60 * SR / (960 * BPM)), SR, 8 * FRAMES)
+    piece = midi_piece(0, [0], 4 * BAR, 1.0, mono, SR, BPM, notes)
+    assert piece.occurrences[0].tick == 2 * BAR
+    assert piece.start == round(2 * BAR * 60 * SR / (960 * BPM))
+    both = midi_piece(0, [0, 8 * BAR], 4 * BAR, 1.0, mono, SR, BPM, notes)
+    assert both.start == 0 and [o.tick for o in both.occurrences] == [0, 8 * BAR]
+
+
+def test_an067_audible_tail_before_the_first_note_is_not_cut() -> None:
+    notes = [(2 * BAR + 100, 60, 240)]
+    mono = tone(round(BAR * 60 * SR / (960 * BPM)), 3 * SR, 8 * FRAMES)  # звук уже с такта 1 (хвост)
+    piece = midi_piece(0, [0], 4 * BAR, 1.0, mono, SR, BPM, notes)
+    assert piece.occurrences[0].tick == BAR
+
+
+def test_an067_moved_occurrence_shifts_tick_and_shortens_its_length() -> None:
+    from logic2mpc.core.model import Occurrence
+
+    shifted = moved(Occurrence(100, 0.5, 4000), 960)
+    assert (shifted.tick, shifted.gain, shifted.length) == (1060, 0.5, 3040)
+    assert moved(Occurrence(100), 960).length is None
+
+
+def test_an067_group_of_two_regions_keeps_the_region_start() -> None:
+    a = [note(2 * QUARTER, 60, 960)]
+    regions = [MidiRegion(0, a), MidiRegion(20 * BAR, a)]
+    mono = tone(round(2 * QUARTER * 60 * SR / (960 * BPM)), SR // 2, 40 * FRAMES)
+    mono += tone(round((20 * BAR + 2 * QUARTER) * 60 * SR / (960 * BPM)), SR // 2, 40 * FRAMES)
+    cut = region_parts(regions, mono, SR, BPM)
+    assert len(cut.pieces) == 1 and [o.tick for o in cut.pieces[0].occurrences] == [0, 20 * BAR]
+    assert cut.pieces[0].start == 0

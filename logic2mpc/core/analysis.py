@@ -242,10 +242,17 @@ def analyze_midi(regions: list[MidiRegion], mono: np.ndarray, sr: int, bpm: floa
         occurrences.append(Occurrence(tick, length=length))
         if short:
             lost.append(tick)  # AN-033
-    start = signal.ticks_to_frames(sample, bpm, sr)
-    pieces = [Piece(start, start + limit, round(min(found.score, 1.0), 3), occurrences)]
+    window = signal.ticks_to_frames(sample, bpm, sr)
+    if len(occurrences) == 1:
+        # AN-067: образец с одним вхождением начинается от четверти перед первой нотой окна.
+        begin = heard_start(beat_start(sample, notes, size), sample, mono, sr, bpm, window + limit)
+        occurrences = [moved(o, begin - sample) for o in occurrences]
+    else:
+        begin = sample
+    start = signal.ticks_to_frames(begin, bpm, sr)
+    pieces = [Piece(start, window + limit, round(min(found.score, 1.0), 3), occurrences)]
     for first, ticks in others[: windows.MAX_VARIANTS - 1]:
-        pieces.append(midi_piece(first, ticks, size, 1.0, mono, sr, bpm))
+        pieces.append(midi_piece(first, ticks, size, 1.0, mono, sr, bpm, notes))
     lost += [t for _, ticks in others[windows.MAX_VARIANTS - 1 :] for t in ticks]
     replaced = [
         bar_of(t) for t in passes
@@ -289,13 +296,46 @@ def variants(notes: list[tuple[int, int, int]], found: cycles.Cycle, size: int) 
     return [(g[0], g) for g in sorted(grouped.values(), key=lambda g: (-len(g), g[0]))]
 
 
+QUARTER = BAR // 4
+
+
+def beat_start(window_tick: int, notes: list[tuple[int, int, int]], size: int) -> int:
+    """AN-067: начало образца это последняя четверть такта не позже первой включённой ноты окна.
+
+    Не раньше начала окна. Выключенные регионы в `notes` не входят (AN-003).
+    """
+    first = min((t for t, _, _ in notes if window_tick <= t < window_tick + size), default=window_tick)
+    return max(window_tick, first // QUARTER * QUARTER)
+
+
+def moved(occurrence: Occurrence, shift: int) -> Occurrence:
+    """Вхождение после сдвига начала образца: тик позже на сдвиг, недоигранная длина короче на него."""
+    length = max(occurrence.length - shift, 1) if occurrence.length else occurrence.length
+    return Occurrence(occurrence.tick + shift, occurrence.gain, length)
+
+
+def heard_start(
+    begin: int, window_tick: int, mono: np.ndarray, sr: int, bpm: float, until: int
+) -> int:
+    """Начало не позже слышимого звука: хвост, звучащий до первой ноты, не обрезается (AN-067)."""
+    window = signal.ticks_to_frames(window_tick, bpm, sr)
+    onset = signal.frames_to_ticks(signal.sound_start(mono, window, until), bpm, sr)
+    return max(window_tick, min(begin, onset // QUARTER * QUARTER))
+
+
 def midi_piece(
-    start_tick: int, ticks: list[int], size: int, confidence: float, mono: np.ndarray, sr: int, bpm: float
+    start_tick: int, ticks: list[int], size: int, confidence: float, mono: np.ndarray, sr: int, bpm: float,
+    notes: list[tuple[int, int, int]],
 ) -> Piece:
-    start = signal.ticks_to_frames(start_tick, bpm, sr)
-    limit = start + signal.ticks_to_frames(size, bpm, sr)
-    sample_end = max(signal.sound_end(mono, start, limit), start)
-    return Piece(start, sample_end, round(confidence, 3), [Occurrence(t) for t in ticks])
+    """Вариант цикла. С одним вхождением начинается от четверти перед первой нотой, AN-067."""
+    window = signal.ticks_to_frames(start_tick, bpm, sr)
+    limit = window + signal.ticks_to_frames(size, bpm, sr)
+    sample_end = max(signal.sound_end(mono, window, limit), window)
+    begin = start_tick
+    if len(ticks) == 1:
+        begin = heard_start(beat_start(start_tick, notes, size), start_tick, mono, sr, bpm, limit)
+    start = signal.ticks_to_frames(begin, bpm, sr)
+    return Piece(start, max(sample_end, start), round(confidence, 3), [Occurrence(t + begin - start_tick) for t in ticks])
 
 
 def region_parts(regions: list[MidiRegion], mono: np.ndarray, sr: int, bpm: float) -> Cut:
@@ -321,11 +361,18 @@ def region_parts(regions: list[MidiRegion], mono: np.ndarray, sr: int, bpm: floa
         # Нота может лежать раньше начала региона, см. LOGIC-063: фрагмент начинается с неё.
         begin = min(tick, tick + min(n.tick for n in group[0].notes))
         begin = begin // BAR * BAR if begin < tick else tick
+        following = [t for t in starts if t > tick]
+        limit = signal.ticks_to_frames(following[0], bpm, sr) if following else len(mono)
+        if len(group) == 1:
+            # AN-067: одно вхождение, начало от четверти перед первой нотой, но не позже слышимого звука.
+            first = tick + min(n.tick for n in group[0].notes)
+            moved = heard_start(max(0, first // QUARTER * QUARTER), begin, mono, sr, bpm, limit)
+        else:
+            moved = begin
+        begin = moved
         start = signal.ticks_to_frames(begin, bpm, sr)
         model = cycles.region_type(group[0])
         replaced += [bar_of(r.tick) for r in group[1:] if cycles.region_type(r) != model]
-        following = [t for t in starts if t > tick]
-        limit = signal.ticks_to_frames(following[0], bpm, sr) if following else len(mono)
         end = signal.sound_end(mono, start, limit)
         found = [Occurrence(r.tick - (tick - begin)) for r in group]
         pieces.append(Piece(start, end, LOW_CONFIDENCE, found))
