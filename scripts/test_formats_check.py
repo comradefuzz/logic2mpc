@@ -216,3 +216,45 @@ def test_open_requests_only() -> None:
 
 def test_real_base_passes() -> None:
     assert formats_check.check(ROOT / "docs" / "formats", ROOT / "stories") == []
+
+
+EXPORT = "path\tclass\tobserved\trequired\texport_value\tfact\tnote\n"
+SCHEMA = "# файлов 1\ndata\t1\tdict\t\ndata.name\t1\tstr (1 значений)\t\n"
+
+
+def export_row(path: str = "data.name", fact_id: str = "") -> str:
+    return f"{path}\tref\t\tunknown\t\t{fact_id}\t\n"
+
+
+def export_errors(row: str, fact_text: str = "") -> list[str]:
+    files = {"formats/mpc/schema.tsv": SCHEMA, "formats/mpc/export.tsv": EXPORT + row}
+    if fact_text:
+        files["formats/mpc/a.md"] = fact_text
+    return errors(files)
+
+
+def test_export_spec_good_row_and_empty_fact_pass() -> None:
+    assert export_errors(export_row()) == []
+    assert export_errors(export_row(fact_id="MPC-001"), fact()) == []
+
+
+def test_export_spec_path_outside_schema() -> None:
+    assert any("data.other" in e for e in export_errors(export_row("data.other")))
+
+
+def test_export_spec_fact_must_exist() -> None:
+    assert any("MPC-009" in e for e in export_errors(export_row(fact_id="MPC-009"), fact()))
+
+
+def test_export_spec_fact_must_be_usable() -> None:
+    result = export_errors(export_row(fact_id="MPC-001"), fact(status="hypothesis"))
+    assert any("MPC-001" in e and "hypothesis" in e for e in result)
+
+
+def test_export_spec_several_facts_are_checked() -> None:
+    both = fact("MPC-001") + "\n" + fact("MPC-002", "refuted")
+    assert any("MPC-002" in e for e in export_errors(export_row(fact_id="MPC-001, MPC-002"), both))
+
+
+def test_no_export_spec_is_fine() -> None:
+    assert errors({"formats/mpc/schema.tsv": SCHEMA}) == []

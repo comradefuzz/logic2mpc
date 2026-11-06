@@ -80,7 +80,7 @@ def difference(a: np.ndarray, b: np.ndarray, frame: int) -> float:
 
 
 def reduce_piece(mono: np.ndarray, start: int, size: int) -> np.ndarray:
-    """Каждый кусок прореживается сам по себе: фильтр не тянет в него соседний звук."""
+    """Каждый фрагмент прореживается сам по себе: фильтр не тянет в него соседний звук."""
     piece = mono[start : start + size]
     return resample_poly(np.pad(piece, (0, size - len(piece))), 1, REDUCE)
 
@@ -111,7 +111,7 @@ def layout(mono: np.ndarray, sr: int, first: int, bars: int, bar: int) -> Layout
         if span is None:
             previous = False
         elif previous and span[0] == start and span[1] - span[0] < size * TAIL_SHARE:
-            # Хвост это не кусок, он остаётся в конце предыдущего.
+            # Хвост это не фрагмент, он остаётся в конце предыдущего.
             ends[-1] = span[1]
             previous = False
         else:
@@ -144,7 +144,7 @@ def labels_of(item: Layout, value: float) -> np.ndarray:
 
 
 def group_of(item: Layout, indices: list[int]) -> Group:
-    # Образец это кусок, ближайший к остальным.
+    # Образец это фрагмент, ближайший к остальным.
     leader = min(indices, key=lambda i: float(item.distances[i, indices].sum()))
     length = item.ends[leader] - item.positions[leader]
     members = []
@@ -158,10 +158,10 @@ def group_of(item: Layout, indices: list[int]) -> Group:
 
 
 def cut(mono: np.ndarray, sr: int, first: int, bar: int, value: float = DEFAULT) -> Decision:
-    """Берутся деления, где кусков не больше лимита, из них наименьшая сумма тактов, затем меньшее число кусков.
+    """Берутся деления, где фрагментов не больше лимита, из них наименьшая сумма тактов, затем меньшее число фрагментов.
 
     Если таких делений нет, дорожка не режется чисто: берётся самая длинная длина, и от значения
-    по умолчанию вправо такая дорожка сливается в один кусок принудительно.
+    по умолчанию вправо такая дорожка сливается в один фрагмент принудительно.
     """
     start = first_sound(mono, first, bar)
     layouts = [layout(mono, sr, start, bars, bar) for bars in WINDOW_BARS]

@@ -237,7 +237,7 @@ def audio_regions(records: list[Record], bpm: float, sr: int) -> dict[int, list[
                 target = audio.get((u32(body, offset + 0x2C) << 16, u32(body, offset + 0x28) << 16))
                 frames = u32(target.payload, 0x16) if target else None
                 length = round(frames * PPQ * bpm / (60 * sr)) if frames else None
-                # Номер файла и кусок файла, см. LOGIC-R-009.
+                # Номер файла и фрагмент файла, см. LOGIC-R-009.
                 source = u32(body, offset + 0x2C)
                 start = u32(target.payload, 0x06) if target else None
                 region = AudioRegion(tick, tick + total if flags & LOOP else None, length, off, source, start, frames)

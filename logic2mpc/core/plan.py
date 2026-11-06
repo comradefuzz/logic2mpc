@@ -74,12 +74,12 @@ class Plan:
 
 
 def is_exported(piece: PlanPiece) -> bool:
-    """Кусок, слитый в другой, пэда не получает, но остаётся в плане (AN-070)."""
+    """Фрагмент, слитый в другой, пэда не получает, но остаётся в плане (AN-070)."""
     return piece.export and piece.merged_into is None
 
 
 def occurrences_of(track: PlanTrack, piece: PlanPiece) -> list[Occurrence]:
-    """Вхождения куска и всех кусков дорожки, слитых в него."""
+    """Вхождения фрагмента и всех фрагментов дорожки, слитых в него."""
     found = [o for p in track.pieces if p is piece or p.merged_into == piece.name for o in p.occurrences]
     return sorted(found, key=lambda o: o.tick)
 

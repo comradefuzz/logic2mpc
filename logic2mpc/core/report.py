@@ -13,7 +13,7 @@ def bars_text(values: list[float]) -> str:
 def describe(edit: dict) -> list[str]:
     op = edit["op"]
     if op == "merge_pieces":
-        lines = [f"{name} объединён в {edit['target']}, вхождения играет целевой кусок" for name in edit["sources"]]
+        lines = [f"{name} объединён в {edit['target']}, вхождения играет целевой фрагмент" for name in edit["sources"]]
     elif op == "split_piece":
         lines = [f"{edit['target']}: объединение снято"]
     elif op == "rename_group":
@@ -35,7 +35,7 @@ def render(plan: Plan) -> str:
     lines = [
         f"# {plan.song}",
         "",
-        f"Темп {plan.bpm:g}, решительность {plan.decisiveness}. Секций {len(plan.sections)}, кусков {len(pieces)}.",
+        f"Темп {plan.bpm:g}, решительность {plan.decisiveness}. Секций {len(plan.sections)}, фрагментов {len(pieces)}.",
     ]
     if plan.notes_extended or plan.notes_outside:
         lines.append(

@@ -483,7 +483,7 @@ def test_an030_most_frequent_exact_variant_wins() -> None:
 def test_an003_muted_region_does_not_affect_cycle_and_is_reported() -> None:
     a, b = phrase(1), phrase(2)
     regions = [MidiRegion(i * 4 * BAR, b if i % 2 else a) for i in range(8)]
-    # Без Mute такой регион дал бы проход вне цикла и второй кусок.
+    # Без Mute такой регион дал бы проход вне цикла и второй фрагмент.
     muted = MidiRegion(32 * BAR, phrase(3), muted=True)
     mono = np.random.default_rng(10).normal(0, 0.2, FRAMES * 40)
     cut = analyze_track(midi_track([*regions, muted]), stereo(mono), SR, BPM)

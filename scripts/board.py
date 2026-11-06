@@ -47,6 +47,11 @@ def parse_story(text: str, path: str) -> Story:
     )
 
 
+def kind(story: Story) -> str:
+    """Тип стори на доске: спайк (проверка, код продукта не меняется) выделен явно."""
+    return "СПАЙК" if story.type == "spike" else story.type
+
+
 def link(story: Story) -> str:
     return f"[{story.id}]({story.path})"
 
@@ -61,17 +66,17 @@ def render(stories: list[Story]) -> str:
 
     lines += ["## Ждёт тебя", ""]
     if waiting:
-        lines += ["| Стори | Название | Статус | Что сделать |", "|---|---|---|---|"]
+        lines += ["| Стори | Тип | Название | Статус | Что сделать |", "|---|---|---|---|---|"]
         for s in waiting:
             action = WAITING[s.status].format(num=s.num)
-            lines.append(f"| {link(s)} | {s.title} | `{s.status}` | {action} |")
+            lines.append(f"| {link(s)} | {kind(s)} | {s.title} | `{s.status}` | {action} |")
     else:
         lines.append("Ничего.")
 
     lines += ["", "## В работе у Claude", ""]
     if active:
-        lines += ["| Стори | Название | Статус |", "|---|---|---|"]
-        lines += [f"| {link(s)} | {s.title} | `{s.status}` |" for s in active]
+        lines += ["| Стори | Тип | Название | Статус |", "|---|---|---|---|"]
+        lines += [f"| {link(s)} | {kind(s)} | {s.title} | `{s.status}` |" for s in active]
     else:
         lines.append("Ничего.")
 
@@ -80,7 +85,7 @@ def render(stories: list[Story]) -> str:
         lines += [f"- {link(s)} {s.title}: `{s.status}`" for s in invalid]
 
     lines += ["", "## Готово", ""]
-    lines += [f"- {link(s)} {s.title}" for s in done] or ["Пока ничего."]
+    lines += [f"- {link(s)} `{kind(s)}` {s.title}" for s in done] or ["Пока ничего."]
     return "\n".join(lines) + "\n"
 
 

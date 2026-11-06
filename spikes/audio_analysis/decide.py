@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Решение по дорожке и нарезка для ревью, спайк S-009. Не код продукта.
 
-Куски дорожки сравниваются один раз и складываются в дерево сходства. Решительность
-выбирает уровень его разреза: 0 сохраняет каждое отличие, 1 оставляет один кусок.
+Фрагменты дорожки сравниваются один раз и складываются в дерево сходства. Решительность
+выбирает уровень его разреза: 0 сохраняет каждое отличие, 1 оставляет один фрагмент.
 
     probe.py positions <project.logicx> --track NAME > grid.json
     decide.py <track.wav> <grid.json> --code ELA --group SY --name Saw --out DIR
@@ -113,7 +113,7 @@ def first_position(grid: analyze.Grid, sr: int) -> int:
 
 
 def reduce_piece(mono: np.ndarray, start: int, size: int) -> np.ndarray:
-    """Каждый кусок прореживается сам по себе: фильтр не тянет в него соседний звук."""
+    """Каждый фрагмент прореживается сам по себе: фильтр не тянет в него соседний звук."""
     piece = mono[start : start + size]
     return resample_poly(np.pad(piece, (0, size - len(piece))), 1, REDUCE)
 
@@ -134,7 +134,7 @@ def layout(mono: np.ndarray, sr: int, first: int, bars: int, bar: int) -> Layout
         if span is None:
             previous = False
         elif previous and span[0] == start and span[1] - span[0] < size * analyze.TAIL_SHARE:
-            # Хвост это не кусок, он остаётся в конце предыдущего.
+            # Хвост это не фрагмент, он остаётся в конце предыдущего.
             ends[-1] = span[1]
             previous = False
         else:
@@ -176,7 +176,7 @@ def labels_of(item: Layout, value: float) -> np.ndarray:
 
 
 def group_of(item: Layout, indices: list[int], measured: Measured) -> Group:
-    # Образец это кусок, ближайший к остальным.
+    # Образец это фрагмент, ближайший к остальным.
     leader = min(indices, key=lambda i: float(item.distances[i, indices].sum()))
     length = item.ends[leader] - item.positions[leader]
     members = []
@@ -196,12 +196,12 @@ def bar_at(position: int, measured: Measured) -> float:
 
 
 def cut(measured: Measured, value: float) -> Decision:
-    """Длина куска выбирается при значении по умолчанию: решительность не меняет деление дорожки.
+    """Длина фрагмента выбирается при значении по умолчанию: решительность не меняет деление дорожки.
 
-    Берутся деления, где кусков не больше лимита. Из них выигрывает наименьшая сумма тактов,
-    при равенстве меньшее число кусков. Если таких делений нет, дорожка не режется чисто
+    Берутся деления, где фрагментов не больше лимита. Из них выигрывает наименьшая сумма тактов,
+    при равенстве меньшее число фрагментов. Если таких делений нет, дорожка не режется чисто
     и берётся самая длинная длина: от значения по умолчанию вправо такая дорожка
-    сливается в один кусок принудительно, влево режется порогом как обычно.
+    сливается в один фрагмент принудительно, влево режется порогом как обычно.
     """
     filled = [item for item in measured.layouts if item.positions]
     if not filled:
@@ -243,14 +243,14 @@ def report(decision: Decision, name: str, version: int, refusal: str | None) -> 
         f"# {name}, версия {version}",
         "",
         f"Вердикт: {decision.verdict}. Решительность {decision.decisiveness}, уверенность {decision.confidence}.",
-        f"Длина куска {decision.window_bars} тактов, кусков {len(decision.groups)}, покрыто точно {decision.coverage:.0%} вхождений.",
+        f"Длина фрагмента {decision.window_bars} тактов, фрагментов {len(decision.groups)}, покрыто точно {decision.coverage:.0%} вхождений.",
     ]
     if decision.uncovered:
         lines.append("Не покрыты точно такты: " + ", ".join(map(str, decision.uncovered)) + ".")
     if refusal:
         lines += ["", f"Причина пересмотра: {refusal}"]
     for number, group in enumerate(decision.groups, 1):
-        lines += ["", f"## Кусок {number:02d}", "", f"Взят с такта {group.bar}, вхождений {len(group.members)}, уверенность {group.confidence}.", ""]
+        lines += ["", f"## Фрагмент {number:02d}", "", f"Взят с такта {group.bar}, вхождений {len(group.members)}, уверенность {group.confidence}.", ""]
         replaced = [m for m in group.members if m.difference_db > CLEAN_DB or m.lost_tail]
         for member in replaced:
             if member.difference_db > CLEAN_DB:

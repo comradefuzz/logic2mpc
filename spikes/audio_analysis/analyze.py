@@ -302,7 +302,7 @@ def group_windows(mono: np.ndarray, size: int, bar: int) -> tuple[list[int], lis
 
 
 def analyze_windows(audio: np.ndarray, mono: np.ndarray, sr: int, grid: Grid, onsets: np.ndarray) -> Analysis:
-    """Берётся окно с наименьшим числом разных кусков, при равенстве меньшее."""
+    """Берётся окно с наименьшим числом разных фрагментов, при равенстве меньшее."""
     bar = round(4 * 60 / grid.bpm * sr)
     best = None
     for bars in WINDOW_BARS:

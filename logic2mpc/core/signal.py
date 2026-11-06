@@ -101,7 +101,7 @@ def gain_of(mono: np.ndarray, sample: np.ndarray, position: int) -> float:
 def open_edges(audio: np.ndarray, start: int, end: int) -> tuple[bool, bool]:
     """Начало и конец не в нуле: звук есть уже в крайних отсчётах. AN-050.
 
-    Запас над порогом тишины нужен: кусок, обрезанный по концу звука, кончается ровно на этом пороге.
+    Запас над порогом тишины нужен: фрагмент, обрезанный по концу звука, кончается ровно на этом пороге.
     """
     piece = audio[start:end]
     if len(piece) == 0:

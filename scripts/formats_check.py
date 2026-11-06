@@ -124,6 +124,35 @@ def check_requests(prefix: str, requests: list[Request], facts: list[Fact]) -> l
     return errors
 
 
+EXPORT_COLUMNS = ("path", "class", "observed", "required", "export_value", "fact", "note")
+
+
+def check_export_spec(base: Path, facts: list[Fact]) -> list[str]:
+    """Реестр полей для экспорта: пути есть в schema.tsv, факты существуют и пригодны для кода."""
+    spec = base / "export.tsv"
+    if not spec.is_file():
+        return []
+    schema = base / "schema.tsv"
+    paths = {x.split("\t")[0] for x in schema.read_text(encoding="utf-8").splitlines() if x and not x.startswith("#")} if schema.is_file() else set()
+    by_id = {f.id: f for f in facts}
+    lines = [x for x in spec.read_text(encoding="utf-8").splitlines() if x.strip() and not x.startswith("#")]
+    if not lines or tuple(lines[0].split("\t")) != EXPORT_COLUMNS:
+        return ["export.tsv: неверная шапка"]
+    errors = []
+    for number, line in enumerate(lines[1:], 2):
+        cells = (line.split("\t") + [""] * len(EXPORT_COLUMNS))[: len(EXPORT_COLUMNS)]
+        where = f"export.tsv:{number}"
+        if cells[0] not in paths:
+            errors.append(f"{where}: путь {cells[0]} нет в schema.tsv")
+        for id_ in (x.strip() for x in cells[5].split(",") if x.strip()):
+            status = by_id[id_].fields.get("status") if id_ in by_id else None
+            if id_ not in by_id:
+                errors.append(f"{where}: факт {id_} не найден")
+            elif status not in USABLE_STATUSES:
+                errors.append(f"{where}: факт {id_} имеет status {status}, нужен confirmed или single-sample")
+    return errors
+
+
 def check_independence(base: Path, other: str) -> list[str]:
     pattern = re.compile(rf"\b{BASES[other]}-(R-)?\d{{3}}\b|\.\./{other}\b")
     errors = []
@@ -165,6 +194,7 @@ def check(formats: Path, stories: Path) -> list[str]:
         requests = load_requests(base)
         errors += check_facts(prefix, facts)
         errors += check_requests(prefix, requests, facts)
+        errors += check_export_spec(base, facts)
         errors += check_independence(base, next(x for x in BASES if x != name))
         all_requests |= {r.id: r for r in requests}
     return errors + check_stories(stories, all_requests)

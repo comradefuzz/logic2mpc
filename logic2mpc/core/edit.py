@@ -50,17 +50,17 @@ def find_piece(track: PlanTrack, name: str) -> PlanPiece:
     for piece in track.pieces:
         if piece.name == name:
             return piece
-    raise EditError(f"в дорожке {track.name} нет куска {name}")
+    raise EditError(f"в дорожке {track.name} нет фрагмента {name}")
 
 
 def merge_pieces(plan: Plan, op: dict) -> dict:
     _, track = find_track(plan, op["track"])
     sources = list(op["sources"])
     if not sources:
-        raise EditError("не выбраны куски для объединения")
+        raise EditError("не выбраны фрагменты для объединения")
     target = find_piece(track, op["target"])
     if op["target"] in sources:
-        raise EditError("целевой кусок не может быть среди объединяемых")
+        raise EditError("целевой фрагмент не может быть среди объединяемых")
     if target.merged_into:
         raise EditError(f"{target.name} уже объединён в {target.merged_into}")
     for name in sources:
@@ -81,7 +81,7 @@ def split_piece(plan: Plan, op: dict) -> dict:
     target = find_piece(track, op["target"])
     absorbed = [p for p in track.pieces if p.merged_into == target.name]
     if not absorbed:
-        raise EditError(f"{target.name} не объединяет кусков")
+        raise EditError(f"{target.name} не объединяет фрагментов")
     for piece in absorbed:
         piece.merged_into = None
         piece.origin = "user"
@@ -107,7 +107,7 @@ def count_pads(group: Group) -> int:
 
 def check_pads(group: Group) -> None:
     if count_pads(group) > PADS:
-        raise EditError(f"в группе {group.name} {count_pads(group)} кусков при лимите {PADS} пэдов")
+        raise EditError(f"в группе {group.name} {count_pads(group)} фрагментов при лимите {PADS} пэдов")
 
 
 def split_name(song: str, code: str, name: str) -> tuple[str, int, str] | None:

@@ -1,9 +1,10 @@
 #!/bin/bash
 # Не даёт завершить работу при красных тестах, если менялся Python-код.
-# Красные тесты допустимы только на этапе tests и в статусе blocked.
+# Полный прогон идёт только когда стори дошла до review или acceptance,
+# на остальных этапах хук молчит (весь набор идёт около трёх минут).
 cd "$CLAUDE_PROJECT_DIR" || exit 0
 
-if grep -lE '^status: (tests|blocked)$' stories/S-*.md >/dev/null 2>&1; then
+if ! grep -lE '^status: (review|acceptance)$' stories/S-*.md >/dev/null 2>&1; then
   exit 0
 fi
 if [ -z "$(git status --porcelain -- '*.py' 2>/dev/null)" ]; then

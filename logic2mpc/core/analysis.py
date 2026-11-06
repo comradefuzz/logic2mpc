@@ -67,7 +67,7 @@ def join_regions(regions: list[AudioRegion]) -> tuple[list[AudioRegion], set[int
 
 
 def same_slice(a: AudioRegion, b: AudioRegion) -> bool:
-    """AN-015: один кусок файла или кусок внутри другого, если длины близки."""
+    """AN-015: один фрагмент файла или фрагмент внутри другого, если длины близки."""
     if a.source is None or a.source != b.source or None in (a.offset, a.frames, b.offset, b.frames):
         return False
     inner, outer = sorted((a, b), key=lambda r: r.frames)
@@ -114,7 +114,7 @@ def nearest_loop(length: int) -> int:
 
 
 def loop_cut(regions: list[AudioRegion], mono: np.ndarray, sr: int, bpm: float) -> Cut:
-    """AN-012: длина куска равна длине лупа, каждый проход это вхождение."""
+    """AN-012: длина фрагмента равна длине лупа, каждый проход это вхождение."""
     bars = nearest_loop(regions[0].length)
     step = bars * BAR
     first = min(regions, key=lambda r: r.tick)
@@ -294,7 +294,7 @@ def midi_piece(
 
 
 def region_parts(regions: list[MidiRegion], mono: np.ndarray, sr: int, bpm: float) -> Cut:
-    """AN-023: цикла нет, каждый регион это кусок до конца звука, одинаковые вместе."""
+    """AN-023: цикла нет, каждый регион это фрагмент до конца звука, одинаковые вместе."""
     filled = sorted((r for r in regions if r.notes), key=lambda r: r.tick)
     groups: list[list[MidiRegion]] = []
     for region in filled:
@@ -313,7 +313,7 @@ def region_parts(regions: list[MidiRegion], mono: np.ndarray, sr: int, bpm: floa
             lost += [bar_of(r.tick) for r in group]
             continue
         tick = group[0].tick
-        # Нота может лежать раньше начала региона, см. LOGIC-063: кусок начинается с неё.
+        # Нота может лежать раньше начала региона, см. LOGIC-063: фрагмент начинается с неё.
         begin = min(tick, tick + min(n.tick for n in group[0].notes))
         begin = begin // BAR * BAR if begin < tick else tick
         start = signal.ticks_to_frames(begin, bpm, sr)

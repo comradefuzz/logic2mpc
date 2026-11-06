@@ -1,0 +1,910 @@
+path	class	observed	required	export_value	fact	note
+data.*	const	'1 Bar'	no		MPC-113	
+data.arpeggiatorProperties	node		no		MPC-113	
+data.assignableEnvelopeFollowerAssignments	node		no		MPC-113	
+data.assignablePadGridAssignments	node		no		MPC-113	
+data.assignablePhysicalPadsData	node		no		MPC-113	
+data.assignablePhysicalPadsMode	const	3	no		MPC-113	
+data.assignableXFaderAssignments	node		no		MPC-113	
+data.assignableXYPadAssignments1	node		no		MPC-113	
+data.assignableXYPadAssignments2	node		no		MPC-113	
+data.assignableXYPadAssignments3	node		no		MPC-113	
+data.assignableXYPadAssignments4	node		no		MPC-113	
+data.chainID	const	0	no		MPC-113	
+data.clipPlayerData	node		no		MPC-113	
+data.currentAssignableEnvelopeFollower	const	0	no		MPC-113	
+data.currentAssignablePadBank	const	0	no		MPC-113	
+data.currentAssignableXFader	const	0	no		MPC-113	
+data.currentClipRow	const	0	no		MPC-113	
+data.currentEnvFollowerMode	const	1	no		MPC-113	
+data.currentMIDITriggeredTrackMuteType	const	0	no		MPC-113	
+data.currentPadGridMode	const	1	no		MPC-113	
+data.currentSequence	var	0|4	unknown	0	MPC-110	
+data.currentTrackIndex	var	0|4	unknown	0	MPC-110	
+data.currentXFaderMode	const	1	no		MPC-113	
+data.currentXYPad1Mode	const	1	no		MPC-113	
+data.currentXYPad2Mode	const	1	no		MPC-113	
+data.currentXYPad3Mode	const	1	no		MPC-113	
+data.currentXYPad4Mode	const	1	no		MPC-113	
+data.customMacroSceneData	node		no		MPC-113	
+data.customQLinks	node		no		MPC-113	
+data.customQLinks[]	node		no		MPC-113	
+data.customisable	node		no		MPC-113	
+data.drum	node		no		MPC-113	
+data.emulation	const	0	no		MPC-113	
+data.engineMode	var	'Grid View'|'Main Mode'	unknown	Main Mode	MPC-110	
+data.fxRackMacroSceneData	node		no		MPC-113	
+data.fxRackQLinks	node		no		MPC-113	
+data.guiBusesTracksMemento	node		no		MPC-113	
+data.guiNormalTracksMemento	node		no		MPC-113	
+data.horizontalClipMatrixView	node		no		MPC-113	
+data.info	node		no		MPC-113	
+data.key	ref	'C Major'	unknown	из плана		
+data.lastSavedProductIdentifier	const	'ACVS'	no		MPC-113	
+data.locators	node		no		MPC-113	
+data.masterTempo	var	120.0|97.0|95.0	unknown	из плана		decision
+data.masterTempoEnabled	const	True	unknown	True	MPC-110	
+data.midiChordRecorderData	node		no		MPC-113	
+data.midiEventsFilter	node		no		MPC-113	
+data.midiKillGroup	const	-1	no		MPC-113	
+data.midiLearnSettings	node		no		MPC-113	
+data.midiNoteFilterPipe	node		no		MPC-113	
+data.midiSendDestinations	node		no		MPC-113	
+data.mixable	node		no		MPC-113	
+data.mixer	node		no		MPC-113	
+data.modifierPlaybackProperties	node		no		MPC-113	
+data.mpcClipMatrixView	node		no		MPC-113	
+data.mpcControlSurfaceBehaviour	node		no		MPC-113	
+data.name	ref	'Spike 4 Drum'	no		MPC-113	
+data.originalCreatorProductIdentifier	var	'ACVS'|'ACVB'	no		MPC-113	
+data.padNoteMap	node		no		MPC-113	
+data.padPerformSettings	node		no		MPC-113	
+data.padQuadrantEnablement	const	False	no		MPC-113	
+data.parameterSnapshotterData	node		no		MPC-113	
+data.programPads	node		no		MPC-113	
+data.qlinkMode	const	'Screen'	no		MPC-113	
+data.qlinkPadParamModeAssignments	node		no		MPC-113	
+data.qlinkPadSceneModeAssignments	node		no		MPC-113	
+data.qlinkProjectModeAssignments	node		no		MPC-113	
+data.qlinkProjectModeAssignments2	node		no		MPC-113	
+data.quantiser	node		no		MPC-113	
+data.renderable	node		no		MPC-113	
+data.rowLaunchSnapshotAssignments	node		no		MPC-113	
+data.samples	node		unknown			
+data.samples[]	node		unknown			
+data.samples[].loadImpl	var	0|1	unknown	`0`, решение: как в D01, не проверялось		decision
+data.samples[].metadata	node		unknown			
+data.samples[].metadata.key	ref	(14 значений)	unknown	из плана		
+data.samples[].metadata.rootNote	var	60|36|48|72|84	unknown	`60`, решение: значение образцов, не проверялось		decision
+data.samples[].metadata.tempo	var	(24 значений)	unknown	из плана		decision
+data.samples[].metadata.tune	const	0.0	unknown			
+data.samples[].name	ref	(71 значений)	unknown	из плана		
+data.samples[].path	ref	(71 значений)	unknown	из плана		
+data.samples[].version	const	1	no		MPC-116	
+data.savedRecordDestination	const	1	no		MPC-113	
+data.scene	node		no		MPC-113	
+data.sequences	node		unknown			
+data.sequences[]	node		unknown			
+data.sequences[].key	ref	0|1|4|3|2	unknown	из плана		
+data.sequences[].value	node		unknown			
+data.sequences[].value.autoSelectTrackIndex	var	-1|0|4	unknown	`-1`, решение: как в D01, не проверялось		decision
+data.sequences[].value.bpm	var	120.0|97.0	unknown	из плана		decision
+data.sequences[].value.lengthBars	var	4|8	unknown	из плана		decision
+data.sequences[].value.lengthPulses	var	15360|30720	unknown	из плана		decision
+data.sequences[].value.locators	node		unknown			
+data.sequences[].value.locators.colours	node		unknown			
+data.sequences[].value.locators.colours[]	var	0|16711867	unknown	по умолчанию, как в D01: шесть пустых локаторов (позиция -1, имя пустое)		decision
+data.sequences[].value.locators.names	node		unknown			
+data.sequences[].value.locators.names[]	var	''|'1'	unknown	по умолчанию, как в D01: шесть пустых локаторов (позиция -1, имя пустое)		decision
+data.sequences[].value.locators.positions	node		unknown			
+data.sequences[].value.locators.positions[]	node		unknown			
+data.sequences[].value.locators.positions[].bar	var	-1|3	unknown	по умолчанию, как в D01: шесть пустых локаторов (позиция -1, имя пустое)		decision
+data.sequences[].value.locators.positions[].beat	var	-1|0	unknown	по умолчанию, как в D01: шесть пустых локаторов (позиция -1, имя пустое)		decision
+data.sequences[].value.locators.positions[].pulse	var	-1|0	unknown	по умолчанию, как в D01: шесть пустых локаторов (позиция -1, имя пустое)		decision
+data.sequences[].value.locators.version	const	1	unknown			
+data.sequences[].value.loop	const	True	no		MPC-116	
+data.sequences[].value.loopEndBar	const	4	unknown	из плана: равно длине секции (MPC-035)		
+data.sequences[].value.loopEndPulses	const	15360	unknown	из плана: равно длине секции (MPC-035)		
+data.sequences[].value.loopStartBar	const	0	no		MPC-116	
+data.sequences[].value.loopStartPulses	const	0	no		MPC-116	
+data.sequences[].value.name	ref	'Sequence 01'|'Sequence 02'|'Vox'|'Gtr'|'Sequence 03'|'Chorus'|'Verse'	unknown	из плана		
+data.sequences[].value.seqEventList	node		unknown			
+data.sequences[].value.seqEventList.events	node		unknown			
+data.sequences[].value.seqEventList.length	const	9223372036854775807	unknown			
+data.sequences[].value.seqEventList.numFilterTypes	const	32	unknown			
+data.sequences[].value.seqEventList.quantisation	node		unknown			
+data.sequences[].value.seqEventList.quantisation.pulses	const	0	unknown			
+data.sequences[].value.seqEventList.quantisation.strength	const	1.0	unknown			
+data.sequences[].value.seqEventList.quantisation.swing	const	0.0	unknown			
+data.sequences[].value.seqEventList.quantisation.version	const	1	unknown			
+data.sequences[].value.seqEventList.version	const	2	unknown			
+data.sequences[].value.smpteStart	node		unknown			
+data.sequences[].value.smpteStart.frames	const	0	unknown			
+data.sequences[].value.smpteStart.hours	const	0	unknown			
+data.sequences[].value.smpteStart.mins	const	0	unknown			
+data.sequences[].value.smpteStart.secs	const	0	unknown			
+data.sequences[].value.smpteStart.subframes	const	0	unknown			
+data.sequences[].value.tempoEnable	const	True	no		MPC-116	
+data.sequences[].value.timeSignatureTrack	node		unknown			
+data.sequences[].value.timeSignatureTrack.timeSignatures	node		unknown			
+data.sequences[].value.timeSignatureTrack.timeSignatures[]	node		unknown			
+data.sequences[].value.timeSignatureTrack.timeSignatures[].barStart	var	0|2	unknown	из плана		decision
+data.sequences[].value.timeSignatureTrack.timeSignatures[].beatLength	const	960	unknown			
+data.sequences[].value.timeSignatureTrack.timeSignatures[].beatsPerBar	var	4|3	unknown	из плана		decision
+data.sequences[].value.trackClipMaps	node		unknown			
+data.sequences[].value.trackClipMaps[]	node		unknown			
+data.sequences[].value.trackClipMaps[][]	node		unknown			
+data.sequences[].value.trackClipMaps[][].key	ref	(53 значений)	unknown	из плана		
+data.sequences[].value.trackClipMaps[][].value	node		unknown			
+data.sequences[].value.trackClipMaps[][].value.colour	const	0	no		MPC-116	
+data.sequences[].value.trackClipMaps[][].value.endPulses	var	15360|30720	unknown	из плана		decision
+data.sequences[].value.trackClipMaps[][].value.eventList	node		unknown			
+data.sequences[].value.trackClipMaps[][].value.eventList.events	node		unknown			
+data.sequences[].value.trackClipMaps[][].value.eventList.events[]	node		unknown			
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].automation	node		unknown			
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].automation.note	var	36|37|44|38|40|51|48|47|39|49|50|64	unknown	не пишется: экспорт не создаёт		decision
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].automation.parameter	const	131	unknown			
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].automation.value	var	(103 значений)	unknown	не пишется: экспорт не создаёт		decision
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].channel	var	0|9	unknown	`0`, решение: как в D01, не проверялось		decision
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].invented	var	False|True	unknown	`False`		decision
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].muted	var	False|True	unknown	`False`		decision
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note	node		unknown			
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.EnumCerealisationWrapper(selectedModifierType)	const	'Tuning (coarse)'	unknown			
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.articulation	const	197	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.length	var	(67 значений)	unknown	из плана		decision
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierActiveState0	const	False	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierActiveState1	const	False	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierActiveState10	const	False	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierActiveState11	const	False	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierActiveState12	const	False	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierActiveState13	const	False	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierActiveState14	const	False	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierActiveState15	const	False	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierActiveState2	const	False	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierActiveState3	const	False	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierActiveState4	const	False	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierActiveState5	const	False	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierActiveState6	const	False	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierActiveState7	const	False	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierActiveState8	const	False	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierActiveState9	const	False	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierValue0	const	0.5	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierValue1	const	0.5	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierValue10	const	0.0	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierValue11	const	0.0	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierValue12	const	0.0	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierValue13	const	0.0	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierValue14	const	0.0	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierValue15	const	0.0	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierValue2	const	0.0	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierValue3	const	0.0	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierValue4	const	0.0	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierValue5	const	0.5	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierValue6	const	1.0	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierValue7	const	0.0	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierValue8	const	0.0	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.modifierValue9	const	0.0	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.note	var	(128 значений)	unknown	из плана		decision
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.probability	const	100	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.ratchet	const	1	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.velocity	var	(49 значений)	unknown	из плана		decision
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].note.version	const	1	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].selected	const	False	no		MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].time	var	(1560 значений)	unknown	из плана		decision
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].type	var	1|3	unknown	`3` (нота, MPC-034)		decision
+data.sequences[].value.trackClipMaps[][].value.eventList.events[].version	const	2	yes	2	MPC-118	
+data.sequences[].value.trackClipMaps[][].value.eventList.length	const	9223372036854775807	unknown			
+data.sequences[].value.trackClipMaps[][].value.eventList.numFilterTypes	const	32	unknown			
+data.sequences[].value.trackClipMaps[][].value.eventList.quantisation	node		unknown			
+data.sequences[].value.trackClipMaps[][].value.eventList.quantisation.pulses	const	0	unknown			
+data.sequences[].value.trackClipMaps[][].value.eventList.quantisation.strength	const	1.0	unknown			
+data.sequences[].value.trackClipMaps[][].value.eventList.quantisation.swing	const	0.0	unknown			
+data.sequences[].value.trackClipMaps[][].value.eventList.quantisation.version	const	1	unknown			
+data.sequences[].value.trackClipMaps[][].value.eventList.version	const	2	unknown			
+data.sequences[].value.trackClipMaps[][].value.launch	const	0	no		MPC-116	
+data.sequences[].value.trackClipMaps[][].value.launchQuantisation	const	1	no		MPC-116	
+data.sequences[].value.trackClipMaps[][].value.legato	const	True	no		MPC-116	
+data.sequences[].value.trackClipMaps[][].value.loop	const	True	no		MPC-116	
+data.sequences[].value.trackClipMaps[][].value.loopEndPulses	const	15360	unknown	из плана: равно длине секции (MPC-035)		
+data.sequences[].value.trackClipMaps[][].value.loopStartPulses	const	0	no		MPC-116	
+data.sequences[].value.trackClipMaps[][].value.name	ref	(55 значений)	unknown	из плана		
+data.sequences[].value.trackClipMaps[][].value.perClipParameterValues	node		unknown			
+data.sequences[].value.trackClipMaps[][].value.perClipParameterValues.perClipParameterValues	node		unknown			
+data.sequences[].value.trackClipMaps[][].value.perClipParameterValues.perClipParameterValues[]	node		unknown			
+data.sequences[].value.trackClipMaps[][].value.perClipParameterValues.perClipParameterValues[].key	node		unknown			
+data.sequences[].value.trackClipMaps[][].value.perClipParameterValues.perClipParameterValues[].key.instrumentIndex	var	256|257	unknown	не пишется: экспорт не создаёт		decision
+data.sequences[].value.trackClipMaps[][].value.perClipParameterValues.perClipParameterValues[].key.parameter	const	256	unknown			
+data.sequences[].value.trackClipMaps[][].value.perClipParameterValues.perClipParameterValues[].value	var	0.0|1.0	unknown	не пишется: экспорт не создаёт		decision
+data.sequences[].value.trackClipMaps[][].value.startPulses	const	0	no		MPC-116	
+data.sequences[].value.trackClipMaps[][].value.timeSignatureList	node		unknown			
+data.sequences[].value.trackClipMaps[][].value.timeSignatureList.timeSignatures	node		unknown			
+data.sequences[].value.trackClipMaps[][].value.timeSignatureList.timeSignatures[]	node		unknown			
+data.sequences[].value.trackClipMaps[][].value.timeSignatureList.timeSignatures[].barStart	const	0	unknown			
+data.sequences[].value.trackClipMaps[][].value.timeSignatureList.timeSignatures[].beatLength	const	960	unknown			
+data.sequences[].value.trackClipMaps[][].value.timeSignatureList.timeSignatures[].beatsPerBar	const	4	unknown			
+data.sequences[].value.trackClipMaps[][].value.version	const	3	no		MPC-116	
+data.sequences[].value.transposition	const	0	no		MPC-116	
+data.sequences[].value.version	const	5	no		MPC-116	
+data.sharedClipMatrixData	node		no		MPC-113	
+data.songs	node		no		MPC-113	
+data.songs[]	node		no		MPC-113	
+data.stepSequencerBehaviour	node		no		MPC-113	
+data.trackMutePerSequence	const	True	no		MPC-113	
+data.tracks	node		unknown			
+data.tracks[]	node		unknown			
+data.tracks[].arrangementClipMap	node		unknown			
+data.tracks[].colour	var	(15 значений)	unknown	из плана		decision
+data.tracks[].cvPort	const	0	no		MPC-114,MPC-116	
+data.tracks[].gatePort	const	1	no		MPC-114,MPC-116	
+data.tracks[].length	const	0	no		MPC-114,MPC-116	
+data.tracks[].lengthFollowsSequenceLength	const	True	no		MPC-114,MPC-116	
+data.tracks[].midiBankAndProgramNumber	node		unknown			
+data.tracks[].midiBankAndProgramNumber.midiBankEnable	var	False|True	unknown	False	MPC-110	
+data.tracks[].midiBankAndProgramNumber.midiBankLsb	var	0|1	unknown	0	MPC-110	
+data.tracks[].midiBankAndProgramNumber.midiBankMsb	const	0	unknown	0	MPC-110	
+data.tracks[].midiBankAndProgramNumber.midiProgramNumber	var	0|84	unknown	0	MPC-110	
+data.tracks[].midiBankAndProgramNumber.midiProgramNumberEnable	var	False|True	unknown	False	MPC-110	
+data.tracks[].midiEventsFilter	node		unknown			
+data.tracks[].midiEventsFilter.automationFilterData	node		unknown			
+data.tracks[].midiEventsFilter.automationFilterData.filteredParams	const	'00000000000000000'	unknown	00000000000000000	MPC-110	
+data.tracks[].midiEventsFilter.channelFilterData	node		unknown			
+data.tracks[].midiEventsFilter.channelFilterData.channel	const	255	unknown	255	MPC-110	
+data.tracks[].midiEventsFilter.noteFilterData	node		unknown			
+data.tracks[].midiEventsFilter.noteFilterData.noteRange	node		unknown			
+data.tracks[].midiEventsFilter.noteFilterData.noteRange.data	const	'111111111111111111111111111111111111111	unknown	11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111	MPC-110	
+data.tracks[].midiEventsFilter.noteFilterData.noteRange.type	const	2	unknown	2	MPC-110	
+data.tracks[].midiEventsFilter.velocityFilterData	node		unknown			
+data.tracks[].midiEventsFilter.velocityFilterData.max	const	1.0	unknown	1.0	MPC-110	
+data.tracks[].midiEventsFilter.velocityFilterData.min	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].midiInputRoute	node		unknown			
+data.tracks[].midiInputRoute.inputChannel	var	0|10	unknown	0	MPC-110	
+data.tracks[].midiInputRoute.inputPort	node		unknown			
+data.tracks[].midiInputRoute.inputPort.deviceId	var	''|'28-1'|'24-1'	unknown		MPC-110	
+data.tracks[].midiInputRoute.inputPort.deviceName	var	'All Ports'|'<none>'|'minilogue _ SOUND'	unknown	All Ports	MPC-110	
+data.tracks[].midiInputRoute.inputPort.os	const	'Linux'	unknown	Linux	MPC-110	
+data.tracks[].midiInputRoute.inputPort.type	const	0	unknown	0	MPC-110	
+data.tracks[].midiMonitorable	node		unknown			
+data.tracks[].midiMonitorable.state	var	2|0	unknown	2	MPC-110	
+data.tracks[].midiOutputRoute	node		unknown			
+data.tracks[].midiOutputRoute.outputChannel	var	16|9|0	unknown	16	MPC-110	
+data.tracks[].midiOutputRoute.outputPort	node		unknown			
+data.tracks[].midiOutputRoute.outputPort.deviceId	var	''|'28-1'|'24-1'	unknown		MPC-110	
+data.tracks[].midiOutputRoute.outputPort.deviceName	var	'<none>'|'minilogue _ SOUND'	unknown	<none>	MPC-110	
+data.tracks[].midiOutputRoute.outputPort.os	const	'Linux'	unknown	Linux	MPC-110	
+data.tracks[].midiOutputRoute.outputPort.type	const	1	unknown	1	MPC-110	
+data.tracks[].mute	var	False|True	unknown	False	MPC-110	
+data.tracks[].muteGroup	const	0	no		MPC-114,MPC-116	
+data.tracks[].name	ref	(53 значений)	unknown	из плана		
+data.tracks[].padsFollowTrackColour	const	False	no		MPC-114,MPC-116	
+data.tracks[].pan	const	0.5	no		MPC-114,MPC-116	optional-export
+data.tracks[].panKnown	const	False	no		MPC-114,MPC-116	optional-export
+data.tracks[].program	node		unknown			
+data.tracks[].program.base.customEnvFollower	node		unknown			
+data.tracks[].program.base.customEnvFollowerMacroSceneData	node		unknown			
+data.tracks[].program.base.customEnvFollowerMacroSceneData.*	node		unknown			
+data.tracks[].program.base.customEnvFollowerMacroSceneData.*.first	const	''	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.base.customEnvFollowerMacroSceneData.*.second	node		unknown			
+data.tracks[].program.base.customPadGrid	node		unknown			
+data.tracks[].program.base.customPadGridMacroSceneData	node		unknown			
+data.tracks[].program.base.customPadGridMacroSceneData.*	node		unknown			
+data.tracks[].program.base.customPadGridMacroSceneData.*.first	const	''	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.base.customPadGridMacroSceneData.*.second	node		unknown			
+data.tracks[].program.base.customPhysicalPadsAssignments	node		unknown			
+data.tracks[].program.base.customXFaderMacroSceneData	node		unknown			
+data.tracks[].program.base.customXFaderMacroSceneData.*	node		unknown			
+data.tracks[].program.base.customXFaderMacroSceneData.*.first	const	''	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.base.customXFaderMacroSceneData.*.second	node		unknown			
+data.tracks[].program.base.customXFaders	node		unknown			
+data.tracks[].program.base.customXYPad1	node		unknown			
+data.tracks[].program.base.customXYPad1MacroSceneData	node		unknown			
+data.tracks[].program.base.customXYPad1MacroSceneData.*	node		unknown			
+data.tracks[].program.base.customXYPad1MacroSceneData.*.first	const	''	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.base.customXYPad1MacroSceneData.*.second	node		unknown			
+data.tracks[].program.base.customXYPad2	node		unknown			
+data.tracks[].program.base.customXYPad2MacroSceneData	node		unknown			
+data.tracks[].program.base.customXYPad2MacroSceneData.*	node		unknown			
+data.tracks[].program.base.customXYPad2MacroSceneData.*.first	const	''	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.base.customXYPad2MacroSceneData.*.second	node		unknown			
+data.tracks[].program.base.customXYPad3	node		unknown			
+data.tracks[].program.base.customXYPad3MacroSceneData	node		unknown			
+data.tracks[].program.base.customXYPad3MacroSceneData.*	node		unknown			
+data.tracks[].program.base.customXYPad3MacroSceneData.*.first	const	''	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.base.customXYPad3MacroSceneData.*.second	node		unknown			
+data.tracks[].program.base.customXYPad4	node		unknown			
+data.tracks[].program.base.customXYPad4MacroSceneData	node		unknown			
+data.tracks[].program.base.customXYPad4MacroSceneData.*	node		unknown			
+data.tracks[].program.base.customXYPad4MacroSceneData.*.first	const	''	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.base.customXYPad4MacroSceneData.*.second	node		unknown			
+data.tracks[].program.base.fxRackEnvFollower	node		unknown			
+data.tracks[].program.base.fxRackEnvFollowerMacroSceneData	node		unknown			
+data.tracks[].program.base.fxRackEnvFollowerMacroSceneData.*	node		unknown			
+data.tracks[].program.base.fxRackEnvFollowerMacroSceneData.*.first	const	''	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.base.fxRackEnvFollowerMacroSceneData.*.second	node		unknown			
+data.tracks[].program.base.fxRackPadGrid	node		unknown			
+data.tracks[].program.base.fxRackPadGridMacroSceneData	node		unknown			
+data.tracks[].program.base.fxRackPadGridMacroSceneData.*	node		unknown			
+data.tracks[].program.base.fxRackPadGridMacroSceneData.*.first	const	''	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.base.fxRackPadGridMacroSceneData.*.second	node		unknown			
+data.tracks[].program.base.fxRackPhysicalPadsAssignments	node		unknown			
+data.tracks[].program.base.fxRackXFaderMacroSceneData	node		unknown			
+data.tracks[].program.base.fxRackXFaderMacroSceneData.*	node		unknown			
+data.tracks[].program.base.fxRackXFaderMacroSceneData.*.first	const	''	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.base.fxRackXFaderMacroSceneData.*.second	node		unknown			
+data.tracks[].program.base.fxRackXFaders	node		unknown			
+data.tracks[].program.base.fxRackXYPad1	node		unknown			
+data.tracks[].program.base.fxRackXYPad1MacroSceneData	node		unknown			
+data.tracks[].program.base.fxRackXYPad1MacroSceneData.*	node		unknown			
+data.tracks[].program.base.fxRackXYPad1MacroSceneData.*.first	const	''	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.base.fxRackXYPad1MacroSceneData.*.second	node		unknown			
+data.tracks[].program.base.fxRackXYPad2	node		unknown			
+data.tracks[].program.base.fxRackXYPad2MacroSceneData	node		unknown			
+data.tracks[].program.base.fxRackXYPad2MacroSceneData.*	node		unknown			
+data.tracks[].program.base.fxRackXYPad2MacroSceneData.*.first	const	''	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.base.fxRackXYPad2MacroSceneData.*.second	node		unknown			
+data.tracks[].program.base.fxRackXYPad3	node		unknown			
+data.tracks[].program.base.fxRackXYPad3MacroSceneData	node		unknown			
+data.tracks[].program.base.fxRackXYPad3MacroSceneData.*	node		unknown			
+data.tracks[].program.base.fxRackXYPad3MacroSceneData.*.first	const	''	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.base.fxRackXYPad3MacroSceneData.*.second	node		unknown			
+data.tracks[].program.base.fxRackXYPad4	node		unknown			
+data.tracks[].program.base.fxRackXYPad4MacroSceneData	node		unknown			
+data.tracks[].program.base.fxRackXYPad4MacroSceneData.*	node		unknown			
+data.tracks[].program.base.fxRackXYPad4MacroSceneData.*.first	const	''	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.base.fxRackXYPad4MacroSceneData.*.second	node		unknown			
+data.tracks[].program.chainID	const	0	no		MPC-114,MPC-116	
+data.tracks[].program.customMacroSceneData	node		unknown			
+data.tracks[].program.customMacroSceneData.*	node		unknown			
+data.tracks[].program.customMacroSceneData.*.first	const	''	unknown		MPC-110	
+data.tracks[].program.customMacroSceneData.*.second	node		unknown			
+data.tracks[].program.customQLinks	node		unknown			
+data.tracks[].program.customQLinks[]	node		unknown			
+data.tracks[].program.customQLinks[].controlType	const	0	unknown	0	MPC-110	
+data.tracks[].program.customQLinks[].controlValue	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.customQLinks[].momentary	const	0	unknown	0	MPC-110	
+data.tracks[].program.customQLinks[].name	ref	''	unknown	из плана		
+data.tracks[].program.customQLinks[].targetData	node		unknown			
+data.tracks[].program.customisable	node		unknown			
+data.tracks[].program.customisable.mapping	node		unknown			
+data.tracks[].program.customisable.mapping[]	node		unknown			
+data.tracks[].program.customisable.mapping[].automationIndex	var	(157 значений)	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.customisable.mapping[].name	ref	(498 значений)	unknown	из плана		
+data.tracks[].program.customisable.mapping[].parameterIndex	var	(265 значений)	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.customisable.mapping[].value	var	0.0|0.692187488079071|0.007874015718698502	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum	node		unknown			
+data.tracks[].program.drum.coarseTune	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.driftSpeed	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.drumVersion	const	12	unknown	12	MPC-110	
+data.tracks[].program.drum.editSelection	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.fineTune	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.freeRunningLfoData	node		unknown			
+data.tracks[].program.drum.freeRunningLfoData.*	node		unknown			
+data.tracks[].program.drum.freeRunningLfoData.*.lfoLevel	const	1.0	unknown	1.0	MPC-110	
+data.tracks[].program.drum.freeRunningLfoData.*.lfoRate	const	0.5	unknown	0.5	MPC-110	
+data.tracks[].program.drum.freeRunningLfoData.*.lfoSync	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.freeRunningLfoData.*.lfoWaveformType	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.freeRunningLfoData.*.version	const	29	unknown	29	MPC-110	
+data.tracks[].program.drum.instruments	node		unknown			
+data.tracks[].program.drum.instruments[]	node		unknown			
+data.tracks[].program.drum.instruments[].articulationUseXY	const	False	no		MPC-117	
+data.tracks[].program.drum.instruments[].articulations	node		unknown			
+data.tracks[].program.drum.instruments[].articulations.*	node		unknown			
+data.tracks[].program.drum.instruments[].articulations.*.articulationDynamics	const	0.5	unknown	0.5	MPC-110	
+data.tracks[].program.drum.instruments[].articulations.*.articulationSpeed	const	0.5	unknown	0.5	MPC-110	
+data.tracks[].program.drum.instruments[].articulations.*.articulationSpeedScaling	const	1	unknown	1	MPC-110	
+data.tracks[].program.drum.instruments[].articulations.*.articulationStereo	const	1.0	unknown	1.0	MPC-110	
+data.tracks[].program.drum.instruments[].articulations.*.articulationType	var	0|2	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].articulations.*.version	const	29	unknown	29	MPC-110	
+data.tracks[].program.drum.instruments[].bpmLock	const	True	no		MPC-117	
+data.tracks[].program.drum.instruments[].chopProperties	node		unknown			
+data.tracks[].program.drum.instruments[].chopProperties.chopBars	const	1	unknown	1	MPC-110	
+data.tracks[].program.drum.instruments[].chopProperties.chopBeats	const	4	unknown	4	MPC-110	
+data.tracks[].program.drum.instruments[].chopProperties.chopMinSliceTime	const	100	unknown	100	MPC-110	
+data.tracks[].program.drum.instruments[].chopProperties.chopMode	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].chopProperties.chopRegions	const	16	unknown	16	MPC-110	
+data.tracks[].program.drum.instruments[].chopProperties.chopThreshold	const	65	unknown	65	MPC-110	
+data.tracks[].program.drum.instruments[].chopProperties.chopTimeSignature	const	2	unknown	2	MPC-110	
+data.tracks[].program.drum.instruments[].chopProperties.version	const	1	unknown	1	MPC-110	
+data.tracks[].program.drum.instruments[].coarseTune	const	0	no		MPC-117	
+data.tracks[].program.drum.instruments[].editAllLayers	const	False	no		MPC-117	
+data.tracks[].program.drum.instruments[].emulationProfile	const	0	no		MPC-117	
+data.tracks[].program.drum.instruments[].fineTune	const	0	no		MPC-117	
+data.tracks[].program.drum.instruments[].highNote	var	127|41|53|65|77	unknown	127	MPC-110	
+data.tracks[].program.drum.instruments[].ignoreBaseNote	const	False	no		MPC-117	
+data.tracks[].program.drum.instruments[].layerCrossfade	const	0	no		MPC-117	
+data.tracks[].program.drum.instruments[].layerCrossfadeX	const	0.0	no		MPC-117	
+data.tracks[].program.drum.instruments[].layerCrossfadeY	const	0.0	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv	node		unknown			
+data.tracks[].program.drum.instruments[].layersv[]	node		unknown			
+data.tracks[].program.drum.instruments[].layersv[].OffsetRandom	const	0.0	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].OscillatorType	const	'Warm Sine'	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].PanRandom	const	0.0	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].VolumeRandom	var	0.0|0.4000000059604645|0.4699999988079071	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].layersv[].active	const	True	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].coarseTune	var	0|2|6|7|-4|-2	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].layersv[].direction	const	0	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].fineTune	const	0	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].keyTrackEnable	var	False|True	unknown	False	MPC-110	
+data.tracks[].program.drum.instruments[].layersv[].layerLoopModeOverridesSliceLoopMode	const	False	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].loop	const	False	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].loopCrossfadeLength	const	0	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].loopEnd	const	0	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].loopFineTune	const	0	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].loopMode	const	0	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].loopStart	const	0	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].mute	const	False	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].offset	const	0	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].oscillatorMode	const	False	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].oscillatorParams	node		unknown			
+data.tracks[].program.drum.instruments[].layersv[].oscillatorParams[]	var	0.0|0.36730000376701355|1.0	unknown	как в Empty, по пэду или элементу (2 значений)		decision
+data.tracks[].program.drum.instruments[].layersv[].oscillatorSubTypeName	const	''	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].pan	const	0.5	no		MPC-117	optional-export
+data.tracks[].program.drum.instruments[].layersv[].pitch	var	0.0|2.0|6.0|7.0|-4.0|-2.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].layersv[].pitchRandom	const	0.0	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].playbackOffset	const	0.0	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].quadrantEnabled	node		unknown			
+data.tracks[].program.drum.instruments[].layersv[].quadrantEnabled.*	const	True	unknown	True	MPC-110	
+data.tracks[].program.drum.instruments[].layersv[].rootNote	var	0|36	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].layersv[].sampleEnd	const	0	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].sampleFile	ref	(69 значений)	unknown	из плана		
+data.tracks[].program.drum.instruments[].layersv[].sampleName	ref	(69 значений)	unknown	из плана		
+data.tracks[].program.drum.instruments[].layersv[].sampleStart	const	0	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].sliceCycleLength	const	1	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].sliceIncrement	const	0	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].sliceIncrementRngSeed	var	(768 значений)	unknown	как в Empty, по пэду или элементу (128 значений)		decision
+data.tracks[].program.drum.instruments[].layersv[].sliceIndex	var	129|128	unknown	129	MPC-110	
+data.tracks[].program.drum.instruments[].layersv[].sliceInfo	node		unknown			
+data.tracks[].program.drum.instruments[].layersv[].sliceInfo.End	var	(53 значений)	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].layersv[].sliceInfo.LoopCrossfadeLength	var	0|-1	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].layersv[].sliceInfo.LoopCrossfadeType	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].layersv[].sliceInfo.LoopMode	var	0|1	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].layersv[].sliceInfo.LoopStart	var	(18 значений)	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].layersv[].sliceInfo.NumLoopRepeats	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].layersv[].sliceInfo.PulsePosition	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].layersv[].sliceInfo.Start	var	(13 значений)	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].layersv[].sliceInfo.TailLength	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].layersv[].sliceInfo.TailLoopPosition	const	0.5	unknown	0.5	MPC-110	
+data.tracks[].program.drum.instruments[].layersv[].velocityEnd	var	(16 значений)	unknown	127	MPC-110	
+data.tracks[].program.drum.instruments[].layersv[].velocityStart	var	(17 значений)	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].layersv[].version	const	18	no		MPC-117	
+data.tracks[].program.drum.instruments[].layersv[].volume	node		unknown			optional-export
+data.tracks[].program.drum.instruments[].layersv[].volume.controlValue	var	1.0|0.47539401054382324|0.8346459865570068|0.8503940105438232	unknown	1.0	MPC-110	
+data.tracks[].program.drum.instruments[].layersv[].volume.gainCoefficient	var	1.0|0.47539401054382324|0.8346459865570068|0.8503940105438232	unknown	1.0	MPC-110	
+data.tracks[].program.drum.instruments[].layersv[].volume.law	const	1	unknown	1	MPC-110	
+data.tracks[].program.drum.instruments[].loopLock	const	True	no		MPC-117	
+data.tracks[].program.drum.instruments[].lowNote	var	0|42|54|66|78	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].midiOutBehaviour	const	1	no		MPC-117	
+data.tracks[].program.drum.instruments[].midiOutChannel	const	0	no		MPC-117	
+data.tracks[].program.drum.instruments[].midiOutNote	const	0	no		MPC-117	
+data.tracks[].program.drum.instruments[].mixable	node		unknown			
+data.tracks[].program.drum.instruments[].mixable.audioRoute	node		unknown			
+data.tracks[].program.drum.instruments[].mixable.audioRoute.audioRouteSubIndex	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].mixable.audioRoute.channelBitmap	node		unknown			
+data.tracks[].program.drum.instruments[].mixable.audioRoute.channelBitmap.data	const	3	unknown	3	MPC-110	
+data.tracks[].program.drum.instruments[].mixable.audioRoute.channelBitmap.type	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].mixable.audioRoute.destination	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].mixable.automationFilter	const	1	unknown	1	MPC-110	
+data.tracks[].program.drum.instruments[].mixable.inserts	node		unknown			
+data.tracks[].program.drum.instruments[].mixable.inserts.effects	node		unknown			
+data.tracks[].program.drum.instruments[].mixable.inserts.effects[]	node		unknown			
+data.tracks[].program.drum.instruments[].mixable.inserts.effects[].enable	const	True	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].mixable.inserts.effects[].index	var	0|1	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].mixable.inserts.effects[].plugin	node		unknown			
+data.tracks[].program.drum.instruments[].mixable.inserts.effects[].plugin.description	node		unknown			
+data.tracks[].program.drum.instruments[].mixable.inserts.effects[].plugin.description.category	var	''|'Dynamics'	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].mixable.inserts.effects[].plugin.description.descriptiveName	var	'AIR Pitch Shifter'|'AIR Tube Drive'|'Mother Ducker Input'	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].mixable.inserts.effects[].plugin.description.fileOrIdentifier	var	'MPC:AIR Pitch Shifter'|'MPC:AIR Tube Drive'|'MotherDuckerInput'	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].mixable.inserts.effects[].plugin.description.isInstrument	const	False	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].mixable.inserts.effects[].plugin.description.manufacturerName	var	'AIR Music Technology'|'Akai Professional'	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].mixable.inserts.effects[].plugin.description.name	ref	'AIR Pitch Shifter'|'AIR Tube Drive'|'Mother Ducker Input'	unknown	из плана		
+data.tracks[].program.drum.instruments[].mixable.inserts.effects[].plugin.description.numInputChannels	const	2	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].mixable.inserts.effects[].plugin.description.numOutputChannels	const	2	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].mixable.inserts.effects[].plugin.description.pluginFormatName	const	'MPC'	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].mixable.inserts.effects[].plugin.description.uid	var	1631998035|1631999044|1094932052	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].mixable.inserts.effects[].plugin.description.version	const	1	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].mixable.inserts.effects[].plugin.is64Bits	const	True	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].mixable.inserts.effects[].plugin.presetEdited	const	False	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].mixable.inserts.effects[].plugin.presetName	var	'Init'|'Octave Down'|'Twelve'	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].mixable.inserts.effects[].plugin.programNumber	var	0|1|3	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].mixable.inserts.effects[].plugin.state	var	'118.AMjUSE....PPIIEHPkFcigFHSgVZlQWYxA.|'117.AMjUSM....PPIIEHTUmXkABQxklckA.....|'51.AMjUSA....P.A.........v..........HTc|'111.AMjUSA....PPIIEHPkFcigFHSgVZlQWYxA.	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].mixable.inserts.effects[].plugin.version	const	2	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].mixable.inserts.insertsEnabled	const	True	unknown	True	MPC-110	
+data.tracks[].program.drum.instruments[].mixable.mute	const	False	unknown	False	MPC-110	
+data.tracks[].program.drum.instruments[].mixable.pan	const	0.5	unknown	0.5	MPC-110	optional-export
+data.tracks[].program.drum.instruments[].mixable.sends	node		unknown			
+data.tracks[].program.drum.instruments[].mixable.sends[]	var	0.0|0.715624988079071|0.10999999940395355|0.09999999403953552|0.734375|0.1899999976158142|0.23999999463558197|0.3999999761581421|0.38999998569488525|0.3100000023841858	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].mixable.solo	const	False	unknown	False	MPC-110	
+data.tracks[].program.drum.instruments[].mixable.version	const	1	unknown	1	MPC-110	
+data.tracks[].program.drum.instruments[].mixable.volume	var	0.7079457640647888|0.7079460024833679|0.500781238079071|1.0|0.375|0.5078125|0.5|0.7078120112419128|0.390625|0.7250000238418579|0.765625	unknown	0.7079457640647888	MPC-110	optional-export
+data.tracks[].program.drum.instruments[].modLinks	node		unknown			
+data.tracks[].program.drum.instruments[].modLinks[]	node		unknown			
+data.tracks[].program.drum.instruments[].modLinks[].link.amount	const	1.0	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].modLinks[].link.bipolar	const	False	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].modLinks[].link.enabled	const	True	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].modLinks[].link.max	const	1.0	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].modLinks[].link.min	const	0.0	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].modLinks[].link.shaper	const	0	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].modLinks[].link.shaperAmount	const	1.0	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].modLinks[].link.source	const	0	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].modLinks[].link.target	const	0	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].modLinks[].link.viaAmount	const	1.0	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].modLinks[].link.viaSource	const	0	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.drum.instruments[].modLinks[].version	const	2	unknown	2	MPC-110	
+data.tracks[].program.drum.instruments[].monophonic	var	True|False	unknown	по плану (MPC-115)		decision
+data.tracks[].program.drum.instruments[].muteTargets	node		unknown			
+data.tracks[].program.drum.instruments[].muteTargets.*	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].noteCounters	node		unknown			
+data.tracks[].program.drum.instruments[].noteCounters.*	const	2	unknown	2	MPC-110	
+data.tracks[].program.drum.instruments[].padEffects	node		unknown			
+data.tracks[].program.drum.instruments[].padEffects.padEffectsData	node		unknown			
+data.tracks[].program.drum.instruments[].padEffects.padEffectsData.*	node		unknown			
+data.tracks[].program.drum.instruments[].padEffects.padEffectsData.*.fxType	var	7|1|2|3|4|13|0|9|6	unknown	как в Empty, по пэду или элементу (8 значений)		decision
+data.tracks[].program.drum.instruments[].padEffects.padEffectsData.*.fxValue	var	0.0|0.4599999785423279|0.14999999105930328|0.25999999046325684|0.08999999612569809|0.10999999940395355|0.5799999833106995|0.28999999165534973	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].partialPresetName	const	'<none>'	no		MPC-117	
+data.tracks[].program.drum.instruments[].polyphony	var	1|0|4	unknown	по плану (MPC-115)		decision
+data.tracks[].program.drum.instruments[].randomPlaySeed	var	(753 значений)	unknown	как в Empty, по пэду или элементу (128 значений)		decision
+data.tracks[].program.drum.instruments[].simultPlayTargets	node		unknown			
+data.tracks[].program.drum.instruments[].simultPlayTargets.*	var	0|2|9	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].stretchPercentage	var	100|78|82|99|80|81	unknown	100	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.AD	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.AD.*	const	True	unknown	True	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.Attack	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.Attack.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.AttackCurve	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.AttackCurve.*	const	0.375	unknown	0.375	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.AttackPhase	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.AttackPhase.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.Decay	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.Decay.*	var	0.04724409431219101|0.7874019742012024|0.04724400117993355|0.7514987587928772|0.0	unknown	0.04724409431219101	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.DecayCurve	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.DecayCurve.*	var	0.375|0.0	unknown	0.375	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.DecayFromEnd	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.DecayFromEnd.*	const	True	unknown	True	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.DecayPhase	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.DecayPhase.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.DecayStart	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.DecayStart.*	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.Delay	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.Delay.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.Hold	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.Hold.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.Looped	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.Looped.*	const	False	unknown	False	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.OneShot	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.OneShot.*	var	True|False	unknown	True	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.Release	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.Release.*	var	0.0|0.10000000149011612|0.5287674069404602|0.614347517490387	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.ReleaseCurve	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.ReleaseCurve.*	const	0.375	unknown	0.375	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.Sustain	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.Sustain.*	var	1.0|0.629921019077301	unknown	1.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.TimeScaling	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.TimeScaling.*	const	0.5	unknown	0.5	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.Type	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.VelocityToAttack	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.VelocityToAttack.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.tempoSync	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.tempoSync.*	const	'None'	unknown	None	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.ampEnvelope.version	const	2	unknown	2	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.attackRandom	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.AD	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.AD.*	var	True|False	unknown	True	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.Attack	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.Attack.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.AttackCurve	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.AttackCurve.*	const	0.375	unknown	0.375	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.AttackPhase	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.AttackPhase.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.Decay	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.Decay.*	const	0.04724409431219101	unknown	0.04724409431219101	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.DecayCurve	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.DecayCurve.*	const	0.375	unknown	0.375	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.DecayFromEnd	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.DecayFromEnd.*	const	True	unknown	True	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.DecayPhase	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.DecayPhase.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.DecayStart	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.DecayStart.*	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.Delay	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.Delay.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.Hold	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.Hold.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.Looped	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.Looped.*	const	False	unknown	False	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.OneShot	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.OneShot.*	var	True|False	unknown	True	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.Release	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.Release.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.ReleaseCurve	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.ReleaseCurve.*	const	0.375	unknown	0.375	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.Sustain	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.Sustain.*	const	1.0	unknown	1.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.TimeScaling	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.TimeScaling.*	const	0.5	unknown	0.5	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.Type	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.VelocityToAttack	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.VelocityToAttack.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.tempoSync	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.tempoSync.*	const	'None'	unknown	None	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelope.version	const	2	unknown	2	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.auxEnvelopeAmount	const	1.0	unknown	1.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.decayRandom	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.driftSpeed	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterBlend	const	0.5	unknown	0.5	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterData	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.filterData.*	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.filterData.*.afterTouchToFilter	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterData.*.cutoffRandom	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterData.*.filterCutoff	var	1.0|0.1524360030889511	unknown	1.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterData.*.filterEnvelopeAmount	var	0.0|0.5625	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterData.*.filterEnvelopeVelocity	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterData.*.filterKeytrack	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterData.*.filterResonance	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterData.*.filterType	var	0|2|29	unknown	как в Empty, по пэду или элементу (2 значений)		decision
+data.tracks[].program.drum.instruments[].synthSection.filterData.*.filterVelocity	var	0.0|0.4453119933605194	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterData.*.outputLevel	const	1.0	unknown	1.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterData.*.pressureToFilter	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterData.*.resonanceRandom	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterData.*.version	const	29	unknown	29	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.AD	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.AD.*	const	True	unknown	True	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.Attack	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.Attack.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.AttackCurve	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.AttackCurve.*	const	0.375	unknown	0.375	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.AttackPhase	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.AttackPhase.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.Decay	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.Decay.*	var	0.04724409431219101|0.6878690123558044|0.04724400117993355	unknown	0.04724409431219101	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.DecayCurve	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.DecayCurve.*	const	0.375	unknown	0.375	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.DecayFromEnd	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.DecayFromEnd.*	const	True	unknown	True	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.DecayPhase	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.DecayPhase.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.DecayStart	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.DecayStart.*	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.Delay	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.Delay.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.Hold	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.Hold.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.Looped	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.Looped.*	const	False	unknown	False	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.OneShot	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.OneShot.*	var	True|False	unknown	True	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.Release	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.Release.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.ReleaseCurve	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.ReleaseCurve.*	const	0.375	unknown	0.375	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.Sustain	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.Sustain.*	var	1.0|0.0	unknown	1.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.TimeScaling	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.TimeScaling.*	const	0.5	unknown	0.5	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.Type	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.VelocityToAttack	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.VelocityToAttack.*	var	0.0|0.6484379768371582	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.tempoSync	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.tempoSync.*	const	'None'	unknown	None	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterEnvelope.version	const	2	unknown	2	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.filterSerialRouting	const	False	unknown	False	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.lfoData	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.lfoData.*	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.lfoData.*.lfoAmpLevel	var	0.0|0.4960629940032959	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.lfoData.*.lfoDelay	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.lfoData.*.lfoDelaySync	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.lfoData.*.lfoFadein	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.lfoData.*.lfoFadeinSync	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.lfoData.*.lfoFilterCutOff	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.lfoData.*.lfoFilterCutOff.*	var	0.0|0.5433070063591003	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.lfoData.*.lfoFreeRunning	const	False	unknown	False	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.lfoData.*.lfoLevel	const	1.0	unknown	1.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.lfoData.*.lfoPan	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.lfoData.*.lfoPitch	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.lfoData.*.lfoRate	var	0.5|0.12999999523162842	unknown	0.5	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.lfoData.*.lfoReset	var	True|False	unknown	True	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.lfoData.*.lfoSync	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.lfoData.*.lfoWaveformType	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.lfoData.*.version	const	29	unknown	29	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.AD	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.AD.*	var	True|False	unknown	True	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.Attack	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.Attack.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.AttackCurve	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.AttackCurve.*	const	0.375	unknown	0.375	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.AttackPhase	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.AttackPhase.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.Decay	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.Decay.*	var	0.04724409431219101|0.04724400117993355	unknown	0.04724409431219101	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.DecayCurve	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.DecayCurve.*	const	0.375	unknown	0.375	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.DecayFromEnd	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.DecayFromEnd.*	const	True	unknown	True	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.DecayPhase	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.DecayPhase.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.DecayStart	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.DecayStart.*	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.Delay	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.Delay.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.Hold	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.Hold.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.Looped	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.Looped.*	const	False	unknown	False	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.OneShot	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.OneShot.*	var	True|False	unknown	True	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.Release	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.Release.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.ReleaseCurve	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.ReleaseCurve.*	const	0.375	unknown	0.375	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.Sustain	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.Sustain.*	const	1.0	unknown	1.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.TimeScaling	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.TimeScaling.*	const	0.5	unknown	0.5	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.Type	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.VelocityToAttack	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.VelocityToAttack.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.tempoSync	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.tempoSync.*	const	'None'	unknown	None	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelope.version	const	2	unknown	2	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.pitchEnvelopeAmount	const	0.5	unknown	0.5	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.rampData	node		unknown			
+data.tracks[].program.drum.instruments[].synthSection.rampData.*	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.randomisationScale	const	1.0	unknown	1.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.velocitySensitivity	var	1.0|0.0	unknown	1.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.velocityToPan	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.velocityToPitch	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.velocityToStart	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.instruments[].synthSection.version	const	29	unknown	29	MPC-110	
+data.tracks[].program.drum.instruments[].tempo	var	(14 значений)	unknown	из плана		decision
+data.tracks[].program.drum.instruments[].triggerMode	var	0|2	unknown	по плану: `0` ваншот, `2` Note On (MPC-115)		decision
+data.tracks[].program.drum.instruments[].userSelectableWarpPoolIndex	var	14|0|8	unknown	14	MPC-110	
+data.tracks[].program.drum.instruments[].velocityScale	const	1.0	no		MPC-117	
+data.tracks[].program.drum.instruments[].version	const	29	yes	29	MPC-117	
+data.tracks[].program.drum.instruments[].warpEnable	var	False|True	unknown	`False` (MPC-115)		decision
+data.tracks[].program.drum.instruments[].whichMuteGroup	var	0|1|2	unknown	по плану (MPC-115)		decision
+data.tracks[].program.drum.instruments[].zonePlayTime	var	1|0|2	unknown	1	MPC-110	
+data.tracks[].program.drum.legatoThreshold	const	127	unknown	127	MPC-110	
+data.tracks[].program.drum.monoRetrigger	const	False	unknown	False	MPC-110	
+data.tracks[].program.drum.monophonic	var	False|True	unknown	False	MPC-110	
+data.tracks[].program.drum.padGroup	node		unknown			
+data.tracks[].program.drum.padGroup.*	const	0	unknown	0	MPC-110	
+data.tracks[].program.drum.pitch	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.poliphony	var	16|0	unknown	16	MPC-110	
+data.tracks[].program.drum.portamentoLegato	const	False	unknown	False	MPC-110	
+data.tracks[].program.drum.portamentoQuantised	const	False	unknown	False	MPC-110	
+data.tracks[].program.drum.portamentoTime	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.drum.pressureGlide	const	False	unknown	False	MPC-110	
+data.tracks[].program.drum.sameVoiceLegato	const	False	unknown	False	MPC-110	
+data.tracks[].program.drum.version	const	11	unknown	11	MPC-110	
+data.tracks[].program.fxRackMacroSceneData	node		unknown			
+data.tracks[].program.fxRackMacroSceneData.*	node		unknown			
+data.tracks[].program.fxRackMacroSceneData.*.first	const	''	unknown		MPC-110	
+data.tracks[].program.fxRackMacroSceneData.*.second	node		unknown			
+data.tracks[].program.fxRackQLinks	node		unknown			
+data.tracks[].program.midi	node		unknown			
+data.tracks[].program.midi.mpcePadBehaviour	node		unknown			
+data.tracks[].program.midi.mpcePadBehaviour.enableXSlide	const	True	unknown			
+data.tracks[].program.midi.mpcePadBehaviour.enableYSlide	const	True	unknown			
+data.tracks[].program.midi.mpcePadBehaviour.xPressQuantised	const	True	unknown			
+data.tracks[].program.midi.mpcePadBehaviour.xSlideRange	const	0.010416666977107525	unknown			
+data.tracks[].program.midi.mpcePadBehaviour.xSlideScalesToEdge	const	True	unknown			
+data.tracks[].program.midi.mpcePadBehaviour.yPressQuantised	const	True	unknown			
+data.tracks[].program.midi.mpcePadBehaviour.ySlideRange	const	1.0	unknown			
+data.tracks[].program.midi.mpcePadBehaviour.ySlideScalesToEdge	const	True	unknown			
+data.tracks[].program.midi.mpe	node		unknown			
+data.tracks[].program.midi.mpe.mpeAT04Enabled	const	True	unknown			
+data.tracks[].program.midi.mpe.mpeAftertouchEnabled	const	True	unknown			
+data.tracks[].program.midi.mpe.mpeChannelMode	const	0	unknown			
+data.tracks[].program.midi.mpe.mpeFirstNoteChannel	const	1	unknown			
+data.tracks[].program.midi.mpe.mpeLastNoteChannel	const	15	unknown			
+data.tracks[].program.midi.mpe.mpeXEnabled	const	True	unknown			
+data.tracks[].program.midi.mpe.mpeYEnabled	const	True	unknown			
+data.tracks[].program.midi.mpe.sendMPE	const	False	unknown			
+data.tracks[].program.midi.mpe.version	const	1	unknown			
+data.tracks[].program.midi.version	const	1	no		MPC-116	
+data.tracks[].program.midiEventsFilter	node		unknown			
+data.tracks[].program.midiEventsFilter.automationFilterData	node		unknown			
+data.tracks[].program.midiEventsFilter.automationFilterData.filteredParams	const	'00000000000000000'	unknown	00000000000000000	MPC-110	
+data.tracks[].program.midiEventsFilter.channelFilterData	node		unknown			
+data.tracks[].program.midiEventsFilter.channelFilterData.channel	const	255	unknown	255	MPC-110	
+data.tracks[].program.midiEventsFilter.noteFilterData	node		unknown			
+data.tracks[].program.midiEventsFilter.noteFilterData.noteRange	node		unknown			
+data.tracks[].program.midiEventsFilter.noteFilterData.noteRange.data	const	'111111111111111111111111111111111111111	unknown	11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111	MPC-110	
+data.tracks[].program.midiEventsFilter.noteFilterData.noteRange.type	const	2	unknown	2	MPC-110	
+data.tracks[].program.midiEventsFilter.velocityFilterData	node		unknown			
+data.tracks[].program.midiEventsFilter.velocityFilterData.max	const	1.0	unknown	1.0	MPC-110	
+data.tracks[].program.midiEventsFilter.velocityFilterData.min	const	0.0	unknown	0.0	MPC-110	
+data.tracks[].program.midiKillGroup	const	-1	no		MPC-114,MPC-116	
+data.tracks[].program.mixable	node		unknown			
+data.tracks[].program.mixable.audioRoute	node		unknown			
+data.tracks[].program.mixable.audioRoute.audioRouteSubIndex	var	0|3	unknown	0	MPC-110	
+data.tracks[].program.mixable.audioRoute.channelBitmap	node		unknown			
+data.tracks[].program.mixable.audioRoute.channelBitmap.data	var	3|2	unknown	3	MPC-110	
+data.tracks[].program.mixable.audioRoute.channelBitmap.type	const	0	unknown	0	MPC-110	
+data.tracks[].program.mixable.audioRoute.destination	var	2|1	unknown	2	MPC-110	
+data.tracks[].program.mixable.automationFilter	const	1	unknown	1	MPC-110	
+data.tracks[].program.mixable.inserts	node		unknown			
+data.tracks[].program.mixable.inserts.effects	node		unknown			
+data.tracks[].program.mixable.inserts.effects[]	node		unknown			
+data.tracks[].program.mixable.inserts.effects[].enable	var	True|False	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.mixable.inserts.effects[].index	var	0|1|2|3	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.mixable.inserts.effects[].plugin	node		unknown			
+data.tracks[].program.mixable.inserts.effects[].plugin.description	node		unknown			
+data.tracks[].program.mixable.inserts.effects[].plugin.description.category	var	''|'Dynamics'	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.mixable.inserts.effects[].plugin.description.descriptiveName	var	'AIR Delay'|'AIR Reverb'|'Delay Analog Sync'|'Mother Ducker'|'AIR Tube Drive'|'AIR Flavor Pro'|'Mother Ducker Input'|'AIR Channel Strip'|'HP Filter'|'AIR Stereo Width'|'AIR Para EQ'|'Flex Beat Player'	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.mixable.inserts.effects[].plugin.description.fileOrIdentifier	var	'MPC:AIR Delay'|'MPC:AIR Reverb'|'Delay Analog Sync'|'MotherDuckerOutput'|'MPC:AIR Tube Drive'|'MPC:AIR Flavor Pro'|'MotherDuckerInput'|'MPC:AIR Channel Strip'|'HP Filter'|'MPC:AIR Stereo Width'|'MPC:AIR Para EQ'|'Flex Beat Player'	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.mixable.inserts.effects[].plugin.description.isInstrument	const	False	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.mixable.inserts.effects[].plugin.description.manufacturerName	var	'AIR Music Technology'|'Akai Professional'	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.mixable.inserts.effects[].plugin.description.name	ref	'AIR Delay'|'AIR Reverb'|'Delay Analog Sync'|'Mother Ducker'|'AIR Tube Drive'|'AIR Flavor Pro'|'Mother Ducker Input'|'AIR Channel Strip'|'HP Filter'|'AIR Stereo Width'|'AIR Para EQ'|'Flex Beat Player'	unknown	из плана		
+data.tracks[].program.mixable.inserts.effects[].plugin.description.numInputChannels	const	2	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.mixable.inserts.effects[].plugin.description.numOutputChannels	const	2	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.mixable.inserts.effects[].plugin.description.pluginFormatName	const	'MPC'	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.mixable.inserts.effects[].plugin.description.uid	var	1631994988|1631998582|1094932055|1094940244|1631999044|1632005238|1094932052|1631807571|1094932067|1631998807|1631998021|1179402832	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.mixable.inserts.effects[].plugin.description.version	const	1	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.mixable.inserts.effects[].plugin.is64Bits	const	True	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.mixable.inserts.effects[].plugin.presetEdited	const	False	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.mixable.inserts.effects[].plugin.presetName	var	'Init'|'Light Crunch'|'Cassette'|'Clean Amp'|'Add Width To Mono Signal'|'AKAI PRO1000'|'Large Club'|'Stutter'	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.mixable.inserts.effects[].plugin.programNumber	var	0|1|18|7|6|17|3	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.mixable.inserts.effects[].plugin.state	var	(15 значений)	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.mixable.inserts.effects[].plugin.version	const	2	unknown	не пишется: объекта нет в Empty		decision
+data.tracks[].program.mixable.inserts.insertsEnabled	const	True	unknown	True	MPC-110	
+data.tracks[].program.mixable.mute	var	False|True	unknown	False	MPC-110	
+data.tracks[].program.mixable.pan	const	0.5	unknown	0.5	MPC-110	optional-export
+data.tracks[].program.mixable.sends	node		unknown			
+data.tracks[].program.mixable.sends[]	var	0.0|0.0625|0.0859375|0.140625|0.1953125|0.2421875	unknown	0.0	MPC-110	
+data.tracks[].program.mixable.solo	const	False	unknown	False	MPC-110	
+data.tracks[].program.mixable.version	const	1	unknown	1	MPC-110	
+data.tracks[].program.mixable.volume	var	0.7079457640647888|0.7079460024833679|1.0|0.594531238079071|0.36796876788139343|0.7109375|0.7093750238418579	unknown	0.7079457640647888	MPC-110	optional-export
+data.tracks[].program.name	ref	(53 значений)	unknown	из плана		
+data.tracks[].program.padNoteMap	node		unknown			
+data.tracks[].program.padNoteMap.noteForPad	node		unknown			
+data.tracks[].program.padNoteMap.noteForPad.*	var	(128 значений)	unknown	как в Empty, по пэду или элементу (128 значений)		decision
+data.tracks[].program.programPads	node		unknown			
+data.tracks[].program.programPads.PadsFollowTrackColour	node		unknown			
+data.tracks[].program.programPads.PadsFollowTrackColour.*	const	False	unknown	False	MPC-110	
+data.tracks[].program.programPads.Type	node		unknown			
+data.tracks[].program.programPads.Type.*	var	5|1	unknown	5	MPC-110	
+data.tracks[].program.programPads.Universal	node		unknown			
+data.tracks[].program.programPads.Universal.*	var	True|False	unknown	True	MPC-110	
+data.tracks[].program.programPads.UnusedPads	node		unknown			
+data.tracks[].program.programPads.UnusedPads.*	const	1	unknown	1	MPC-110	
+data.tracks[].program.programPads.pads	node		unknown			
+data.tracks[].program.programPads.pads.*	var	(14 значений)	unknown	0	MPC-110	
+data.tracks[].program.programPads.universalPad	var	65280|16711680|16776960	unknown	65280	MPC-110	
+data.tracks[].program.renderable	node		unknown			
+data.tracks[].program.renderable.sendToCueBus	const	False	unknown	False	MPC-110	
+data.tracks[].program.samples	node		unknown			
+data.tracks[].program.samples[]	node		unknown			
+data.tracks[].program.samples[].loadImpl	var	0|1	unknown			
+data.tracks[].program.samples[].metadata	node		unknown			
+data.tracks[].program.samples[].metadata.key	ref	(14 значений)	unknown	из плана		
+data.tracks[].program.samples[].metadata.rootNote	var	60|84|48|72|36	unknown			
+data.tracks[].program.samples[].metadata.tempo	var	(21 значений)	unknown	из плана		decision
+data.tracks[].program.samples[].metadata.tune	const	0.0	unknown			
+data.tracks[].program.samples[].name	ref	(68 значений)	unknown	из плана		
+data.tracks[].program.samples[].path	ref	(68 значений)	unknown	из плана		
+data.tracks[].program.samples[].version	const	1	unknown			
+data.tracks[].program.transpose	const	0	no		MPC-114,MPC-116	
+data.tracks[].program.type	var	9|8|7|0|1|3|4|6	unknown	`0` драм-трек, `4` MIDI-трек, по способу экспорта		decision
+data.tracks[].program.version	const	6	no		MPC-114,MPC-116	
+data.tracks[].program.xfaderRoute	const	0	no		MPC-114,MPC-116	
+data.tracks[].recordArm	var	False|True	unknown	`True` только у текущего трека, у остальных `False` (MPC-111)		decision
+data.tracks[].sharedClipMap	node		unknown			
+data.tracks[].skipFromRowLaunch	const	False	no		MPC-114,MPC-116	
+data.tracks[].transposition	const	0	no		MPC-114,MPC-116	
+data.tracks[].velocityScale	const	1.0	no		MPC-114,MPC-116	
+data.tracks[].version	const	6	no		MPC-114,MPC-116	
+data.tracks[].volume	var	1.0|0.692187488079071	unknown	1.0	MPC-110	optional-export
+data.tracks[].volumeKnown	var	False|True	unknown	False	MPC-110	optional-export
+data.transpose	const	0	no		MPC-113	
+data.tuiBusesTracksMemento	node		no		MPC-113	
+data.tuiMainModeLayout	node		no		MPC-113	
+data.tuiMainModeMixerLayout	node		no		MPC-113	
+data.tuiNormalTracksMemento	node		no		MPC-113	
+data.type	const	0	no		MPC-113	
+data.version	var	30|6	unknown	30	MPC-110	
+data.xfaderRoute	const	0	no		MPC-113	
+data.xyfxResponder	node		no		MPC-113	
