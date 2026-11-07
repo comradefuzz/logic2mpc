@@ -73,6 +73,7 @@ def test_an070_target_must_be_in_the_track_and_not_in_sources() -> None:
         apply(plan, merge(sources=[]))
 
 
+@pytest.mark.smoke
 def test_an070_merge_marks_sources_and_keeps_them_in_plan() -> None:
     before = make_plan()
     plan = apply(before, merge(sources=["ELA_DR_Kick_02", "ELA_DR_Kick_03"]))
@@ -106,6 +107,7 @@ def test_an070_merged_piece_cannot_be_target_or_source_again() -> None:
         apply(plan, merge(target="ELA_DR_Kick_02", sources=["ELA_DR_Kick_03"]))
 
 
+@pytest.mark.smoke
 def test_an070_split_restores_the_plan() -> None:
     before = make_plan()
     plan = apply(before, merge(sources=["ELA_DR_Kick_02", "ELA_DR_Kick_03"]))

@@ -36,6 +36,7 @@ def digest(folder: Path) -> dict[str, str]:
     return {str(p.relative_to(folder)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(folder.rglob("*")) if p.is_file()}
 
 
+@pytest.mark.smoke
 def test_an062_save_writes_next_version_and_keeps_old_one(version: Path) -> None:
     before = digest(version)
     session = Session(version)
@@ -134,6 +135,7 @@ def client(version: Path, tmp_path: Path) -> TestClient:
     return TestClient(web.create_app(Session(version), tmp_path / "out", "Song"), base_url="http://127.0.0.1:8765")
 
 
+@pytest.mark.smoke
 def test_web_listens_only_on_localhost(version: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     seen: dict = {}
     monkeypatch.setattr(web.uvicorn, "run", lambda app, **kwargs: seen.update(kwargs))

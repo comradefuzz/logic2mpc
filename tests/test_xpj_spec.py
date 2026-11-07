@@ -52,6 +52,7 @@ def test_no_donor_project_in_package() -> None:
     assert not any(hasattr(xpj, name) for name in ("TEMPLATE", "BASE_TRACK", "note_template", "clear_pads", "rename_first_track"))
 
 
+@pytest.mark.smoke
 def test_root_has_only_the_ten_contract_keys(tmp_path: Path) -> None:
     assert set(data_of(tmp_path)) == ROOT_KEYS
 
@@ -136,6 +137,7 @@ def test_tempo_goes_to_project_sequences_and_sample_records(tmp_path: Path) -> N
     assert all(float(s["metadata"]["tempo"]) == 97.0 for s in data["samples"])
 
 
+@pytest.mark.smoke
 def test_build_is_deterministic(tmp_path: Path) -> None:
     first = build(tmp_path / "a").path.read_bytes()
     second = build(tmp_path / "b").path.read_bytes()
@@ -220,6 +222,7 @@ def plan_dict() -> dict:
     return json.loads(to_json(sample_plan()))
 
 
+@pytest.mark.smoke
 def test_contract_schema_accepts_a_real_plan() -> None:
     xpj.validate_plan(plan_dict())
 
@@ -246,6 +249,7 @@ def test_contract_rejects_wrong_type_and_other_version() -> None:
         xpj.validate_plan(plan)
 
 
+@pytest.mark.smoke
 def test_invalid_plan_writes_nothing(tmp_path: Path) -> None:
     plan = sample_plan()
     plan.bpm = "fast"  # type: ignore[assignment]
@@ -276,6 +280,7 @@ def imports_from_core(file: str) -> dict[str, set[str]]:
     return found
 
 
+@pytest.mark.smoke
 def test_exporter_imports_from_core_match_the_contract_document() -> None:
     actual: dict[str, set[str]] = {}
     for file in BOUNDARY:
@@ -343,6 +348,7 @@ def one(name: str, ticks: int, *occurrences: Occurrence) -> PlanPiece:
     return PlanPiece(name, f"{name}.wav", 1.0, ticks, 1.0, list(occurrences) or [Occurrence(0)])
 
 
+@pytest.mark.smoke
 def test_an068_long_piece_inside_its_section_is_note_on(tmp_path: Path) -> None:
     plan = plan_with([one("A", BAR, Occurrence(0), Occurrence(BAR))])  # секция 2 такта
     assert modes(tmp_path, plan, 1)[0] == 2
@@ -421,6 +427,7 @@ def groups_of(tmp_path: Path, plan, group: int = 0, count: int = 8) -> list[int]
     return [pad["whichMuteGroup"] for pad in pads[:count]]
 
 
+@pytest.mark.smoke
 def test_an069_pieces_of_one_track_share_a_group_by_track_order(tmp_path: Path) -> None:
     plan = sample_plan()
     plan.groups[0].tracks = [

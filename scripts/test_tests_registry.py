@@ -14,12 +14,12 @@ def write(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, rows: list[str], coll
     path = tmp_path / "registry.tsv"
     path.write_text(HEADER + "\n" + "\n".join(rows) + "\n", encoding="utf-8")
     monkeypatch.setattr(registry, "REGISTRY", path)
-    monkeypatch.setattr(registry, "collect", lambda: collected)
+    monkeypatch.setattr(registry, "collect", lambda marker=None: [] if marker else collected)
     monkeypatch.setattr(registry, "ROOT", tmp_path)
 
 
-def row(test: str, status: str = "active", value: str = "низкий", removed: str = "") -> str:
-    return "\t".join([test, "суть", "general", value, "", "S-001", "причина", status, removed])
+def row(test: str, status: str = "active", value: str = "низкий", removed: str = "", suite: str = "full") -> str:
+    return "\t".join([test, "суть", suite, value, "", "S-001", "причина", status, removed])
 
 
 def test_real_registry_matches_the_suite() -> None:
@@ -49,3 +49,9 @@ def test_spike_test_files_are_forbidden(tmp_path: Path, monkeypatch: pytest.Monk
     (tmp_path / "spikes" / "s").mkdir(parents=True)
     (tmp_path / "spikes" / "s" / "test_a.py").write_text("")
     assert any("тесты спайков запрещены" in e for e in registry.check())
+
+
+def test_smoke_rows_must_match_the_smoke_marker(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    write(tmp_path, monkeypatch, [row("tests/a.py::test_x", suite="smoke"), row("tests/a.py::test_y", suite="огонь")], ["tests/a.py::test_x", "tests/a.py::test_y"])
+    errors = "\n".join(registry.check())
+    assert "в реестре smoke, но метки smoke в коде нет" in errors and "сьют 'огонь'" in errors

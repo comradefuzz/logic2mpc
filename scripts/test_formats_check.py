@@ -5,6 +5,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 import formats_check  # noqa: E402
@@ -214,6 +216,7 @@ def test_open_requests_only() -> None:
         assert "MPC-R-002" not in text
 
 
+@pytest.mark.smoke
 def test_real_base_passes() -> None:
     assert formats_check.check(ROOT / "docs" / "formats", ROOT / "stories") == []
 

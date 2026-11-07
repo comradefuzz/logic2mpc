@@ -55,6 +55,7 @@ def version(tmp_path: Path) -> Path:
     return folder
 
 
+@pytest.mark.smoke
 def test_plan_round_trip_keeps_everything() -> None:
     plan = sample_plan()
     assert from_json(to_json(plan)) == plan
@@ -94,6 +95,7 @@ def test_an063_crossing_is_reported_once() -> None:
     assert crossings([0, BAR, 2 * BAR], 2 * BAR, sections) == [BAR]
 
 
+@pytest.mark.smoke
 def test_build_refuses_without_confirm(version: Path) -> None:
     with pytest.raises(ConfirmationError):
         build(version, version.parent / "out", "ELA")
@@ -107,6 +109,7 @@ def test_build_refuses_after_plan_change(version: Path) -> None:
         build(version, version.parent / "out", "ELA")
 
 
+@pytest.mark.smoke
 def test_build_after_confirm_writes_project(version: Path) -> None:
     confirm(version)
     target = build(version, version.parent / "out", "ELA")
@@ -240,6 +243,7 @@ def test_build_velocity_comes_from_gain(tmp_path: Path) -> None:
     assert [float(e["note"]["velocity"]) for e in events] == [1.0, 0.5]
 
 
+@pytest.mark.smoke
 def test_build_file_survives_reread_with_same_numbers(tmp_path: Path) -> None:
     plan = sample_plan()
     write_samples(plan, tmp_path / "samples")

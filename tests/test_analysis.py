@@ -40,6 +40,7 @@ def burst(rng: np.random.Generator, size: int) -> np.ndarray:
     return rng.normal(0, 0.4, size) * np.exp(-np.arange(size) / (size / 6))
 
 
+@pytest.mark.smoke
 def test_an010_identical_hits_give_one_sample() -> None:
     rng = np.random.default_rng(1)
     hit = burst(rng, 6000)
@@ -83,6 +84,7 @@ def test_an011_single_region_stays_whole_even_with_many_false_onsets() -> None:
     assert [o.tick for o in cut.pieces[0].occurrences] == [0]
 
 
+@pytest.mark.smoke
 def test_an012_loop_length_gives_piece_length() -> None:
     rng = np.random.default_rng(4)
     loop = rng.normal(0, 0.2, FRAMES * 2)
@@ -234,6 +236,7 @@ def test_an021_regions_differing_only_in_note_length_are_one_type() -> None:
     assert cycle.bars == 8
 
 
+@pytest.mark.smoke
 def test_an021_cycle_starts_on_song_grid_when_region_is_there() -> None:
     a, b = phrase(1), phrase(2)
     regions = [MidiRegion((4 + 4 * i) * BAR, b if i % 2 else a) for i in range(8)]
@@ -548,6 +551,7 @@ def test_an066_sound_start_is_first_sample_above_silence() -> None:
     assert sound_start(np.zeros(100), 10, 100) == 10
 
 
+@pytest.mark.smoke
 def test_an066_hit_starts_at_sound_not_at_region_start() -> None:
     pause = int(0.03 * SR)
     mono, regions = hits_with_pauses([pause] * 4)
@@ -623,6 +627,7 @@ def test_an067_beat_start_is_last_quarter_not_after_the_first_note() -> None:
     assert beat_start(2 * BAR, [(2 * BAR + 100, 60, 240)], 4 * BAR) == 2 * BAR  # не раньше начала окна
 
 
+@pytest.mark.smoke
 def test_an067_single_phrase_starts_at_quarter_before_the_first_note() -> None:
     first = 4 * BAR + 500  # пауза 4 такта и ещё 500 тиков от начала региона
     start = round(first * 60 * SR / (960 * BPM))
