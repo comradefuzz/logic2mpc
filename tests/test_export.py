@@ -1,9 +1,11 @@
 """План, секции, подтверждение, отчёт и сборка проекта на синтетике."""
 from __future__ import annotations
 
+import dataclasses
 import json
 from pathlib import Path
 
+import jsonschema
 import numpy as np
 import pytest
 import soundfile as sf
@@ -135,12 +137,10 @@ def user_tracks(project: xpj.Project) -> list[str]:
     return [t["name"] for t in project.data["tracks"] if t["program"]["type"] < 7]
 
 
-def test_build_hands_is_first_and_empty(tmp_path: Path) -> None:
+def test_build_first_track_is_the_first_group(tmp_path: Path) -> None:
     project = built(sample_plan(), tmp_path)
-    assert user_tracks(project) == ["HANDS", "Drums", "Bass"]
-    hands = project.data["tracks"][0]["program"]
-    assert hands["samples"] == []
-    assert not any(i["layersv"][0]["sampleFile"] for i in hands["drum"]["instruments"])
+    assert user_tracks(project) == ["Drums", "Bass"]
+    assert project.data["tracks"][0]["program"]["samples"]
 
 
 def test_build_arms_only_current_track(tmp_path: Path) -> None:
@@ -372,3 +372,46 @@ def test_an062_new_run_is_new_version(analyzed) -> None:
     tracks = [Track(0, "T", "Bass", [], [AudioRegion(0)])]
     assert analyzed(tracks, {1: tone()}).name == "v1"
     assert analyzed(tracks, {1: tone()}).name == "v2"
+
+
+# S-021: экспорт без пустого трека HANDS
+
+
+def built_data(tmp_path: Path, plan: Plan | None = None) -> dict:
+    plan = plan or sample_plan()
+    write_samples(plan, tmp_path / "samples")
+    return xpj.load(xpj.write_project(plan, tmp_path / "samples", tmp_path / "out", "Song")).data
+
+
+@pytest.mark.smoke
+def test_first_track_is_the_first_group_and_no_hands(tmp_path: Path) -> None:
+    data = built_data(tmp_path)
+    assert [t["name"] for t in data["tracks"] if t["program"]["type"] < 7] == ["Drums", "Bass"]
+    first = data["tracks"][0]["program"]["drum"]["instruments"]
+    assert [i["layersv"][0]["sampleFile"] for i in first[:2]] == ["ELA_DR_Kick_01.wav", "ELA_DR_Kick_02.wav"]
+
+
+def test_record_arm_only_on_the_first_track_which_is_current(tmp_path: Path) -> None:
+    data = built_data(tmp_path)
+    assert data["currentTrackIndex"] == 0
+    assert [t["recordArm"] for t in data["tracks"] if t["program"]["type"] < 7] == [True, False]
+
+
+def test_sequences_have_clips_only_for_group_tracks(tmp_path: Path) -> None:
+    for sequence in built_data(tmp_path)["sequences"]:
+        assert [c["key"] for c in sequence["value"]["trackClipMaps"][0]] == ["Bass", "Drums"]
+
+
+def test_plan_without_groups_is_refused_before_writing(tmp_path: Path) -> None:
+    plan = dataclasses.replace(sample_plan(), groups=[])
+    with pytest.raises(ValueError):
+        xpj.export_project(plan, tmp_path / "samples", tmp_path / "out", "Song")
+    assert not (tmp_path / "out").exists()
+
+
+def test_schema_rejects_empty_groups() -> None:
+    schema = json.loads(xpj.SCHEMA.read_text(encoding="utf-8"))
+    assert schema["properties"]["groups"]["minItems"] == 1
+    plan = json.loads(json.dumps(dataclasses.asdict(sample_plan())))
+    plan["groups"] = []
+    assert list(jsonschema.Draft202012Validator(schema).iter_errors(plan))

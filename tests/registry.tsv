@@ -111,7 +111,8 @@ tests/test_export.py::test_build_refuses_without_confirm	build refuses without c
 tests/test_export.py::test_build_refuses_after_plan_change	build refuses after plan change	S-010: Первый экспорт Elated	active	
 tests/test_export.py::test_build_after_confirm_writes_project	build after confirm writes project	S-010: Первый экспорт Elated	active	
 tests/test_export.py::test_confirm_stores_hash	confirm stores hash	S-010: Первый экспорт Elated	active	
-tests/test_export.py::test_build_hands_is_first_and_empty	build hands is first and empty	S-010: Первый экспорт Elated	active	
+tests/test_export.py::test_build_hands_is_first_and_empty	build hands is first and empty	S-010: Первый экспорт Elated	removed	S-021: трек HANDS убран из экспорта, тест переписан под новое поведение
+tests/test_export.py::test_build_first_track_is_the_first_group	первый трек проекта это трек первой группы, у него сэмплы	S-021: экспорт без пустого трека HANDS	active	
 tests/test_export.py::test_build_arms_only_current_track	build arms only current track	S-018: Сборка проекта MPC по описанию формата	active	
 tests/test_export.py::test_build_name_of_file_and_folder_match	build name of file and folder match	S-010: Первый экспорт Elated	active	
 tests/test_export.py::test_build_sequences_follow_sections	build sequences follow sections	S-010: Первый экспорт Elated	active	
@@ -142,7 +143,8 @@ tests/test_groups.py::test_an071_other_names_get_two_latin_letters	an071 other n
 tests/test_groups.py::test_an071_method_is_drum_and_all_names_are_kept	an071 method is drum and all names are kept	S-013, S-012: Стартовый экран и просмотр проекта	active	
 tests/test_groups.py::test_an071_other_group_has_fixed_code	an071 other group has fixed code	S-013, S-012: Стартовый экран и просмотр проекта	active	
 tests/test_groups.py::test_an071_song_code_from_project_name	an071 song code from project name	S-013, S-012: Стартовый экран и просмотр проекта	active	
-tests/test_overview.py::test_overview_lists_tracks_with_hands_first_and_empty	overview lists tracks with hands first and empty	S-013, S-012: Стартовый экран и просмотр проекта	active	
+tests/test_overview.py::test_overview_lists_tracks_with_hands_first_and_empty	overview lists tracks with hands first and empty	S-013, S-012: Стартовый экран и просмотр проекта	removed	S-021: трек HANDS убран из экспорта, тест переписан под новое поведение
+tests/test_overview.py::test_overview_lists_group_tracks	обзор перечисляет только треки групп	S-021: экспорт без пустого трека HANDS	active	
 tests/test_overview.py::test_overview_pad_has_number_bank_note_and_sample	overview pad has number bank note and sample	S-013, S-012: Стартовый экран и просмотр проекта	active	
 tests/test_overview.py::test_overview_pad_16_is_first_pad_of_bank_b	overview pad 16 is first pad of bank b	S-013, S-012: Стартовый экран и просмотр проекта	active	
 tests/test_overview.py::test_overview_merged_away_piece_has_no_pad_and_is_not_a_sample	overview merged away piece has no pad and is not a sample	S-013, S-012: Стартовый экран и просмотр проекта	active	
@@ -242,7 +244,8 @@ tests/test_xpj_spec.py::test_no_field_marked_no_in_the_registry_is_written_anywh
 tests/test_xpj_spec.py::test_program_sample_records_keep_their_registry_fields	program sample records keep their registry fields	S-018: Сборка проекта MPC по описанию формата	active	
 tests/test_xpj_spec.py::test_twin_track_names_after_transliteration_are_refused	twin track names after transliteration are refused	S-018: Сборка проекта MPC по описанию формата	active	
 tests/test_xpj_spec.py::test_fields_marked_no_in_the_registry_are_not_written	fields marked no in the registry are not written	S-018: Сборка проекта MPC по описанию формата	active	
-tests/test_xpj_spec.py::test_hands_is_first_and_empty_groups_follow	hands is first and empty groups follow	S-018: Сборка проекта MPC по описанию формата	active	
+tests/test_xpj_spec.py::test_hands_is_first_and_empty_groups_follow	hands is first and empty groups follow	S-018: Сборка проекта MPC по описанию формата	removed	S-021: трек HANDS убран из экспорта, тест переписан под новое поведение
+tests/test_xpj_spec.py::test_groups_are_the_only_tracks_and_the_first_group_leads	в проекте только треки групп, первая группа ведёт	S-021: экспорт без пустого трека HANDS	active	
 tests/test_xpj_spec.py::test_every_track_has_a_clip_in_every_sequence	every track has a clip in every sequence	S-018: Сборка проекта MPC по описанию формата	active	
 tests/test_xpj_spec.py::test_tempo_goes_to_project_sequences_and_sample_records	tempo goes to project sequences and sample records	S-018: Сборка проекта MPC по описанию формата	active	
 tests/test_xpj_spec.py::test_build_is_deterministic	build is deterministic	S-018: Сборка проекта MPC по описанию формата	active	
@@ -416,3 +419,8 @@ tests/test_xpj_spec.py::test_an072_tracks_of_a_built_project_follow_the_circle	�
 tests/test_xpj_spec.py::test_an072_pads_of_one_logic_track_share_a_colour_and_tracks_differ	Фрагменты одной дорожки Logic красятся одним цветом, разные дорожки разными	S-019: цвета треков и пэдов при экспорте	active	
 tests/test_xpj_spec.py::test_an072_numbering_restarts_in_every_drum_track_and_empty_pads_stay_unpainted	Нумерация цветов в каждом драм-треке заново, пустые пэды без цвета	S-019: цвета треков и пэдов при экспорте	active	
 tests/test_xpj_spec.py::test_an072_merged_and_not_exported_pieces_do_not_take_a_colour	Слитые и неэкспортируемые фрагменты не берут цвет	S-019: цвета треков и пэдов при экспорте	active	
+tests/test_export.py::test_first_track_is_the_first_group_and_no_hands	первый трек проекта это первая группа, HANDS нет	S-021: экспорт без пустого трека HANDS	active	
+tests/test_export.py::test_record_arm_only_on_the_first_track_which_is_current	recordArm true только у первого трека, он же currentTrackIndex	S-021: экспорт без пустого трека HANDS	active	
+tests/test_export.py::test_sequences_have_clips_only_for_group_tracks	в секвенциях клипы только у треков групп	S-021: экспорт без пустого трека HANDS	active	
+tests/test_export.py::test_plan_without_groups_is_refused_before_writing	план без групп отклоняется до записи, папки вывода нет	S-021: экспорт без пустого трека HANDS	active	
+tests/test_export.py::test_schema_rejects_empty_groups	схема входа требует хотя бы одну группу	S-021: экспорт без пустого трека HANDS	active	

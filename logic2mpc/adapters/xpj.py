@@ -26,7 +26,6 @@ from .mpcfile import Number, Project, dump, load, pack, parse, render  # noqa: F
 PADS = 128
 DEFAULT_NOTE_ON_FROM = Fraction(2, 4)
 MUTE_GROUPS = 32
-HANDS = "HANDS"
 MIN_VELOCITY = 0.05
 SCHEMA = xpj_spec.SPEC / "export-plan.schema.json"
 SERVICE_LOSS = (
@@ -177,7 +176,7 @@ def check(plan: Plan, samples: Path) -> None:
         pieces = exported(group)
         if len(pieces) > PADS:
             raise ValueError(f"группа {group.name}: {len(pieces)} фрагментов при лимите {PADS} пэдов")
-    titles = [HANDS] + [transliterate(g.name) for g in plan.groups]
+    titles = [transliterate(g.name) for g in plan.groups]
     twins = sorted({t for t in titles if titles.count(t) > 1})
     if twins:
         raise ValueError("совпадают имена треков после транслитерации: " + ", ".join(twins))
@@ -190,7 +189,7 @@ def drum_track(
     number: int, title: str, pieces: list[PlanPiece], modes: list[int], mutes: list[int], colours: list[int], samples: Path,
     bpm: float,
 ) -> tuple[dict[str, Any], list[tuple[Path, str]]]:
-    """Трек HANDS (без фрагментов) или трек группы: 128 пэдов, на первых сэмплы фрагментов."""
+    """Трек группы: 128 пэдов, на первых сэмплы фрагментов. Первый трек проекта armed (MPC-111)."""
     track = xpj_spec.drum_track(title, armed=number == 0, colour=xpj_spec.track_colour(number))
     program = track["program"]
     copies = []
@@ -221,23 +220,22 @@ def export_project(
     losses = [SERVICE_LOSS]
     copies: list[tuple[Path, str]] = []
     chosen: list[tuple[str, Group, list[PlanPiece]]] = []
-    titles = [HANDS]
-    for number, group in enumerate([None, *plan.groups]):
-        pieces = exported(group) if group else []
-        title = transliterate(group.name) if group else HANDS
-        modes = [trigger_mode(p, plays(group, p), plan.sections, limit) for p in pieces] if group else []
-        mutes, short = mute_groups(group) if group else ([], 0)
+    titles: list[str] = []
+    for number, group in enumerate(plan.groups):
+        pieces = exported(group)
+        title = transliterate(group.name)
+        modes = [trigger_mode(p, plays(group, p), plan.sections, limit) for p in pieces]
+        mutes, short = mute_groups(group)
         if short:
             losses.append(f"Не хватило mute group (максимум {MUTE_GROUPS}) в группе «{title}»: дорожек без группы {short}")
-        colours = pad_colours(group) if group else []
+        colours = pad_colours(group)
         track, made = drum_track(number, title, pieces, modes, mutes, colours, samples, bpm)
         data["tracks"].append(track)
         copies += made
         for piece in pieces:
             data["samples"].append(xpj_spec.sample_entry(piece.name, f"{piece.name}.wav", bpm))
-        if group:
-            chosen.append((title, group, pieces))
-            titles.append(title)
+        chosen.append((title, group, pieces))
+        titles.append(title)
     made_sequences = []
     for number, section in enumerate(plan.sections):
         pulses = section.bars * BAR

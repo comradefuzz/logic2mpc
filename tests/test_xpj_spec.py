@@ -91,7 +91,7 @@ def test_no_field_marked_no_in_the_registry_is_written_anywhere(tmp_path: Path) 
 
 def test_program_sample_records_keep_their_registry_fields(tmp_path: Path) -> None:
     data = data_of(tmp_path)
-    program_sample = data["tracks"][1]["program"]["samples"][0]
+    program_sample = data["tracks"][0]["program"]["samples"][0]
     assert program_sample["version"] == 1 and "version" not in data["samples"][0]
     assert program_sample["name"] == data["samples"][0]["name"]
 
@@ -112,12 +112,10 @@ def test_fields_marked_no_in_the_registry_are_not_written(tmp_path: Path) -> Non
     assert "version" not in pad["layersv"][0] and "version" not in data["samples"][0]
 
 
-def test_hands_is_first_and_empty_groups_follow(tmp_path: Path) -> None:
+def test_groups_are_the_only_tracks_and_the_first_group_leads(tmp_path: Path) -> None:
     data = data_of(tmp_path)
-    assert [t["name"] for t in data["tracks"]] == ["HANDS", "Drums", "Bass"]
-    hands = data["tracks"][0]["program"]
-    assert hands["samples"] == [] and not any(i["layersv"][0]["sampleFile"] for i in hands["drum"]["instruments"])
-    assert [i["layersv"][0]["sampleFile"] for i in data["tracks"][1]["program"]["drum"]["instruments"][:2]] == [
+    assert [t["name"] for t in data["tracks"]] == ["Drums", "Bass"]
+    assert [i["layersv"][0]["sampleFile"] for i in data["tracks"][0]["program"]["drum"]["instruments"][:2]] == [
         "ELA_DR_Kick_01.wav", "ELA_DR_Kick_02.wav",
     ]
 
@@ -125,7 +123,7 @@ def test_hands_is_first_and_empty_groups_follow(tmp_path: Path) -> None:
 def test_every_track_has_a_clip_in_every_sequence(tmp_path: Path) -> None:
     data = data_of(tmp_path)
     for sequence in data["sequences"]:
-        assert [c["key"] for c in sequence["value"]["trackClipMaps"][0]] == ["Bass", "Drums", "HANDS"]
+        assert [c["key"] for c in sequence["value"]["trackClipMaps"][0]] == ["Bass", "Drums"]
 
 
 def test_tempo_goes_to_project_sequences_and_sample_records(tmp_path: Path) -> None:
@@ -351,40 +349,40 @@ def one(name: str, ticks: int, *occurrences: Occurrence) -> PlanPiece:
 @pytest.mark.smoke
 def test_an068_long_piece_inside_its_section_is_note_on(tmp_path: Path) -> None:
     plan = plan_with([one("A", BAR, Occurrence(0), Occurrence(BAR))])  # секция 2 такта
-    assert modes(tmp_path, plan, 1)[0] == 2
+    assert modes(tmp_path, plan, 0)[0] == 2
 
 
 def test_an068_short_piece_and_piece_of_exactly_the_limit_are_one_shot(tmp_path: Path) -> None:
     plan = plan_with([one("A", BAR // 4), one("B", BAR // 2), one("C", BAR // 2 + 1)])
-    assert modes(tmp_path, plan, 1) == [0, 0, 2]
+    assert modes(tmp_path, plan, 0) == [0, 0, 2]
 
 
 def test_an068_piece_past_the_section_end_is_one_shot(tmp_path: Path) -> None:
     plan = plan_with([one("A", 2 * BAR, Occurrence(BAR))])  # от второго такта 2 тактов не помещается
-    assert modes(tmp_path, plan, 1)[0] == 0
+    assert modes(tmp_path, plan, 0)[0] == 0
 
 
 def test_an068_one_crossing_occurrence_makes_the_whole_pad_one_shot(tmp_path: Path) -> None:
     plan = plan_with([one("A", BAR, Occurrence(0), Occurrence(BAR + BAR // 2))])
-    assert modes(tmp_path, plan, 1)[0] == 0
+    assert modes(tmp_path, plan, 0)[0] == 0
 
 
 def test_an068_unplayed_length_of_an_occurrence_is_used(tmp_path: Path) -> None:
     plan = plan_with([one("A", 2 * BAR, Occurrence(BAR, length=BAR))])  # длина вхождения короче, помещается
-    assert modes(tmp_path, plan, 1)[0] == 2
+    assert modes(tmp_path, plan, 0)[0] == 2
 
 
 def test_an068_merged_occurrences_are_counted(tmp_path: Path) -> None:
     main = one("A", BAR, Occurrence(0))
     twin = PlanPiece("B", "B.wav", 1.0, BAR // 4, 1.0, [Occurrence(BAR + BAR // 2)], merged_into="A")
-    assert modes(tmp_path, plan_with([main, twin]), 1)[0] == 0
+    assert modes(tmp_path, plan_with([main, twin]), 0)[0] == 0
 
 
 def test_an068_threshold_is_a_parameter(tmp_path: Path) -> None:
     piece = one("A", 3 * BAR // 4, Occurrence(0))
-    assert modes(tmp_path / "a", plan_with([piece]), 1, note_on_from="1/4")[0] == 2
-    assert modes(tmp_path / "b", plan_with([piece]), 1, note_on_from="1/1")[0] == 0
-    assert modes(tmp_path / "c", plan_with([piece]), 1)[0] == 2  # по умолчанию 2/4
+    assert modes(tmp_path / "a", plan_with([piece]), 0, note_on_from="1/4")[0] == 2
+    assert modes(tmp_path / "b", plan_with([piece]), 0, note_on_from="1/1")[0] == 0
+    assert modes(tmp_path / "c", plan_with([piece]), 0)[0] == 2  # по умолчанию 2/4
 
 
 @pytest.mark.parametrize("value", ["0", "-1/4", "abc", "1/0"])
@@ -408,8 +406,8 @@ def test_an068_app_passes_the_threshold(version: Path, tmp_path: Path) -> None:
     app.confirm(version)
     strict = app.build_result(version, tmp_path / "a", "Song", note_on_from="4/1").path
     loose = app.build_result(version, tmp_path / "b", "Song", note_on_from="1/8").path
-    one_shot = [p["triggerMode"] for p in xpj.load(strict).data["tracks"][1]["program"]["drum"]["instruments"][:2]]
-    note_on = [p["triggerMode"] for p in xpj.load(loose).data["tracks"][1]["program"]["drum"]["instruments"][:2]]
+    one_shot = [p["triggerMode"] for p in xpj.load(strict).data["tracks"][0]["program"]["drum"]["instruments"][:2]]
+    note_on = [p["triggerMode"] for p in xpj.load(loose).data["tracks"][0]["program"]["drum"]["instruments"][:2]]
     assert one_shot == [0, 0] and 2 in note_on
 
 
@@ -423,7 +421,7 @@ def track_of(row: int, *pieces: PlanPiece) -> PlanTrack:
 def groups_of(tmp_path: Path, plan, group: int = 0, count: int = 8) -> list[int]:
     write_samples(plan, tmp_path / "samples")
     path = xpj.export_project(plan, tmp_path / "samples", tmp_path / "out", "Song").path
-    pads = xpj.load(path).data["tracks"][group + 1]["program"]["drum"]["instruments"]  # нулевой трек HANDS
+    pads = xpj.load(path).data["tracks"][group]["program"]["drum"]["instruments"]
     return [pad["whichMuteGroup"] for pad in pads[:count]]
 
 
@@ -457,7 +455,7 @@ def test_an069_tracks_above_32_get_no_group_and_it_is_reported(tmp_path: Path) -
     plan.groups[0].tracks = [track_of(i, one(f"p{i}a", BAR), one(f"p{i}b", BAR)) for i in range(1, 34)]
     write_samples(plan, tmp_path / "samples")
     result = xpj.export_project(plan, tmp_path / "samples", tmp_path / "out", "Song")
-    pads = xpj.load(result.path).data["tracks"][1]["program"]["drum"]["instruments"][:66]
+    pads = xpj.load(result.path).data["tracks"][0]["program"]["drum"]["instruments"][:66]
     assert [p["whichMuteGroup"] for p in pads] == [n for n in range(1, 33) for _ in (0, 1)] + [0, 0]
     assert any("mute group" in loss and "32" in loss for loss in result.losses)
 
@@ -503,14 +501,14 @@ def test_an072_tracks_of_a_built_project_follow_the_circle(tmp_path: Path) -> No
 def test_an072_pads_of_one_logic_track_share_a_colour_and_tracks_differ(tmp_path: Path) -> None:
     plan = sample_plan()
     plan.groups[0].tracks = [track_of(1, one("a1", BAR), one("a2", BAR)), track_of(2, one("b1", BAR)), track_of(3, one("c1", BAR), one("c2", BAR))]
-    assert painted(tmp_path, plan, 1, 7) == [CIRCLE[0], CIRCLE[0], CIRCLE[1], CIRCLE[2], CIRCLE[2], 0, 0]
+    assert painted(tmp_path, plan, 0, 7) == [CIRCLE[0], CIRCLE[0], CIRCLE[1], CIRCLE[2], CIRCLE[2], 0, 0]
 
 
 def test_an072_numbering_restarts_in_every_drum_track_and_empty_pads_stay_unpainted(tmp_path: Path) -> None:
     plan = sample_plan()
     plan.groups[0].tracks = [track_of(1, one("a1", BAR))]
     plan.groups[1].tracks = [track_of(2, one("b1", BAR))]
-    assert painted(tmp_path / "a", plan, 1, 3) == [CIRCLE[0], 0, 0] and painted(tmp_path / "b", plan, 2, 3) == [CIRCLE[0], 0, 0]
+    assert painted(tmp_path / "a", plan, 0, 3) == [CIRCLE[0], 0, 0] and painted(tmp_path / "b", plan, 1, 3) == [CIRCLE[0], 0, 0]
 
 
 def test_an072_merged_and_not_exported_pieces_do_not_take_a_colour(tmp_path: Path) -> None:
@@ -518,4 +516,4 @@ def test_an072_merged_and_not_exported_pieces_do_not_take_a_colour(tmp_path: Pat
     merged = PlanPiece("a2", "a2.wav", 1.0, BAR, 1.0, [Occurrence(0)], merged_into="a1")
     hidden = PlanPiece("b2", "b2.wav", 1.0, BAR, 1.0, [Occurrence(0)], export=False)
     plan.groups[0].tracks = [track_of(1, one("a1", BAR), merged), track_of(2, hidden), track_of(3, one("c1", BAR))]
-    assert painted(tmp_path, plan, 1, 3) == [CIRCLE[0], CIRCLE[1], 0]
+    assert painted(tmp_path, plan, 0, 3) == [CIRCLE[0], CIRCLE[1], 0]

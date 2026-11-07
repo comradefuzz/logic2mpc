@@ -33,11 +33,10 @@ def build(plan: Plan, tmp_path: Path, name: str = "Song") -> Path:
     return xpj.write_project(plan, tmp_path / "samples", tmp_path / "out", name)
 
 
-def test_overview_lists_tracks_with_hands_first_and_empty(tmp_path: Path) -> None:
+def test_overview_lists_group_tracks(tmp_path: Path) -> None:
     view = xpj_view.read_overview(build(make_plan(), tmp_path))
-    assert [t["name"] for t in view["tracks"]] == ["HANDS", "Drums", "Bass", "Synth", "Lead"]
-    assert [t["filled"] for t in view["tracks"]] == [0, 4, 2, 1, 1]
-    assert view["tracks"][0]["pads"] == []
+    assert [t["name"] for t in view["tracks"]] == ["Drums", "Bass", "Synth", "Lead"]
+    assert [t["filled"] for t in view["tracks"]] == [4, 2, 1, 1]
     assert all(t["kind"] == "drum" for t in view["tracks"])
 
 
@@ -168,7 +167,7 @@ def test_web_project_is_refused_before_build_and_served_after(client: TestClient
     state = client.get("/api/state").json()
     assert state["built"] == str(tmp_path / "result" / "Song.xpj")
     view = client.get("/api/project").json()
-    assert [t["name"] for t in view["tracks"]][:2] == ["HANDS", "Drums"]
+    assert [t["name"] for t in view["tracks"]][:2] == ["Drums", "Bass"]
 
 
 @pytest.mark.web
