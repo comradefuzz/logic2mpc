@@ -14,12 +14,12 @@ def write(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, rows: list[str], coll
     path = tmp_path / "registry.tsv"
     path.write_text(HEADER + "\n" + "\n".join(rows) + "\n", encoding="utf-8")
     monkeypatch.setattr(registry, "REGISTRY", path)
-    monkeypatch.setattr(registry, "collect", lambda marker=None: [] if marker else collected)
+    monkeypatch.setattr(registry, "collect", lambda: collected)
     monkeypatch.setattr(registry, "ROOT", tmp_path)
 
 
-def row(test: str, status: str = "active", value: str = "низкий", removed: str = "", suite: str = "full") -> str:
-    return "\t".join([test, "суть", suite, value, "", "S-001", "причина", status, removed])
+def row(test: str, status: str = "active", removed: str = "", purpose: str = "суть") -> str:
+    return "\t".join([test, purpose, "причина", status, removed])
 
 
 def test_real_registry_matches_the_suite() -> None:
@@ -32,10 +32,10 @@ def test_missing_and_stale_rows_are_reported(tmp_path: Path, monkeypatch: pytest
     assert "test_new: тест есть в наборе, но не внесён" in errors and "test_old: в реестре active, но в наборе нет" in errors
 
 
-def test_removed_row_needs_a_reason_and_active_row_a_known_value(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    write(tmp_path, monkeypatch, [row("tests/a.py::test_x", "removed"), row("tests/a.py::test_y", value="огонь")], ["tests/a.py::test_y"])
+def test_removed_row_needs_a_reason_and_active_row_a_purpose(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    write(tmp_path, monkeypatch, [row("tests/a.py::test_x", "removed"), row("tests/a.py::test_y", purpose="")], ["tests/a.py::test_y"])
     errors = "\n".join(registry.check())
-    assert "удалённый тест без причины удаления" in errors and "оценка 'огонь'" in errors
+    assert "удалённый тест без причины удаления" in errors and "пустое поле purpose" in errors
 
 
 def test_spike_and_story_tests_are_forbidden_in_the_registry(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -49,9 +49,3 @@ def test_spike_test_files_are_forbidden(tmp_path: Path, monkeypatch: pytest.Monk
     (tmp_path / "spikes" / "s").mkdir(parents=True)
     (tmp_path / "spikes" / "s" / "test_a.py").write_text("")
     assert any("тесты спайков запрещены" in e for e in registry.check())
-
-
-def test_smoke_rows_must_match_the_smoke_marker(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    write(tmp_path, monkeypatch, [row("tests/a.py::test_x", suite="smoke"), row("tests/a.py::test_y", suite="огонь")], ["tests/a.py::test_x", "tests/a.py::test_y"])
-    errors = "\n".join(registry.check())
-    assert "в реестре smoke, но метки smoke в коде нет" in errors and "сьют 'огонь'" in errors

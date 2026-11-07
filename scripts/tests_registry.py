@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Реестр тестов общего набора: `tests/registry.tsv`. Правила: docs/testing.md.
+"""Реестр тестов общего набора: `tests/registry.tsv` (для чего тест, причина появления, причина удаления).
+Сьюты определяются метками в коде, не реестром. Правила: docs/testing.md.
 
     tests_registry.py check    реестр совпадает с набором, у строк есть причины, тестов спайков нет
-    tests_registry.py audit    актуализация: прогон с замерами, пропуски, медленные тесты, тесты с оценкой «высокий»
+    tests_registry.py audit    актуализация: замеры full и smoke, пропуски, медленные тесты
 
 `check` быстрый (сбор без прогона) и входит в `gate.py sanity` и Stop-хук.
 """
@@ -15,14 +16,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY = ROOT / "tests" / "registry.tsv"
-COLUMNS = (
-    "test", "essence", "suite", "value", "value_note", "added_for", "reason_added", "status", "removed_reason",
-)
-VALUES = {"низкий", "средний", "высокий"}
+COLUMNS = ("test", "purpose", "reason_added", "status", "removed_reason")
 STATUSES = {"active", "removed"}
-SUITES = {"smoke", "full"}
 FORBIDDEN_PREFIXES = ("spikes/", "story_tests/")
 BUDGET_SECONDS = 150
+SMOKE_BUDGET_SECONDS = 15
 SLOW_SECONDS = 2.0
 
 
@@ -38,12 +36,9 @@ def read_registry() -> list[dict[str, str]]:
     return [dict(zip(COLUMNS, (line.split("\t") + [""] * len(COLUMNS))[: len(COLUMNS)])) for line in lines[1:]]
 
 
-def collect(marker: str | None = None) -> list[str]:
-    """Функции общего набора (без параметров), в порядке сбора. С `marker` только помеченные им."""
-    command = [python(), "-m", "pytest", "--collect-only", "-q", "-p", "no:cacheprovider"]
-    if marker:
-        command += ["-m", marker]
-    result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
+def collect() -> list[str]:
+    """Функции общего набора (без параметров), в порядке сбора."""
+    result = subprocess.run([python(), "-m", "pytest", "--collect-only", "-q", "-p", "no:cacheprovider"], cwd=ROOT, capture_output=True, text=True)
     found: list[str] = []
     for line in result.stdout.splitlines():
         if "::" in line:
@@ -68,23 +63,15 @@ def check() -> list[str]:
         if row["status"] == "active":
             if row["test"].startswith(FORBIDDEN_PREFIXES):
                 errors.append(f"{where}: тесты спайков и стори в реестр общего набора не входят")
-            for field in ("essence", "value", "reason_added", "added_for"):
+            for field in ("purpose", "reason_added"):
                 if not row[field]:
                     errors.append(f"{where}: пустое поле {field}")
-            if row["suite"] not in SUITES:
-                errors.append(f"{where}: сьют {row['suite']!r}, нужен smoke или full")
-            if row["value"] not in VALUES:
-                errors.append(f"{where}: оценка {row['value']!r}, нужна одна из {sorted(VALUES)}")
         elif not row["removed_reason"]:
             errors.append(f"{where}: удалённый тест без причины удаления")
     collected = collect()
     active = {r["test"] for r in rows if r["status"] == "active"}
     errors += [f"{t}: тест есть в наборе, но не внесён в реестр" for t in collected if t not in active]
     errors += [f"{t}: в реестре active, но в наборе нет: пометить removed с причиной" for t in sorted(active - set(collected))]
-    smoke = {r["test"] for r in rows if r["status"] == "active" and r["suite"] == "smoke"}
-    marked = set(collect("smoke"))
-    errors += [f"{t}: помечен smoke, но в реестре сьют не smoke" for t in sorted(marked - smoke)]
-    errors += [f"{t}: в реестре smoke, но метки smoke в коде нет" for t in sorted(smoke - marked)]
     for path in (ROOT / "spikes").rglob("test_*.py"):
         errors.append(f"{path.relative_to(ROOT)}: тесты спайков запрещены, нужные в ходе спайка лежат в story_tests/")
     return errors
@@ -106,12 +93,13 @@ def audit() -> int:
     skipped = re.findall(r"^SKIPPED \[(\d+)\] (.+)$", text, re.M)
     for count, reason in skipped:
         print(f"пропущено {count}: {reason[:120]}")
-    for row in read_registry():
-        if row["status"] == "active" and row["value"] == "высокий":
-            print(f"оценка «высокий»: {row['test']}: {row['value_note']}")
+    smoke = subprocess.run([python(), "-m", "pytest", "-q", "-m", "smoke", "-p", "no:cacheprovider"], cwd=ROOT, capture_output=True, text=True).stdout
+    found = re.search(r"in ([\d.]+)s", smoke)
+    smoke_seconds = float(found.group(1)) if found else 0.0
+    print(f"smoke: {smoke_seconds:.0f} с при бюджете {SMOKE_BUDGET_SECONDS} с{' (ПРЕВЫШЕН)' if smoke_seconds > SMOKE_BUDGET_SECONDS else ''}")
     for error in errors:
         print(f"ОШИБКА: {error}")
-    return 0 if not errors and seconds <= BUDGET_SECONDS else 1
+    return 0 if not errors and seconds <= BUDGET_SECONDS and smoke_seconds <= SMOKE_BUDGET_SECONDS else 1
 
 
 def main() -> int:
