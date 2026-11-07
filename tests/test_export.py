@@ -11,7 +11,7 @@ import pytest
 import soundfile as sf
 
 from logic2mpc import app
-from logic2mpc.adapters import logic, xpj
+from logic2mpc.adapters import logic, logic_source, xpj
 from logic2mpc.app import ConfirmationError, build, confirm
 from logic2mpc.core.model import BAR, AudioRegion, Track
 from logic2mpc.core.names import clean_name, sample_name
@@ -319,7 +319,7 @@ def song(tracks: list[Track]) -> logic.Song:
 @pytest.fixture
 def analyzed(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     def run(tracks: list[Track], files: dict[int, np.ndarray]) -> Path:
-        monkeypatch.setattr(logic, "read_project", lambda _: song(tracks))
+        monkeypatch.setattr(logic_source, "read_project", lambda _: song(tracks))
         export = tmp_path / "export"
         export.mkdir(exist_ok=True)
         for number, audio in files.items():

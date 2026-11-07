@@ -15,7 +15,7 @@ import pytest
 
 import soundfile as sf
 
-from logic2mpc.adapters import logic
+from logic2mpc.adapters import logic_source
 from logic2mpc.core.analysis import analyze_track
 from logic2mpc.core.cycle import find_cycle
 from logic2mpc.core.model import BAR, Cut
@@ -31,12 +31,12 @@ needs_export = pytest.mark.skipif(not (PROJECT and EXPORT), reason="нет LOGIC
 
 
 def track(name: str):
-    song = logic.read_project(Path(PROJECT))
+    song = logic_source.read_project(Path(PROJECT))
     return next(t for t in song.tracks if t.name == name)
 
 
 def cut_of(name: str) -> Cut:
-    song = logic.read_project(Path(PROJECT))
+    song = logic_source.read_project(Path(PROJECT))
     item = next(t for t in song.tracks if t.name == name)
     files = {int(p.name.split("_")[0]): p for p in Path(EXPORT).glob("*.wav")}
     audio, sr = sf.read(files[item.row + 1], always_2d=True)

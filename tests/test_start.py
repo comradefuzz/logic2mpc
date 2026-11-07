@@ -12,7 +12,7 @@ import soundfile as sf
 from fastapi.testclient import TestClient
 
 from logic2mpc import app
-from logic2mpc.adapters import logic, web
+from logic2mpc.adapters import logic, logic_source, web
 from logic2mpc.app import BusyError, Workspace, find_version, inspect_project
 from logic2mpc.core.model import AudioRegion, Track
 from logic2mpc.core.plan import from_json
@@ -36,7 +36,7 @@ def tracks() -> list[Track]:
 @pytest.fixture
 def setup(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> tuple[Path, Path]:
     song = logic.Song(120.0, 48000, tracks(), [(0, "Intro")], 0, 0)
-    monkeypatch.setattr(logic, "read_project", lambda _: song)
+    monkeypatch.setattr(logic_source, "read_project", lambda _: song)
     project = tmp_path / "Fuzz - Elated.logicx"
     project.mkdir()
     export = tmp_path / "export"
@@ -246,7 +246,7 @@ def test_analyze_refused_while_a_plan_is_open(setup: tuple[Path, Path]) -> None:
 def test_project_without_audible_tracks_is_refused(setup: tuple[Path, Path], monkeypatch: pytest.MonkeyPatch) -> None:
     project, export = setup
     empty = logic.Song(120.0, 48000, [Track(0, "Off", "Drums", [], [AudioRegion(0, muted=True)])], [], 0, 0)
-    monkeypatch.setattr(logic, "read_project", lambda _: empty)
+    monkeypatch.setattr(logic_source, "read_project", lambda _: empty)
     with pytest.raises(ValueError, match="нет дорожек со звуком"):
         inspect_project(project, export)
     with pytest.raises(ValueError, match="нет дорожек со звуком"):

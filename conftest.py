@@ -18,6 +18,7 @@ DEFAULT_AREA = {
     "tests/test_groups.py": "core",
     "tests/test_real_project.py": "core",
     "tests/test_session.py": "core",
+    "tests/test_logic_source.py": "core",
     "tests/test_start.py": "core",
 }
 

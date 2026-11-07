@@ -26,7 +26,7 @@ AREA_PATHS = {
     "build": ("logic2mpc/adapters/xpj", "logic2mpc/adapters/mpcfile", "logic2mpc/spec/", "docs/contracts/", "scripts/build_spec.py",
               "tests/test_xpj_spec.py", "tests/test_export.py", "tests/test_mpcfile.py", "tests/test_overview.py"),
     "web": ("logic2mpc/adapters/web.py", "logic2mpc/web/"),
-    "core": ("logic2mpc/core/", "logic2mpc/adapters/logic.py", "tests/test_analysis.py", "tests/test_edit.py", "tests/test_groups.py",
+    "core": ("logic2mpc/core/", "logic2mpc/adapters/logic", "tests/test_analysis.py", "tests/test_edit.py", "tests/test_groups.py",
              "tests/test_real_project.py", "tests/test_session.py", "tests/test_start.py"),
     "tools": ("scripts/", "pytest.ini", "conftest.py"),
 }

@@ -424,3 +424,18 @@ tests/test_export.py::test_record_arm_only_on_the_first_track_which_is_current	r
 tests/test_export.py::test_sequences_have_clips_only_for_group_tracks	в секвенциях клипы только у треков групп	S-021: экспорт без пустого трека HANDS	active	
 tests/test_export.py::test_plan_without_groups_is_refused_before_writing	план без групп отклоняется до записи, папки вывода нет	S-021: экспорт без пустого трека HANDS	active	
 tests/test_export.py::test_schema_rejects_empty_groups	схема входа требует хотя бы одну группу	S-021: экспорт без пустого трека HANDS	active	
+tests/test_logic_source.py::test_versions_declared	адаптеры объявляют свои версии файла: 10.8.1 это 0x09CB, Logic 12 это 0x09D1	S-028: Адаптер Logic 12 и выбор адаптера по версии файла	active	
+tests/test_logic_source.py::test_adapters_have_same_interface	адаптер Logic 12 имеет тот же интерфейс, что адаптер 10.8.1	S-028: Адаптер Logic 12 и выбор адаптера по версии файла	active	
+tests/test_logic_source.py::test_dispatch_by_version	точка выбора направляет проект в адаптер своей версии	S-028: Адаптер Logic 12 и выбор адаптера по версии файла	active	
+tests/test_logic_source.py::test_mixed_package_uses_active_alternative	в пакете со смешанными версиями берётся активная альтернатива	S-028: Адаптер Logic 12 и выбор адаптера по версии файла	active	
+tests/test_logic_source.py::test_without_active_variant_last_alternative	без ActiveVariant берётся последняя альтернатива	S-028: Адаптер Logic 12 и выбор адаптера по версии файла	active	
+tests/test_logic_source.py::test_unknown_version_refused_with_versions_in_message	неизвестная версия даёт отказ с перечнем известных, без догадки	S-028: Адаптер Logic 12 и выбор адаптера по версии файла	active	
+tests/test_logic_source.py::test_no_signature_refused	файл без сигнатуры отклоняется	S-028: Адаптер Logic 12 и выбор адаптера по версии файла	active	
+tests/test_logic_source.py::test_truncated_file_refused	обрезанный файл отклоняется понятной ошибкой	S-028: Адаптер Logic 12 и выбор адаптера по версии файла	active	
+tests/test_logic_source.py::test_no_projectdata_refused	пакет без ProjectData даёт FileNotFoundError	S-028: Адаптер Logic 12 и выбор адаптера по версии файла	active	
+tests/test_logic_source.py::test_adapters_do_not_cover_each_other	адаптеры отказывают на версии друг друга	S-028: Адаптер Logic 12 и выбор адаптера по версии файла	active	
+tests/test_logic_source.py::test_old_adapter_untouched	адаптер 10.8.1 заморожен и не принимает 0x09D1	S-028: Адаптер Logic 12 и выбор адаптера по версии файла	active	
+scripts/test_adapter_overlap.py::test_overlap_counts	считает одинаковые, изменённые и уникальные функции двух модулей	S-028: Адаптер Logic 12 и выбор адаптера по версии файла	active	
+scripts/test_adapter_overlap.py::test_identical_modules	одинаковые модули дают долю 100%	S-028: Адаптер Logic 12 и выбор адаптера по версии файла	active	
+scripts/test_adapter_overlap.py::test_disjoint_modules	модули без общих функций дают долю 0%	S-028: Адаптер Logic 12 и выбор адаптера по версии файла	active	
+scripts/test_adapter_overlap.py::test_report_text	текстовый отчёт содержит долю и список изменённых функций	S-028: Адаптер Logic 12 и выбор адаптера по версии файла	active	

@@ -12,7 +12,7 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
-from .adapters import logic, xpj
+from .adapters import logic_source, xpj
 from .core import edit as editing
 from .core import report, signal
 from .core.analysis import analyze_track
@@ -95,7 +95,7 @@ def inspect_project(project: Path, export: Path) -> dict:
         raise ValueError(f"нет проекта {project}")
     if not export.is_dir():
         raise ValueError(f"нет папки с экспортом {export}")
-    song = logic.read_project(project)
+    song = logic_source.read_project(project)
     content = [t for t in song.tracks if audible(t)]
     if not content:
         raise ValueError("в проекте нет дорожек со звуком")
@@ -127,7 +127,7 @@ def analyze(
     Без файла групп группы строятся по папкам Logic (`AN-071`), `progress(сделано, всего, дорожка)`.
     """
     check_song_code(song)
-    proj = logic.read_project(project)
+    proj = logic_source.read_project(project)
     files = export_files(export)
     content = [t for t in proj.tracks if audible(t)]
     if groups_file is not None:
