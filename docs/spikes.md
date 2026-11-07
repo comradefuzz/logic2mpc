@@ -336,3 +336,13 @@ Logic 11 не проверялся, такой версии на машине н
 `spikes/mpc_spec/fill.py` заполнил `docs/formats/mpc/export.tsv`: 194 поля `no` (можно не писать), 2 поля `yes` (`instruments[].version`, `events[].version`), остальные 713 `unknown` (не проверялись: узлы, переменные и вложенные постоянные поля). Переменные поля получили значение из `Empty.xpj`, из плана или решение.
 
 Четыре поля вне `Empty.xpj` решены без проверки на железе: `samples[].metadata.rootNote` 60, `samples[].loadImpl` 0, `sequences[].value.autoSelectTrackIndex` -1, `events[].channel` 0. Обязательность `rootNote` не измерялась.
+
+## Спайк: цвета треков и пэдов Live 2 по эталону Example Colours
+
+Стори [S-025](../stories/S-025-colours-reference.md). Эталон `test-projects/reference/Example Colours.xpj` сохранён Live 2: 64 драм-трека созданы подряд, у первого трека пэды покрашены всеми цветами функции PadColors.
+
+- Цвет трека (`tracks[].colour`, RGB) Live 2 назначает по кругу из 21 значения, первый трек `55FF00`, 22-й снова `55FF00`. Служебные треки красятся фиксированно: Submix `FF6D17`, Return `ECEC24`, Out `A2A9AD`. Реквест MPC-R-014.
+- Цвет пэда хранится в `program.programPads.pads.valueN` (N 0–127), 0 значит цвет не задан. Палитра PadColors из 25 цветов: 21 цвет круга треков, три цвета служебных треков и `29B574`. Пэд с сэмплом без заданного цвета Live 2 показывает ярко-зелёным (со слов пользователя; у треков 2–64 `universalPad` 0x00FF00), функция Pad Color сбрасывает цвета пэдов и задаёт их заново. Реквест MPC-R-015.
+- Ключи `programPads` соответствуют экрану Pad Color по четырём снимкам пользователя (MPC-R-015): `Type` PAD DISPLAY TYPE (5 это Bright->Velocity), `UnusedPads` EMPTY PADS (1 это dim), `Universal` SINGLE PAD или ALL PADS, `universalPad` цвет режима ALL PADS, `PadsFollowTrackColour` режим Follow Track (цвета пэдов сбрасываются, пэды получают цвет трека, заполненный ярко, пустой приглушён). Выведено по совпадению значений, прямой проверки не было.
+- Не установлено: какое поле включает Follow Track (`programPads.PadsFollowTrackColour` или `tracks[].padsFollowTrackColour`), коды имён цветов палитры (`Canary` и другие), принимает ли Live 2 цвета вне палитры.
+- Следствие: S-019 (цвета треков) разблокирована, S-020 (палитра вручную) закрыта как ненужная.

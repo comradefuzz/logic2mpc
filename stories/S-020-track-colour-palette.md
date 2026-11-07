@@ -2,7 +2,7 @@
 id: S-020
 title: "Спайк: палитра цветов треков Live 2"
 type: spike
-status: plan-review
+status: done
 ---
 
 ## Стори
@@ -51,4 +51,4 @@ status: plan-review
 
 ## Результат приёмки
 
-Заполняется при `/accept`.
+Закрыта без выполнения: палитру дал эталон `Example Colours.xpj`, анализ в [S-025](S-025-colours-reference.md) (реквесты MPC-R-014, MPC-R-015). Ручной заход на Live 2 не нужен.
