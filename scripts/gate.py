@@ -3,20 +3,26 @@
 
     gate.py sanity   формат базы знаний и стори, реестр тестов, синтаксис и импорт кода (секунды)
     gate.py commit   sanity и smoke-тесты, smoke только если в индексе есть код или тесты (для коммита)
-    gate.py full     sanity и полный общий набор (для /approve и /accept)
+    gate.py full     sanity и полный общий набор (для /approve и /accept); один прогон на состояние кода:
+                     если набор уже зелёный для текущего состояния (штамп), прогон пропускается
+    gate.py full --force   полный набор без учёта штампа
 
 Код возврата не 0, если уровень не пройден.
 """
 from __future__ import annotations
 
+import hashlib
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CODE_SUFFIXES = (".py",)
 CODE_FILES = ("pytest.ini", "requirements.txt", "tests/registry.tsv")
 CODE_PREFIXES = ("logic2mpc/spec/",)
+STAMP = ROOT / ".gate_full_ok"
+STAMP_EXCLUDE = ("story_tests/", "spikes/")
 
 
 def python() -> str:
@@ -36,6 +42,24 @@ def touches_code(paths: list[str]) -> bool:
 def staged() -> list[str]:
     result = subprocess.run(["git", "diff", "--cached", "--name-only"], cwd=ROOT, capture_output=True, text=True)
     return [line for line in result.stdout.splitlines() if line]
+
+
+def fingerprint(paths: list[str], read=lambda p: (ROOT / p).read_bytes()) -> str:
+    """Хеш состояния, от которого зависит результат общего набора: код, тесты, спека, конфигурация."""
+    digest = hashlib.sha256()
+    for path in sorted(p for p in paths if touches_code([p]) and not p.startswith(STAMP_EXCLUDE)):
+        digest.update(path.encode())
+        digest.update(read(path))
+    return digest.hexdigest()
+
+
+def tracked_and_new() -> list[str]:
+    result = subprocess.run(["git", "ls-files", "-co", "--exclude-standard"], cwd=ROOT, capture_output=True, text=True)
+    return [line for line in result.stdout.splitlines() if line and (ROOT / line).is_file()]
+
+
+def stamped() -> str | None:
+    return STAMP.read_text().split()[0] if STAMP.is_file() and STAMP.read_text().split() else None
 
 
 def sanity() -> int:
@@ -66,9 +90,15 @@ def main() -> int:
         if run("-m", "pytest", "-q", "-m", "smoke", "-x"):
             print("Коммит заблокирован: smoke-тесты красные.", file=sys.stderr)
             return 1
-    if level == "full" and run("-m", "pytest", "-q"):
-        print("Полный набор красный.", file=sys.stderr)
-        return 1
+    if level == "full":
+        state = fingerprint(tracked_and_new())
+        if "--force" not in sys.argv and stamped() == state:
+            print("full: набор уже зелёный для этого состояния кода (штамп), прогон пропущен; --force запускает заново")
+            return 0
+        if run("-m", "pytest", "-q"):
+            print("Полный набор красный.", file=sys.stderr)
+            return 1
+        STAMP.write_text(f"{state} {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
     return 0
 
 

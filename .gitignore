@@ -6,3 +6,4 @@ __pycache__/
 .claude/worktrees/
 BOARD.md
 test-projects/
+.gate_full_ok
