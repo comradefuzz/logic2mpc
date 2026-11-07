@@ -76,3 +76,10 @@
 - evidence: S-002, варианты не сравнивались, повторного экспорта не было; LOGIC-R-004, Elated 1
 - fact: Влияние эффектов, фейдеров, хвоста и других `Range` не проверялось. Причина сдвига `CTRL_kick` на 3 мс не выяснена. Track Alternatives и take folders в экспорте не проверялись. Mute региона убирает его из экспорта.
 - updated: 2026-10-31
+
+### LOGIC-104 Logic 12: пакет и экспорты
+- status: single-sample
+- applies: Logic 12.3.1 (6682)
+- evidence: S-027, LOGIC-R-013: `Spike Control copy.logicx`, `Spike Control copy.mid`, `Spike Control copy.fcpxml`, `all-tracks-l12/`; тесты `story_tests/S-027/test_logic12.py`
+- fact: Пакет: `ProjectInformation.plist` `BundleVersion` 2 (как у 10.8.1), `LastSavedFrom` «Logic Pro Creator Studio 12.3.1 (6682)». Пакет может смешивать версии: после пересохранения активна альтернатива 000 версии 0x09D1, альтернатива 001 осталась побайтово как у 10.8.1 (0x09CB), активную выбирает `ActiveVariant`. `MetaData.plist` с теми же ключами, пути `SamplerInstrumentsFiles` вида `${CONTENT_iOS:Logic Pro Library.bundle}/Plug-In Settings/Sampler/…` вместо `/Library/Application Support/Logic/Sampler Instruments/…`. MIDI-экспорт: устройство то же (LOGIC-080), но End of Track дорожки региона стоит на границе такта позже последней ноты (kick на 7680, sub на 15360 тиках при 480 PPQ), у 10.8.1 сразу на последней ноте; гипотеза: конец региона, не сверено с длиной региона. FCP XML версии 1.8, по структуре и длинам не отличается. All Tracks: те же 7 файлов, те же длины в кадрах; имя без префикса `NN_` и 16 бит вместо 24 это выбор в диалоге, а не изменение формата.
+- updated: 2026-11-08

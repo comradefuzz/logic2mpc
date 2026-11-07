@@ -1,6 +1,6 @@
 ---
 id: LOGIC-R-011
-status: open
+status: applied
 kind: correct
 targets: LOGIC-007, LOGIC-008
 proposed-status: single-sample
@@ -8,6 +8,8 @@ applies: Logic 12.3.1 (6682)
 evidence: S-027, Spike Control: 612 записей Logic 12 против 521 у 10.8.1, заголовок файла и записи
 found-in: S-027
 created: 2026-11-07
+resolved: 2026-11-08
+comment: Принято по решению пользователя без отдельной проверки (LOGIC-007, LOGIC-008)
 ---
 
 Версия файла `0x09D1` (LOGIC-007, смещение 0x04, повторена в Song `+0x04`). Остальные поля заголовка файла как у 0x09CB, `+0x10` равно размеру файла − 24.
