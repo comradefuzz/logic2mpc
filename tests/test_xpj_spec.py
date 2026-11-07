@@ -15,7 +15,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import build_spec  # noqa: E402
 from logic2mpc.adapters import xpj, xpj_spec
-from logic2mpc.core.plan import Occurrence, PlanPiece, to_json
+from logic2mpc.core.plan import Occurrence, PlanPiece, PlanTrack, to_json
 
 from logic2mpc import app
 from test_export import sample_plan, version, write_samples  # noqa: F401
@@ -405,3 +405,64 @@ def test_an068_app_passes_the_threshold(version: Path, tmp_path: Path) -> None:
     one_shot = [p["triggerMode"] for p in xpj.load(strict).data["tracks"][1]["program"]["drum"]["instruments"][:2]]
     note_on = [p["triggerMode"] for p in xpj.load(loose).data["tracks"][1]["program"]["drum"]["instruments"][:2]]
     assert one_shot == [0, 0] and 2 in note_on
+
+
+# S-024: mute group для фрагментов одной дорожки Logic (AN-069)
+
+
+def track_of(row: int, *pieces: PlanPiece) -> PlanTrack:
+    return PlanTrack(row, f"T{row}", "AN-010", 1.0, list(pieces))
+
+
+def groups_of(tmp_path: Path, plan, group: int = 0, count: int = 8) -> list[int]:
+    write_samples(plan, tmp_path / "samples")
+    path = xpj.export_project(plan, tmp_path / "samples", tmp_path / "out", "Song").path
+    pads = xpj.load(path).data["tracks"][group + 1]["program"]["drum"]["instruments"]  # нулевой трек HANDS
+    return [pad["whichMuteGroup"] for pad in pads[:count]]
+
+
+def test_an069_pieces_of_one_track_share_a_group_by_track_order(tmp_path: Path) -> None:
+    plan = sample_plan()
+    plan.groups[0].tracks = [
+        track_of(1, one("a1", BAR), one("a2", BAR)), track_of(2, one("b1", BAR), one("b2", BAR), one("b3", BAR)),
+        track_of(3, one("c1", BAR)),
+    ]
+    assert groups_of(tmp_path, plan, 0, 7) == [1, 1, 2, 2, 2, 0, 0]
+
+
+def test_an069_numbering_starts_again_in_every_drum_track(tmp_path: Path) -> None:
+    plan = sample_plan()
+    plan.groups[0].tracks = [track_of(1, one("a1", BAR), one("a2", BAR))]
+    plan.groups[1].tracks = [track_of(2, one("b1", BAR), one("b2", BAR))]
+    assert groups_of(tmp_path / "a", plan, 0, 2) == [1, 1] and groups_of(tmp_path / "b", plan, 1, 2) == [1, 1]
+
+
+def test_an069_merged_and_not_exported_pieces_are_not_counted(tmp_path: Path) -> None:
+    plan = sample_plan()
+    merged = PlanPiece("a2", "a2.wav", 1.0, BAR, 1.0, [Occurrence(0)], merged_into="a1")
+    hidden = PlanPiece("b2", "b2.wav", 1.0, BAR, 1.0, [Occurrence(0)], export=False)
+    plan.groups[0].tracks = [track_of(1, one("a1", BAR), merged), track_of(2, one("b1", BAR), hidden), track_of(3, one("c1", BAR), one("c2", BAR))]
+    assert groups_of(tmp_path, plan, 0, 4) == [0, 0, 1, 1]
+
+
+def test_an069_tracks_above_32_get_no_group_and_it_is_reported(tmp_path: Path) -> None:
+    plan = sample_plan()
+    plan.groups[0].tracks = [track_of(i, one(f"p{i}a", BAR), one(f"p{i}b", BAR)) for i in range(1, 34)]
+    write_samples(plan, tmp_path / "samples")
+    result = xpj.export_project(plan, tmp_path / "samples", tmp_path / "out", "Song")
+    pads = xpj.load(result.path).data["tracks"][1]["program"]["drum"]["instruments"][:66]
+    assert [p["whichMuteGroup"] for p in pads] == [n for n in range(1, 33) for _ in (0, 1)] + [0, 0]
+    assert any("mute group" in loss and "32" in loss for loss in result.losses)
+
+
+def test_an069_only_the_mute_group_field_differs(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    plan = sample_plan()
+    plan.groups[0].tracks = [track_of(1, one("a1", BAR), one("a2", BAR))]
+    write_samples(plan, tmp_path / "samples")
+    with_groups = xpj.load(xpj.export_project(plan, tmp_path / "samples", tmp_path / "a", "Song").path).data
+    monkeypatch.setattr(xpj, "mute_groups", lambda group: ([0] * len(xpj.exported(group)), 0))
+    without = xpj.load(xpj.export_project(plan, tmp_path / "samples", tmp_path / "b", "Song").path).data
+    for track_a, track_b in zip(with_groups["tracks"], without["tracks"]):
+        for pad_a, pad_b in zip(track_a["program"]["drum"]["instruments"], track_b["program"]["drum"]["instruments"]):
+            pad_a["whichMuteGroup"] = pad_b["whichMuteGroup"] = 0
+    assert with_groups == without

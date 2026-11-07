@@ -764,7 +764,7 @@ data.tracks[].program.drum.instruments[].userSelectableWarpPoolIndex	var	14|0|8	
 data.tracks[].program.drum.instruments[].velocityScale	const	1.0	no		MPC-117	
 data.tracks[].program.drum.instruments[].version	const	29	yes	29	MPC-117	
 data.tracks[].program.drum.instruments[].warpEnable	var	False|True	unknown	`False` (MPC-115)		decision
-data.tracks[].program.drum.instruments[].whichMuteGroup	var	0|1|2	unknown	по плану (MPC-115)		decision
+data.tracks[].program.drum.instruments[].whichMuteGroup	var	0|1|2	unknown	по дорожкам плана: общая группа 1–32 у фрагментов одной дорожки, иначе `0` (MPC-115, AN-069)		decision
 data.tracks[].program.drum.instruments[].zonePlayTime	var	1|0|2	unknown	1	MPC-110	
 data.tracks[].program.drum.legatoThreshold	const	127	unknown	127	MPC-110	
 data.tracks[].program.drum.monoRetrigger	const	False	unknown	False	MPC-110	

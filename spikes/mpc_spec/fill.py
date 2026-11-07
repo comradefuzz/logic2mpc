@@ -136,7 +136,7 @@ FIXED = {
     "tracks[].program.drum.instruments[].triggerMode": "по длине образца и концу секции: `0` One Shot, `2` Note On (MPC-115, AN-068)",
     "tracks[].program.drum.instruments[].monophonic": "по плану (MPC-115)",
     "tracks[].program.drum.instruments[].polyphony": "по плану (MPC-115)",
-    "tracks[].program.drum.instruments[].whichMuteGroup": "по плану (MPC-115)",
+    "tracks[].program.drum.instruments[].whichMuteGroup": "по дорожкам плана: общая группа 1–32 у фрагментов одной дорожки, иначе `0` (MPC-115, AN-069)",
     "tracks[].program.drum.instruments[].warpEnable": "`False` (MPC-115)",
 }
 

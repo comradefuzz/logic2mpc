@@ -25,6 +25,7 @@ from .mpcfile import Number, Project, dump, load, pack, parse, render  # noqa: F
 
 PADS = 128
 DEFAULT_NOTE_ON_FROM = Fraction(2, 4)
+MUTE_GROUPS = 32
 HANDS = "HANDS"
 MIN_VELOCITY = 0.05
 SCHEMA = xpj_spec.SPEC / "export-plan.schema.json"
@@ -131,6 +132,29 @@ def trigger_mode(piece: PlanPiece, occurrences: list[Occurrence], sections: list
     return 2 if piece.ticks > limit and not past_section_end(piece, occurrences, sections) else 0
 
 
+def mute_groups(group: Group) -> tuple[list[int], int]:
+    """AN-069: mute group для экспортируемых фрагментов группы плана, по порядку `exported(group)`.
+
+    Фрагменты одной дорожки Logic, оставшиеся отдельными (два и больше), получают общий номер от 1 по порядку
+    дорожек. Одиночные фрагменты и дорожки сверх `MUTE_GROUPS` остаются в 0. Второе значение это число дорожек,
+    которым группы не хватило.
+    """
+    numbers: list[int] = []
+    next_group = 1
+    short = 0
+    for track in group.tracks:
+        kept = [p for p in track.pieces if is_exported(p)]
+        if len(kept) < 2:
+            numbers += [0] * len(kept)
+        elif next_group > MUTE_GROUPS:
+            numbers += [0] * len(kept)
+            short += 1
+        else:
+            numbers += [next_group] * len(kept)
+            next_group += 1
+    return numbers, short
+
+
 def check(plan: Plan, samples: Path) -> None:
     """Всё проверяется до записи: без сэмпла Live 2 покажет Sample not found, см. MPC-083."""
     for group in plan.groups:
@@ -146,7 +170,9 @@ def check(plan: Plan, samples: Path) -> None:
         raise FileNotFoundError("нет сэмплов: " + ", ".join(missing))
 
 
-def drum_track(number: int, title: str, pieces: list[PlanPiece], modes: list[int], samples: Path, bpm: float) -> tuple[dict[str, Any], list[tuple[Path, str]]]:
+def drum_track(
+    number: int, title: str, pieces: list[PlanPiece], modes: list[int], mutes: list[int], samples: Path, bpm: float,
+) -> tuple[dict[str, Any], list[tuple[Path, str]]]:
     """Трек HANDS (без фрагментов) или трек группы: 128 пэдов, на первых сэмплы фрагментов."""
     track = xpj_spec.drum_track(title, armed=number == 0)
     program = track["program"]
@@ -157,7 +183,7 @@ def drum_track(number: int, title: str, pieces: list[PlanPiece], modes: list[int
             path = f"{piece.name}.wav"
             program["samples"].append(xpj_spec.sample_entry(piece.name, path, bpm, in_program=True))
             copies.append((samples / piece.file, path))
-            made = xpj_spec.pad(number * PADS + index, (piece.name, path, frames(samples / piece.file)), bpm, modes[index])
+            made = xpj_spec.pad(number * PADS + index, (piece.name, path, frames(samples / piece.file)), bpm, modes[index], mutes[index])
         else:
             made = xpj_spec.pad(number * PADS + index, None, bpm)
         program["drum"]["instruments"].append(made)
@@ -181,7 +207,10 @@ def export_project(
         pieces = exported(group) if group else []
         title = transliterate(group.name) if group else HANDS
         modes = [trigger_mode(p, plays(group, p), plan.sections, limit) for p in pieces] if group else []
-        track, made = drum_track(number, title, pieces, modes, samples, bpm)
+        mutes, short = mute_groups(group) if group else ([], 0)
+        if short:
+            losses.append(f"Не хватило mute group (максимум {MUTE_GROUPS}) в группе «{title}»: дорожек без группы {short}")
+        track, made = drum_track(number, title, pieces, modes, mutes, samples, bpm)
         data["tracks"].append(track)
         copies += made
         for piece in pieces:
