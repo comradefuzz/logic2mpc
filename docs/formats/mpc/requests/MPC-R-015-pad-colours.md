@@ -1,6 +1,6 @@
 ---
 id: MPC-R-015
-status: open
+status: applied
 kind: add
 targets:
 proposed-status: single-sample
@@ -8,6 +8,7 @@ applies: firmware 3.10.0.49, Live 2
 evidence: S-025, test-projects/reference/Example Colours.xpj, наблюдения пользователя на Live 2 и четыре снимка экрана Pad Color (`test-projects/reference/Pad Colour screens/`): вкладки FOLLOW TRACK и PAD, палитра из 25 цветов и клетка «без цвета», выпадающие списки PAD DISPLAY TYPE и EMPTY PADS, переключатель SINGLE PAD и ALL PADS, кнопка MAKE DEFAULT. У первого трека (Drum 001) пэды 0–24 покрашены вручную всеми доступными цветами функции PadColors (по словам пользователя), в `program.programPads.pads.value0`–`value24` 25 разных значений, остальные 103 пэда 0. У треков Drum 002–064 `pads.value0..127` все 0, `universalPad` 0x00FF00. У первого трека `universalPad` 0xFF0000
 found-in: S-025
 created: 2026-11-07
+resolved: 2026-11-08
 ---
 
 Предлагается записать как `single-sample`: цвет пэда драм-программы хранится в `tracks[].program.programPads.pads.valueN` (N от 0 до 127 по порядку пэдов), целое RGB 0xRRGGBB, 0 означает, что цвет пэду не задан. Пэд с сэмплом и незаданным цветом Live 2 показывает ярко-зелёным (наблюдение пользователя). Это совпадает с `universalPad` 0x00FF00 у треков Drum 002–064, возможно значение по умолчанию, но связь по файлу не доказана. Функция Pad Color на Live 2 сбрасывает цвета пэдов и задаёт их заново по настройкам функции (наблюдение пользователя). `programPads.PadsFollowTrackColour.value0` это режим Follow Track этой функции (наблюдение пользователя, по названию): при его выборе цвета всех пэдов сбрасываются и пэдам устанавливается цвет трека, заполненный пэд светится ярко, пустой приглушён; в эталоне он false. Как соотносится с `tracks[].padsFollowTrackColour` (тоже false везде) по файлу не видно. Палитра PadColors на Live 2 состоит из 25 цветов, в порядке, в котором пользователь красил пэды 0–24: 0xFF0000, 0xFF6D17, 0xFF4400, 0xFF8800, 0xECEC24, 0xFFD500, 0xE6FF00, 0xA2FF00, 0x55FF00, 0x11FF00, 0x00FF33, 0x00FF80, 0x00FFC4, 0x00F7FF, 0x00AAFF, 0x0066FF, 0xA2A9AD, 0x0022FF, 0x5200FF, 0x6F00FF, 0xB200FF, 0xFF00FF, 0xFF00BB, 0xFF0077, 0x29B574. Двадцать один из них это автоназначаемые цвета треков (MPC-R-014), ещё три (0xFF6D17, 0xECEC24, 0xA2A9AD) это цвета служебных треков, 0x29B574 встречается только у пэдов. Экран Pad Color Live 2 и ключи `programPads`, соответствие по значениям эталона (в эталоне у первого трека Type 5, UnusedPads 1, Universal false, у остальных треков и в `Empty.xpj` Universal true):

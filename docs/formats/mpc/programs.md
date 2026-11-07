@@ -165,3 +165,12 @@
 | `active`, `mute`, `pan`, `loop`, `offset`, `direction` | | Неизвестно, постоянные | unknown |
 | `VolumeRandom`, `PanRandom`, `OffsetRandom`, `pitchRandom` | 0–0.47 | Случайный разброс | hypothesis |
 | `oscillatorMode`, `OscillatorType`, `oscillatorParams` | `Warm Sine` | Осциллятор вместо сэмпла | hypothesis |
+
+### MPC-123 Цвета пэдов драм-программы
+- status: single-sample
+- applies: firmware 3.10.0.49, Live 2
+- evidence: MPC-R-015, S-025, `test-projects/reference/Example Colours.xpj`, наблюдения пользователя на Live 2, четыре снимка экрана Pad Color (`test-projects/reference/Pad Colour screens/`)
+- fact: Цвет пэда хранится в `tracks[].program.programPads.pads.valueN` (N от 0 до 127 по порядку пэдов), целое RGB 0xRRGGBB, 0 значит цвет не задан. Пэд с сэмплом и незаданным цветом Live 2 показывает ярко-зелёным; совпадает с `universalPad` 0x00FF00 у новых треков, связь по файлу не доказана. Палитра PadColors из 25 цветов (в порядке, в котором пользователь красил пэды 0–24): 0xFF0000, 0xFF6D17, 0xFF4400, 0xFF8800, 0xECEC24, 0xFFD500, 0xE6FF00, 0xA2FF00, 0x55FF00, 0x11FF00, 0x00FF33, 0x00FF80, 0x00FFC4, 0x00F7FF, 0x00AAFF, 0x0066FF, 0xA2A9AD, 0x0022FF, 0x5200FF, 0x6F00FF, 0xB200FF, 0xFF00FF, 0xFF00BB, 0xFF0077, 0x29B574. Двадцать один совпадает с кругом цветов треков (MPC-122), три (0xFF6D17, 0xECEC24, 0xA2A9AD) это цвета служебных треков, 0x29B574 встречается только у пэдов.
+- fact: Ключи `programPads` соответствуют экрану Pad Color по значениям эталона (прямой проверки сменой настройки не было): `Type` это PAD DISPLAY TYPE (0 Off, Classic Velocity, Fixed, Off->Velocity, Dim->Velocity, 5 Bright->Velocity; в эталоне 5), `UnusedPads` это EMPTY PADS (0 off, 1 dim, 2 normal; в эталоне 1), `Universal` это переключатель SINGLE PAD (false) и ALL PADS (true, у новых треков и в `Empty.xpj`) при цвете режима ALL PADS в `universalPad`, `PadsFollowTrackColour.value0` это режим FOLLOW TRACK (false в эталоне): по словам пользователя при нём цвета пэдов сбрасываются в цвет трека, заполненный пэд светится ярко, пустой приглушён. Как он соотносится с `tracks[].padsFollowTrackColour` (false везде), по файлу не видно. Что `pads.valueN` в режиме ALL PADS игнорируются, это вывод из поведения.
+- fact: Нумерация по подписям экрана: банк B это B 01–B 16, B 01 слева внизу; согласуется с гипотезой MPC-R-002 (пэды 16–31 файла это B 01–B 16). Имена цветов палитры (например, `Canary`) кодам не сопоставлены.
+- updated: 2026-11-08
