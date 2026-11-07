@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import gzip
 import json
+from json.encoder import encode_basestring
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -35,17 +36,28 @@ def load(path: Path) -> Project:
 
 
 def dump(node: Any) -> str:
-    if isinstance(node, Number):
+    """Запись JSON в раскладке Live 2: каждый элемент на своей строке. Быстрые ветки для частых типов."""
+    kind = type(node)
+    if kind is str:
+        return encode_basestring(node)
+    if kind is int:
         return str(node)
-    if isinstance(node, dict):
+    if kind is bool:
+        return "true" if node else "false"
+    if node is None:
+        return "null"
+    if kind is Number:
+        return str(node)
+    if kind is dict:
         if not node:
             return "{}"
-        items = ",\n".join(f"{json.dumps(k, ensure_ascii=False)}: {dump(v)}" for k, v in node.items())
-        return "{\n" + items + "\n}"
-    if isinstance(node, list):
+        return "{\n" + ",\n".join([f"{encode_basestring(k)}: {dump(v)}" for k, v in node.items()]) + "\n}"
+    if kind is list:
         if not node:
             return "[]"
-        return "[\n" + ",\n".join(dump(v) for v in node) + "\n]"
+        return "[\n" + ",\n".join([dump(v) for v in node]) + "\n]"
+    if isinstance(node, Number):
+        return str(node)
     return json.dumps(node, ensure_ascii=False)
 
 

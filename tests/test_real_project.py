@@ -1,6 +1,7 @@
 """Сценарии из docs/analysis.md на реальном проекте.
 
-Пути задаются переменными окружения, без них тесты пропускаются:
+Пути задаются переменными окружения, по умолчанию берётся Elated из test-projects (каталог не в git).
+Нет ни переменных, ни каталога: тесты пропускаются.
 
     LOGIC2MPC_PROJECT   проект .logicx
     LOGIC2MPC_EXPORT    папка с экспортом дорожек
@@ -19,9 +20,11 @@ from logic2mpc.core.analysis import analyze_track
 from logic2mpc.core.cycle import find_cycle
 from logic2mpc.core.model import BAR, Cut
 
-PROJECT = os.environ.get("LOGIC2MPC_PROJECT")
-
-EXPORT = os.environ.get("LOGIC2MPC_EXPORT")
+ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_PROJECT = ROOT / "test-projects" / "copies" / "Fuzz - Elated.logicx"
+DEFAULT_EXPORT = ROOT / "test-projects" / "exports" / "elated"
+PROJECT = os.environ.get("LOGIC2MPC_PROJECT") or (str(DEFAULT_PROJECT) if DEFAULT_PROJECT.exists() else None)
+EXPORT = os.environ.get("LOGIC2MPC_EXPORT") or (str(DEFAULT_EXPORT) if DEFAULT_EXPORT.exists() else None)
 
 needs_project = pytest.mark.skipif(not PROJECT, reason="нет LOGIC2MPC_PROJECT")
 needs_export = pytest.mark.skipif(not (PROJECT and EXPORT), reason="нет LOGIC2MPC_PROJECT или LOGIC2MPC_EXPORT")
