@@ -132,3 +132,10 @@
 - evidence: MPC-R-011, S-015, раунд 2, кейсы E01–E05, по одному открытию каждого
 - fact: Из постоянных полей события-ноты обязательно только `events[].version`: без него нот в гриде нет. Без `selected`, `note.version`, `note.modifier*`, `note.probability`, `note.ratchet`, `note.articulation` ноты есть и играют. Уточняет MPC-116.
 - updated: 2026-11-06
+
+### MPC-122 Цвет нового драм-трека и служебных треков
+- status: single-sample
+- applies: firmware 3.10.0.49, Live 2
+- evidence: MPC-R-014, S-025, `test-projects/reference/Example Colours.xpj` (64 драм-трека созданы подряд, сохранён Live 2)
+- fact: Live 2 назначает новому драм-треку `tracks[].colour` (целое RGB 0xRRGGBB) по кругу из 21 значения: 0x55FF00, 0x00FF80, 0x00AAFF, 0x5200FF, 0xFF00FF, 0xFF4400, 0xE6FF00, 0x11FF00, 0x00FFC4, 0x0066FF, 0x6F00FF, 0xFF00BB, 0xFF8800, 0xA2FF00, 0x00FF33, 0x00F7FF, 0x0022FF, 0xB200FF, 0xFF0077, 0xFF0000, 0xFFD500. Первый трек получает 0x55FF00, 22-й снова 0x55FF00. Служебные треки красятся фиксированно: Submix 0xFF6D17, Return 0xECEC24, Out 0xA2A9AD. `padsFollowTrackColour` false у всех 92 треков образца. Голубой по умолчанию из MPC-114 (0x0022FF) это 17-й цвет круга. Порядок показал один проект.
+- updated: 2026-11-08
