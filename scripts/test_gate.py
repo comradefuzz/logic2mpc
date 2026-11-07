@@ -27,3 +27,16 @@ def test_fingerprint_changes_with_code_and_ignores_docs_and_story_tests() -> Non
 def test_fingerprint_depends_on_the_set_of_files() -> None:
     files = {"logic2mpc/a.py": b"1", "logic2mpc/b.py": b"2"}
     assert gate.fingerprint(["logic2mpc/a.py"], files.__getitem__) != gate.fingerprint(list(files), files.__getitem__)
+
+
+def test_areas_follow_the_changed_paths() -> None:
+    assert gate.areas_for(["logic2mpc/adapters/xpj.py"]) == {"build"}
+    assert gate.areas_for(["logic2mpc/spec/pad.json", "tests/test_export.py"]) == {"build"}
+    assert gate.areas_for(["logic2mpc/adapters/web.py"]) == {"web"}
+    assert gate.areas_for(["logic2mpc/core/analysis.py", "tests/test_edit.py"]) == {"core"}
+    assert gate.areas_for(["scripts/gate.py"]) == {"tools"}
+
+
+def test_unknown_code_touches_every_area_and_docs_none() -> None:
+    assert gate.areas_for(["logic2mpc/app.py"]) == set(gate.ALL_AREAS)
+    assert gate.areas_for(["docs/analysis.md", "stories/S-001.md"]) == set()

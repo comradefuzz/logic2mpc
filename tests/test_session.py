@@ -136,6 +136,7 @@ def client(version: Path, tmp_path: Path) -> TestClient:
 
 
 @pytest.mark.smoke
+@pytest.mark.web
 def test_web_listens_only_on_localhost(version: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     seen: dict = {}
     monkeypatch.setattr(web.uvicorn, "run", lambda app, **kwargs: seen.update(kwargs))
@@ -143,6 +144,7 @@ def test_web_listens_only_on_localhost(version: Path, tmp_path: Path, monkeypatc
     assert seen["host"] == "127.0.0.1"
 
 
+@pytest.mark.web
 def test_web_refuses_foreign_host_and_origin(client: TestClient) -> None:
     assert client.get("/api/state", headers={"host": "evil.example"}).status_code == 403
     assert client.post("/api/save", headers={"origin": "http://evil.example"}).status_code == 403
@@ -150,6 +152,7 @@ def test_web_refuses_foreign_host_and_origin(client: TestClient) -> None:
     assert client.get("/api/state", headers={"host": "localhost:8765"}).status_code == 200
 
 
+@pytest.mark.web
 def test_web_state_has_plan_and_flags(client: TestClient) -> None:
     state = client.get("/api/state").json()
     assert state["version"] == "v1"
@@ -157,6 +160,7 @@ def test_web_state_has_plan_and_flags(client: TestClient) -> None:
     assert [g["name"] for g in state["plan"]["groups"]] == ["Drums", "Bass", "Synth", "Lead"]
 
 
+@pytest.mark.web
 def test_web_edit_refusal_is_400_with_text(client: TestClient) -> None:
     answer = client.post("/api/edit", json=merge(sources=["ELA_DR_Snare_01"]))
     assert answer.status_code == 400
@@ -164,6 +168,7 @@ def test_web_edit_refusal_is_400_with_text(client: TestClient) -> None:
     assert client.get("/api/state").json()["dirty"] is False
 
 
+@pytest.mark.web
 def test_web_edit_undo_save(client: TestClient) -> None:
     assert client.post("/api/edit", json=merge()).json()["dirty"] is True
     assert client.post("/api/undo").json()["dirty"] is False
@@ -172,6 +177,7 @@ def test_web_edit_undo_save(client: TestClient) -> None:
     assert state["version"] == "v2" and state["dirty"] is False
 
 
+@pytest.mark.web
 def test_web_audio_serves_piece_wav_and_refuses_unknown_names(client: TestClient) -> None:
     answer = client.get("/api/audio", params={"name": "ELA_DR_Kick_01"})
     assert answer.status_code == 200
@@ -181,6 +187,7 @@ def test_web_audio_serves_piece_wav_and_refuses_unknown_names(client: TestClient
     assert client.get("/api/audio", params={"name": "plan"}).status_code == 404
 
 
+@pytest.mark.web
 def test_web_build_needs_confirm_then_creates_project(client: TestClient, tmp_path: Path) -> None:
     client.post("/api/edit", json=merge())
     assert client.post("/api/confirm").status_code == 409
@@ -193,6 +200,7 @@ def test_web_build_needs_confirm_then_creates_project(client: TestClient, tmp_pa
     assert json.loads(answer.text)["project"].endswith("Song.xpj")
 
 
+@pytest.mark.web
 def test_web_page_is_served(client: TestClient) -> None:
     answer = client.get("/")
     assert answer.status_code == 200
@@ -257,6 +265,7 @@ def test_finish_without_folder_is_refused_and_saves_nothing(version: Path) -> No
     assert session.dirty and not (version.parent / "v2").exists()
 
 
+@pytest.mark.web
 def test_pick_folder_runs_system_dialog_and_strips_the_trailing_slash(monkeypatch: pytest.MonkeyPatch) -> None:
     calls: list[list[str]] = []
 
@@ -268,6 +277,7 @@ def test_pick_folder_runs_system_dialog_and_strips_the_trailing_slash(monkeypatc
     assert calls[0][0] == "osascript" and "choose folder" in calls[0][-1]
 
 
+@pytest.mark.web
 def test_pick_folder_returns_none_on_cancel(monkeypatch: pytest.MonkeyPatch) -> None:
     class Cancelled:
         returncode, stdout = 1, ""
@@ -283,6 +293,7 @@ def picked(version: Path, tmp_path: Path) -> tuple[TestClient, dict]:
     return TestClient(app, base_url="http://127.0.0.1:8765"), chosen
 
 
+@pytest.mark.web
 def test_web_export_panel_state_and_updates(picked: tuple[TestClient, dict], tmp_path: Path) -> None:
     client, _ = picked
     export = client.get("/api/state").json()["export"]
@@ -294,6 +305,7 @@ def test_web_export_panel_state_and_updates(picked: tuple[TestClient, dict], tmp
     assert client.get("/api/state").json()["export"]["name"] == "Песня"
 
 
+@pytest.mark.web
 def test_web_pick_folder_sets_folder_and_cancel_keeps_it(picked: tuple[TestClient, dict], tmp_path: Path) -> None:
     client, chosen = picked
     chosen["folder"] = tmp_path
@@ -302,6 +314,7 @@ def test_web_pick_folder_sets_folder_and_cancel_keeps_it(picked: tuple[TestClien
     assert client.post("/api/pick-folder").json()["export"]["folder"] == str(tmp_path)
 
 
+@pytest.mark.web
 def test_web_finish_builds_project_after_edit(picked: tuple[TestClient, dict], tmp_path: Path) -> None:
     client, _ = picked
     client.post("/api/edit", json=merge())
@@ -314,6 +327,7 @@ def test_web_finish_builds_project_after_edit(picked: tuple[TestClient, dict], t
     assert state["version"] == "v2" and state["export"]["exists"] is True
 
 
+@pytest.mark.web
 def test_web_new_endpoints_refuse_foreign_origin(picked: tuple[TestClient, dict]) -> None:
     client, _ = picked
     for path in ("/api/export", "/api/pick-folder", "/api/finish"):
@@ -360,6 +374,7 @@ def test_save_failure_leaves_no_half_written_version(version: Path, monkeypatch:
     assert session.dirty
 
 
+@pytest.mark.web
 def test_web_finish_and_build_need_overwrite_flag_for_existing_project(picked: tuple[TestClient, dict], tmp_path: Path) -> None:
     client, _ = picked
     client.post("/api/export", json={"folder": str(tmp_path), "name": "Song"})
@@ -369,6 +384,7 @@ def test_web_finish_and_build_need_overwrite_flag_for_existing_project(picked: t
     assert client.post("/api/finish", json={"overwrite": True}).status_code == 200
 
 
+@pytest.mark.web
 def test_web_os_errors_and_wrong_types_are_json_errors(picked: tuple[TestClient, dict], tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     client, _ = picked
     for body in ({"folder": 5}, {"name": 5}, {"folder": ["x"]}):
@@ -380,6 +396,7 @@ def test_web_os_errors_and_wrong_types_are_json_errors(picked: tuple[TestClient,
     assert answer.status_code == 400 and "нет прав" in answer.json()["error"]
 
 
+@pytest.mark.web
 def test_web_pick_folder_without_osascript_is_json_error(version: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     def missing(*args, **kwargs):
         raise FileNotFoundError("osascript")
@@ -438,6 +455,7 @@ def test_finish_while_another_finish_runs_is_refused_and_changes_nothing(version
     assert session.version.name == "v2"
 
 
+@pytest.mark.web
 def test_web_second_finish_during_build_is_409(version: Path, tmp_path: Path) -> None:
     session = Session(version)
     client = TestClient(web.create_app(session, tmp_path, "Song"), base_url="http://127.0.0.1:8765")
@@ -448,6 +466,7 @@ def test_web_second_finish_during_build_is_409(version: Path, tmp_path: Path) ->
     assert client.post("/api/finish").status_code == 200
 
 
+@pytest.mark.web
 def test_web_state_tells_when_build_is_running(version: Path, tmp_path: Path) -> None:
     session = Session(version)
     client = TestClient(web.create_app(session, tmp_path, "Song"), base_url="http://127.0.0.1:8765")

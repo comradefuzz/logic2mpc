@@ -108,6 +108,7 @@ def client(tmp_path: Path) -> TestClient:
     return TestClient(web.create_app(None, None, None), base_url=HOST)
 
 
+@pytest.mark.web
 def test_web_without_session_is_start_mode_and_refuses_edit_and_build(client: TestClient) -> None:
     state = client.get("/api/state").json()
     assert state["mode"] == "start" and state["job"]["running"] is False
@@ -117,17 +118,20 @@ def test_web_without_session_is_start_mode_and_refuses_edit_and_build(client: Te
     assert client.get("/api/audio", params={"name": "x"}).status_code == 404
 
 
+@pytest.mark.web
 def test_web_start_endpoints_refuse_foreign_origin(client: TestClient) -> None:
     for path in ("/api/inspect", "/api/analyze", "/api/pick-logic", "/api/pick-export"):
         assert client.post(path, json={}, headers={"origin": "http://evil.example"}).status_code == 403
 
 
+@pytest.mark.web
 def test_web_inspect_bad_path_is_json_error(client: TestClient, tmp_path: Path) -> None:
     answer = client.post("/api/inspect", json={"project": str(tmp_path / "x.txt"), "export": str(tmp_path)})
     assert answer.status_code == 400 and answer.json()["error"]
     assert client.post("/api/inspect", json={"project": 5, "export": None}).status_code == 400
 
 
+@pytest.mark.web
 def test_web_inspect_returns_summary(setup: tuple[Path, Path]) -> None:
     project, export = setup
     client = TestClient(web.create_app(None, None, None), base_url=HOST)
@@ -144,6 +148,7 @@ def wait(client: TestClient) -> dict:
     raise AssertionError("анализ не закончился")
 
 
+@pytest.mark.web
 def test_web_analyze_runs_in_background_then_opens_editor(setup: tuple[Path, Path]) -> None:
     project, export = setup
     client = TestClient(web.create_app(None, None, None), base_url=HOST)
@@ -159,6 +164,7 @@ def test_web_analyze_runs_in_background_then_opens_editor(setup: tuple[Path, Pat
     assert client.get("/api/audio", params={"name": "ELX_DR_Kick_01"}).status_code == 200
 
 
+@pytest.mark.web
 def test_web_second_analyze_during_first_is_409_and_error_is_in_job(setup: tuple[Path, Path], tmp_path: Path) -> None:
     project, export = setup
     release = []
@@ -177,6 +183,7 @@ def test_web_second_analyze_during_first_is_409_and_error_is_in_job(setup: tuple
     assert state["mode"] == "start" and "анализ не удался" in state["job"]["error"]
 
 
+@pytest.mark.web
 def test_web_pickers_fill_paths_and_cancel_returns_none(setup: tuple[Path, Path]) -> None:
     project, export = setup
     chosen = {"logic": project, "export": export}

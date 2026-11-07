@@ -160,6 +160,7 @@ def client(version: Path, tmp_path: Path) -> TestClient:
     return TestClient(web.create_app(Session(version), out, "Song"), base_url=HOST)
 
 
+@pytest.mark.web
 def test_web_project_is_refused_before_build_and_served_after(client: TestClient, tmp_path: Path) -> None:
     assert client.get("/api/state").json()["built"] is None
     assert client.get("/api/project").status_code == 409
@@ -170,6 +171,7 @@ def test_web_project_is_refused_before_build_and_served_after(client: TestClient
     assert [t["name"] for t in view["tracks"]][:2] == ["HANDS", "Drums"]
 
 
+@pytest.mark.web
 def test_web_project_audio_serves_only_files_used_by_pads(client: TestClient, tmp_path: Path) -> None:
     client.post("/api/finish")
     data = tmp_path / "result" / "Song_[ProjectData]"
@@ -181,12 +183,14 @@ def test_web_project_audio_serves_only_files_used_by_pads(client: TestClient, tm
         assert client.get("/api/project/audio", params={"name": name}).status_code == 404
 
 
+@pytest.mark.web
 def test_web_project_endpoints_refuse_foreign_host_and_origin(client: TestClient) -> None:
     client.post("/api/finish")
     assert client.get("/api/project", headers={"host": "evil.example"}).status_code == 403
     assert client.get("/api/project/audio", params={"name": "x.wav"}, headers={"origin": "http://evil.example"}).status_code == 403
 
 
+@pytest.mark.web
 def test_web_project_after_rebuild_shows_new_state(client: TestClient) -> None:
     client.post("/api/finish")
     client.post("/api/edit", json=merge())
@@ -203,6 +207,7 @@ def tamper(project: Path, sample_file: str) -> None:
 
 
 @pytest.mark.parametrize("kind", ["parent", "absolute", "symlink"])
+@pytest.mark.web
 def test_web_project_audio_refuses_files_outside_data_folder_even_if_project_points_there(
     client: TestClient, tmp_path: Path, kind: str
 ) -> None:
