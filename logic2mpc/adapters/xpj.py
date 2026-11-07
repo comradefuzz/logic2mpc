@@ -155,6 +155,22 @@ def mute_groups(group: Group) -> tuple[list[int], int]:
     return numbers, short
 
 
+def pad_colours(group: Group) -> list[int]:
+    """AN-072: цвет пэда для экспортируемых фрагментов группы, по порядку `exported(group)`.
+
+    Фрагменты одной дорожки Logic (оставшиеся экспортируемыми) красятся одним цветом круга Live 2, разные дорожки
+    по порядку разными, нумерация в каждом драм-треке заново.
+    """
+    colours: list[int] = []
+    number = 0
+    for track in group.tracks:
+        kept = [p for p in track.pieces if is_exported(p)]
+        if kept:
+            colours += [xpj_spec.track_colour(number)] * len(kept)
+            number += 1
+    return colours
+
+
 def check(plan: Plan, samples: Path) -> None:
     """Всё проверяется до записи: без сэмпла Live 2 покажет Sample not found, см. MPC-083."""
     for group in plan.groups:
@@ -171,10 +187,11 @@ def check(plan: Plan, samples: Path) -> None:
 
 
 def drum_track(
-    number: int, title: str, pieces: list[PlanPiece], modes: list[int], mutes: list[int], samples: Path, bpm: float,
+    number: int, title: str, pieces: list[PlanPiece], modes: list[int], mutes: list[int], colours: list[int], samples: Path,
+    bpm: float,
 ) -> tuple[dict[str, Any], list[tuple[Path, str]]]:
     """Трек HANDS (без фрагментов) или трек группы: 128 пэдов, на первых сэмплы фрагментов."""
-    track = xpj_spec.drum_track(title, armed=number == 0)
+    track = xpj_spec.drum_track(title, armed=number == 0, colour=xpj_spec.track_colour(number))
     program = track["program"]
     copies = []
     for index in range(PADS):
@@ -187,6 +204,8 @@ def drum_track(
         else:
             made = xpj_spec.pad(number * PADS + index, None, bpm)
         program["drum"]["instruments"].append(made)
+    if pieces:
+        xpj_spec.paint_pads(track, {index: colour for index, colour in enumerate(colours)})
     return track, copies
 
 
@@ -210,7 +229,8 @@ def export_project(
         mutes, short = mute_groups(group) if group else ([], 0)
         if short:
             losses.append(f"Не хватило mute group (максимум {MUTE_GROUPS}) в группе «{title}»: дорожек без группы {short}")
-        track, made = drum_track(number, title, pieces, modes, mutes, samples, bpm)
+        colours = pad_colours(group) if group else []
+        track, made = drum_track(number, title, pieces, modes, mutes, colours, samples, bpm)
         data["tracks"].append(track)
         copies += made
         for piece in pieces:

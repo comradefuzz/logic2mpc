@@ -25,6 +25,8 @@ DEFAULT_AREA = {
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
     for item in items:
         path = item.nodeid.split("::")[0]
+        if path.startswith("story_tests/"):
+            continue  # тесты стори вне общего набора, области им не нужны
         own = [m.name for m in item.own_markers if m.name in AREAS]
         if len(own) > 1:
             raise pytest.UsageError(f"{item.nodeid}: больше одной области {own}")

@@ -233,7 +233,7 @@ data.trackMutePerSequence	const	True	no		MPC-113
 data.tracks	node		unknown			
 data.tracks[]	node		unknown			
 data.tracks[].arrangementClipMap	node		unknown			
-data.tracks[].colour	var	(15 значений)	unknown	из плана		decision
+data.tracks[].colour	var	(15 значений)	unknown	круг Live 2 из 21 цвета по порядку треков, первый `0x55FF00` (MPC-R-014, AN-072)		decision
 data.tracks[].cvPort	const	0	no		MPC-114,MPC-116	
 data.tracks[].gatePort	const	1	no		MPC-114,MPC-116	
 data.tracks[].length	const	0	no		MPC-114,MPC-116	
@@ -868,11 +868,11 @@ data.tracks[].program.programPads.PadsFollowTrackColour.*	const	False	unknown	Fa
 data.tracks[].program.programPads.Type	node		unknown			
 data.tracks[].program.programPads.Type.*	var	5|1	unknown	5	MPC-110	
 data.tracks[].program.programPads.Universal	node		unknown			
-data.tracks[].program.programPads.Universal.*	var	True|False	unknown	True	MPC-110	
+data.tracks[].program.programPads.Universal.*	var	True|False	unknown	`False` (SINGLE PAD) у трека с пэдами, иначе как в Empty (AN-072, MPC-R-015)		decision
 data.tracks[].program.programPads.UnusedPads	node		unknown			
 data.tracks[].program.programPads.UnusedPads.*	const	1	unknown	1	MPC-110	
 data.tracks[].program.programPads.pads	node		unknown			
-data.tracks[].program.programPads.pads.*	var	(14 значений)	unknown	0	MPC-110	
+data.tracks[].program.programPads.pads.*	var	(14 значений)	unknown	цвет круга Live 2 по дорожке Logic у заполненных пэдов, у остальных `0` (AN-072, MPC-R-015)		decision
 data.tracks[].program.programPads.universalPad	var	65280|16711680|16776960	unknown	65280	MPC-110	
 data.tracks[].program.renderable	node		unknown			
 data.tracks[].program.renderable.sendToCueBus	const	False	unknown	False	MPC-110	

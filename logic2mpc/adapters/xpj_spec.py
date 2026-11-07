@@ -34,6 +34,26 @@ def number(value: float) -> Number:
     return Number(str(float(value)))
 
 
+# Цвета новых драм-треков Live 2: круг из 21 значения (MPC-R-014), первый трек 0x55FF00.
+TRACK_PALETTE = (
+    0x55FF00, 0x00FF80, 0x00AAFF, 0x5200FF, 0xFF00FF, 0xFF4400, 0xE6FF00, 0x11FF00, 0x00FFC4, 0x0066FF, 0x6F00FF,
+    0xFF00BB, 0xFF8800, 0xA2FF00, 0x00FF33, 0x00F7FF, 0x0022FF, 0xB200FF, 0xFF0077, 0xFF0000, 0xFFD500,
+)
+
+
+def track_colour(number: int) -> int:
+    """Цвет трека или дорожки Logic под номером `number` (с 0): круг Live 2."""
+    return TRACK_PALETTE[number % len(TRACK_PALETTE)]
+
+
+def paint_pads(track: dict[str, Any], colours: dict[int, int]) -> None:
+    """Красит пэды драм-трека по одному: `programPads.pads.valueN` и режим SINGLE PAD (`Universal` false), MPC-R-015."""
+    pads = track["program"]["programPads"]
+    for index, colour in colours.items():
+        pads["pads"][f"value{index}"] = colour
+    pads["Universal"]["value0"] = False
+
+
 def seed(index: int, layer: int = 0) -> int:
     """Детерминированное зерно воспроизведения: Live 2 пишет случайные, сборка должна повторяться."""
     return (index * 2654435761 + layer * 40503 + 12345) & SEED_MASK
@@ -45,11 +65,13 @@ def root(bpm: float) -> dict[str, Any]:
     return data
 
 
-def drum_track(name: str, armed: bool) -> dict[str, Any]:
-    """Пустой драм-трек. Пэды добавляются отдельно, `recordArm` задаётся явно, MPC-111."""
+def drum_track(name: str, armed: bool, colour: int | None = None) -> dict[str, Any]:
+    """Пустой драм-трек. Пэды добавляются отдельно, `recordArm` задаётся явно, MPC-111, цвет задаётся явно."""
     track = _object("track.json")
     track["name"] = track["program"]["name"] = name
     track["recordArm"] = armed
+    if colour is not None:
+        track["colour"] = colour
     return track
 
 

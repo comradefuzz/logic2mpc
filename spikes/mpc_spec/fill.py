@@ -138,6 +138,9 @@ FIXED = {
     "tracks[].program.drum.instruments[].polyphony": "по плану (MPC-115)",
     "tracks[].program.drum.instruments[].whichMuteGroup": "по дорожкам плана: общая группа 1–32 у фрагментов одной дорожки, иначе `0` (MPC-115, AN-069)",
     "tracks[].program.drum.instruments[].warpEnable": "`False` (MPC-115)",
+    "tracks[].colour": "круг Live 2 из 21 цвета по порядку треков, первый `0x55FF00` (MPC-R-014, AN-072)",
+    "tracks[].program.programPads.Universal.*": "`False` (SINGLE PAD) у трека с пэдами, иначе как в Empty (AN-072, MPC-R-015)",
+    "tracks[].program.programPads.pads.*": "цвет круга Live 2 по дорожке Logic у заполненных пэдов, у остальных `0` (AN-072, MPC-R-015)",
 }
 
 
