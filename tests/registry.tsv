@@ -411,3 +411,8 @@ scripts/test_gate.py::test_fingerprint_changes_with_code_and_ignores_docs_and_st
 scripts/test_gate.py::test_fingerprint_depends_on_the_set_of_files	Штамп зависит от набора файлов	Один полный прогон на состояние кода (2026-11-07), решение пользователя	active	
 scripts/test_gate.py::test_areas_follow_the_changed_paths	Области тестов определяются по изменённым путям	Метки областей build, web, core, tools (2026-11-07), решение пользователя	active	
 scripts/test_gate.py::test_unknown_code_touches_every_area_and_docs_none	Неизвестный код затрагивает все области, документы ни одной	Метки областей build, web, core, tools (2026-11-07), решение пользователя	active	
+tests/test_xpj_spec.py::test_an072_track_palette_is_the_live2_circle_of_21	Палитра треков это круг Live 2 из 21 цвета и повторяется после 21-го	S-019: цвета треков и пэдов при экспорте	active	
+tests/test_xpj_spec.py::test_an072_tracks_of_a_built_project_follow_the_circle	Треки собранного проекта красятся по кругу Live 2, первый 55FF00	S-019: цвета треков и пэдов при экспорте	active	
+tests/test_xpj_spec.py::test_an072_pads_of_one_logic_track_share_a_colour_and_tracks_differ	Фрагменты одной дорожки Logic красятся одним цветом, разные дорожки разными	S-019: цвета треков и пэдов при экспорте	active	
+tests/test_xpj_spec.py::test_an072_numbering_restarts_in_every_drum_track_and_empty_pads_stay_unpainted	Нумерация цветов в каждом драм-треке заново, пустые пэды без цвета	S-019: цвета треков и пэдов при экспорте	active	
+tests/test_xpj_spec.py::test_an072_merged_and_not_exported_pieces_do_not_take_a_colour	Слитые и неэкспортируемые фрагменты не берут цвет	S-019: цвета треков и пэдов при экспорте	active	

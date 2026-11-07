@@ -473,3 +473,49 @@ def test_an069_only_the_mute_group_field_differs(tmp_path: Path, monkeypatch: py
         for pad_a, pad_b in zip(track_a["program"]["drum"]["instruments"], track_b["program"]["drum"]["instruments"]):
             pad_a["whichMuteGroup"] = pad_b["whichMuteGroup"] = 0
     assert with_groups == without
+
+
+# S-019: цвета треков и пэдов (AN-072)
+
+CIRCLE = [
+    0x55FF00, 0x00FF80, 0x00AAFF, 0x5200FF, 0xFF00FF, 0xFF4400, 0xE6FF00, 0x11FF00, 0x00FFC4, 0x0066FF, 0x6F00FF,
+    0xFF00BB, 0xFF8800, 0xA2FF00, 0x00FF33, 0x00F7FF, 0x0022FF, 0xB200FF, 0xFF0077, 0xFF0000, 0xFFD500,
+]
+
+
+def painted(tmp_path: Path, plan, track: int, count: int) -> list[int]:
+    write_samples(plan, tmp_path / "samples")
+    data = xpj.load(xpj.export_project(plan, tmp_path / "samples", tmp_path / "out", "Song").path).data
+    pads = data["tracks"][track]["program"]["programPads"]["pads"]
+    return [int(str(pads[f"value{i}"])) for i in range(count)]
+
+
+def test_an072_track_palette_is_the_live2_circle_of_21() -> None:
+    assert list(xpj_spec.TRACK_PALETTE) == CIRCLE
+    assert [xpj_spec.track_colour(n) for n in (0, 20, 21, 42, 63)] == [0x55FF00, 0xFFD500, 0x55FF00, 0x55FF00, 0x55FF00]
+
+
+def test_an072_tracks_of_a_built_project_follow_the_circle(tmp_path: Path) -> None:
+    data = data_of(tmp_path)
+    assert [t["colour"] for t in data["tracks"]] == CIRCLE[: len(data["tracks"])]
+
+
+def test_an072_pads_of_one_logic_track_share_a_colour_and_tracks_differ(tmp_path: Path) -> None:
+    plan = sample_plan()
+    plan.groups[0].tracks = [track_of(1, one("a1", BAR), one("a2", BAR)), track_of(2, one("b1", BAR)), track_of(3, one("c1", BAR), one("c2", BAR))]
+    assert painted(tmp_path, plan, 1, 7) == [CIRCLE[0], CIRCLE[0], CIRCLE[1], CIRCLE[2], CIRCLE[2], 0, 0]
+
+
+def test_an072_numbering_restarts_in_every_drum_track_and_empty_pads_stay_unpainted(tmp_path: Path) -> None:
+    plan = sample_plan()
+    plan.groups[0].tracks = [track_of(1, one("a1", BAR))]
+    plan.groups[1].tracks = [track_of(2, one("b1", BAR))]
+    assert painted(tmp_path / "a", plan, 1, 3) == [CIRCLE[0], 0, 0] and painted(tmp_path / "b", plan, 2, 3) == [CIRCLE[0], 0, 0]
+
+
+def test_an072_merged_and_not_exported_pieces_do_not_take_a_colour(tmp_path: Path) -> None:
+    plan = sample_plan()
+    merged = PlanPiece("a2", "a2.wav", 1.0, BAR, 1.0, [Occurrence(0)], merged_into="a1")
+    hidden = PlanPiece("b2", "b2.wav", 1.0, BAR, 1.0, [Occurrence(0)], export=False)
+    plan.groups[0].tracks = [track_of(1, one("a1", BAR), merged), track_of(2, hidden), track_of(3, one("c1", BAR))]
+    assert painted(tmp_path, plan, 1, 3) == [CIRCLE[0], CIRCLE[1], 0]
